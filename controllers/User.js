@@ -249,7 +249,7 @@ const forgetPassword = async (req, res) => {
 
 const resetPassword = async (req, res) => {
     try {
-        const { otp, newPassword } = req.body;
+        const { otp, newPassword, rewritePassword } = req.body;
 
         const user = await User.findOne({
             resetPasswordOtp: otp,
@@ -261,9 +261,16 @@ const resetPassword = async (req, res) => {
                 .status(400)
                 .json({ success: false, message: "Invalid OTP or OTP has been expired" });
         }
-        user.password = newPassword;
-        user.resetPasswordOtp = null;
-        user.resetPasswordExpiry = null;
+        if (newPassword == rewritePassword) {
+            user.password = newPassword;
+            user.resetPasswordOtp = null;
+            user.resetPasswordExpiry = null;
+        }
+        else {
+            return res
+             .status(400)
+             .json({ success: false, message: "The password or confirm password is in correct"})
+        }
         await user.save();
 
         res
