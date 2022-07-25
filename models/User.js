@@ -41,11 +41,10 @@ const userSchema = new mongoose.Schema({
         default: "user"
     },
 
-    // Avatar
-    //avatar: {
-    //    public_id: String,
-    //    url: String,
-    //},
+    avatar: {
+       public_id: String,
+       url: String,
+    },
 
 
     //  Mã công ty
