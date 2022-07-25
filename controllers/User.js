@@ -3,6 +3,7 @@ const sendMail = require("../utils/sendMail")
 const sendToken = require("../utils/sendToken")
 const cloudinary = require("cloudinary")
 const fs = require("fs")
+const moment = require("moment")
 const verify = async (req, res) => {
     try {
         const otp = Number(req.body.otp);
@@ -47,16 +48,27 @@ const register = async (req, res) => {
 
         fs.rmSync("./tmp", { recursive: true });
 
+        // kiểm tra và định dạng lại Date
+        var dateMomentObject = moment(startWorkingDate, "DD/MM/YYYY"); // 1st argument - string, 2nd argument - format
+        if (!dateMomentObject.isValid()) {
+            return res
+                .status(400)
+                .json({ success: false, message: "Wrong date format. Must be dd/mm/yyyy" });
+        }
+        var formatStartWorkingDate = dateMomentObject.toDate(); // convert moment.js object to Date object
+
+        //console.log(formatStartWorkingDate.toString())
+
         user = await User.create({
             name,
             email,
             phoneNumber,
             password,
             avatar: {
-               public_id: mycloud.public_id,
-               url: mycloud.secure_url,
+                public_id: mycloud.public_id,
+                url: mycloud.secure_url,
             },
-            startWorkingDate,
+            startWorkingDate: formatStartWorkingDate,
             contractStatus,
             typeOfEmployee,
             otp,
