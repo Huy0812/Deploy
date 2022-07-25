@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema({
     // Email
     email: {
         type: String,
+        match: /^[a-z][a-z0-9_.]{5,32}@[a-z0-9]{2,}(.[a-z0-9]{2,4}){1,2}$/,
         required: true,
         unique: true,
     },
@@ -19,6 +20,7 @@ const userSchema = new mongoose.Schema({
     // SĐT
     phoneNumber: {
         type: String,
+        match: /^(0)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$/,
         required: true,
         unique: true,
     },
@@ -26,8 +28,9 @@ const userSchema = new mongoose.Schema({
     // Mật khẩu
     password: {
         type: String,
+        match: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
         required: true,
-        minlength: [8, "Password must be at least 8 characters long"],
+        minlength: [8, "Password must be at least 8 characters long, one uppercase letter, one lowercase letter, one number and one special character"],
         select: false,
     },
 
@@ -39,10 +42,10 @@ const userSchema = new mongoose.Schema({
     },
 
     // Avatar
-    avatar: {
-       public_id: String,
-       url: String,
-    },
+    //avatar: {
+    //    public_id: String,
+    //    url: String,
+    //},
 
 
     //  Mã công ty
@@ -56,24 +59,26 @@ const userSchema = new mongoose.Schema({
     //  Mã nhân viên
     userId: {
         type: Number,
-        //required: true,
         unique: true,
     },
 
     // Ngày bắt đầu làm việc
     startWorkingDate: {
         type: Date,
-        default: Date.now,
+        match: /^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/,
+        required: true,
     },
 
     // Tình trạng hợp đồng: Full-time, Part-time
     contractStatus: {
         type: String,
+        required: true,
     },
 
     // Loại hình nhân viên
     typeOfEmployee: {
         type: String,
+        required: true,
     },
 
     // Xác thực
