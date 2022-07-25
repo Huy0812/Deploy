@@ -1,8 +1,8 @@
 const User = require("../models/User")
 const sendMail = require("../utils/sendMail")
 const sendToken = require("../utils/sendToken")
-//const cloudinary = require("cloudinary")
-//const fs = require("fs")
+const cloudinary = require("cloudinary")
+const fs = require("fs")
 const verify = async (req, res) => {
     try {
         const otp = Number(req.body.otp);
@@ -29,7 +29,7 @@ const verify = async (req, res) => {
 
 const register = async (req, res) => {
     try {
-        const { name, email, phoneNumber, password } = req.body;
+        const { name, email, phoneNumber, password, startWorkingDate, contractStatus, typeOfEmployee } = req.body;
 
         const avatar = req.files.avatar.tempFilePath;
 
@@ -56,6 +56,9 @@ const register = async (req, res) => {
                public_id: mycloud.public_id,
                url: mycloud.secure_url,
             },
+            startWorkingDate,
+            contractStatus,
+            typeOfEmployee,
             otp,
             otp_expiry: new Date(Date.now() + process.env.OTP_EXPIRE * 60 * 1000),
         });
