@@ -1,9 +1,10 @@
 const express = require("express")
 const User = require("./routers/User");
 const Company = require("./routers/Company");
+const Timesheet = require("./routers/Timesheet");
 const cors = require("cors")
 const fileUpload = require("express-fileupload")
-const cookieParser = require("cookie-parser")
+const cookieParser = require("cookie-parser");
 //const bodyparser = require('body-Parser')
 const app = express()
 //app.use(bodyparser.json())
@@ -17,9 +18,8 @@ app.use(
     })
 );
 app.use(cors());
-app.use("/api/v1/user", User);
+app.use("/api/v1/user", User, Timesheet);
 app.use("/api/v1/company", Company);
-
 app.get("/", (req, res) => {
     res.send("Server is working");
 });

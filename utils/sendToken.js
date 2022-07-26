@@ -12,9 +12,8 @@ const sendToken = (res, user, statusCode, message) => {
         _id: user._id,
         name: user.name,
         email: user.email,
-        phoneNumber: user.phoneNumber ,
+        phoneNumber: user.phoneNumber,
         avatar: user.avatar,
-        tasks: user.tasks,
         verified: user.verified,
     };
 

@@ -39,7 +39,15 @@ const register = async (req, res) => {
         if (user) {
             return res
                 .status(400)
-                .json({ success: false, message: "User already exists" });
+                .json({ success: false, message: "Mail already exists" });
+        }
+
+        user = await User.findOne({ phoneNumber });
+
+        if (user) {
+            return res
+                .status(400)
+                .json({ success: false, message: "Phone number already exists" });
         }
 
         const otp = Math.floor(Math.random() * 1000000);
@@ -49,13 +57,13 @@ const register = async (req, res) => {
         fs.rmSync("./tmp", { recursive: true });
 
         // kiểm tra và định dạng lại Date
-        var dateMomentObject = moment(startWorkingDate, "DD/MM/YYYY"); // 1st argument - string, 2nd argument - format
+        var dateMomentObject = moment(startWorkingDate, "DD/MM/YYYY", true); // 1st argument - string, 2nd argument - format
         if (!dateMomentObject.isValid()) {
             return res
                 .status(400)
                 .json({ success: false, message: "Wrong date format. Must be dd/mm/yyyy" });
         }
-        var formatStartWorkingDate = dateMomentObject.toDate(); // convert moment.js object to Date object
+        //var formatStartWorkingDate = dateMomentObject.toDate(); // convert moment.js object to Date object
 
         //console.log(formatStartWorkingDate.toString())
 
@@ -68,7 +76,8 @@ const register = async (req, res) => {
                 public_id: mycloud.public_id,
                 url: mycloud.secure_url,
             },
-            startWorkingDate: formatStartWorkingDate,
+            //startWorkingDate: formatStartWorkingDate,
+            startWorkingDate: dateMomentObject,
             contractStatus,
             typeOfEmployee,
             otp,
@@ -268,8 +277,8 @@ const resetPassword = async (req, res) => {
         }
         else {
             return res
-             .status(400)
-             .json({ success: false, message: "The password or confirm password is in correct"})
+                .status(400)
+                .json({ success: false, message: "The password or confirm password is incorrect" })
         }
         await user.save();
 
