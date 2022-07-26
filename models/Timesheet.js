@@ -7,26 +7,33 @@ const timesheetSchema = new mongoose.Schema({
         required: true,
     },
 
-    //  Segment (ngày)
-    timesheetSegment: {
-        type: Object,
+    //  Array
+    segments: {
+        type: Array,
         required: true,
 
-        // Ngày
-        date: {
-            type: String,
+        // Segment
+        segment: {
+            type: Object,
+
+            // Ngày
+            date: {
+                type: String,
+            },
+
+            // Thời gian checkin
+            checkinTime: {
+                type: String,
+            },
+
+            // Thời gian checkout
+            checkoutTime: {
+                type: String,
+            },
+
         },
 
-        // Thời gian checkin
-        checkinTime: {
-            type: String,
-        },
-
-        // Thời gian checkout
-        checkoutTime: {
-            type: String,
-        },
-    },
+    }
 
 });
 

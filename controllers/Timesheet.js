@@ -8,19 +8,18 @@ const checkin = async (req, res) => {
         let timesheetSegment = {
             date: date,
             checkinTime: checkinTime,
-            checkoutTime: null,
         };
 
         const user = await User.findById(req.user._id);
         const userId = user.userId;
 
         let timesheet = await Timesheet.findOne({ userId: userId });
-        if (!timesheet) timesheet = await Timesheet.create(({
+        if (!timesheet) timesheet = await Timesheet.create({
             userId: userId,
-            timesheetSegment: {}
-        }));
+            segments: [],
+        });
 
-        timesheet.timesheetSegment = Object.assign({}, timesheetSegment);
+        timesheet.segments.push(timesheetSegment);
         await timesheet.save();
         res
             .status(200)
@@ -33,11 +32,20 @@ const checkin = async (req, res) => {
 
 const checkout = async (req, res) => {
     try {
-        const user = await User.findById(req.user._id);
-        const userId = user.userId;
         const date = moment().format("DD/MM/YYYY");
         const checkoutTime = moment().format("hh:mm:ss");
-        await Timesheet.findOneAndUpdate({ "userId": userId, "timesheetSegment.date": date }, { $set: { "timesheetSegment.checkoutTime": checkoutTime } })
+
+        const user = await User.findById(req.user._id);
+        const userId = user.userId;
+        let timesheet = await Timesheet.findOne({ "userId": userId });
+        let index = timesheet.segments.findIndex(x => x.date === date);
+        timesheet = await Timesheet.findOne({ "userId": userId, "segments[index].date": date });
+        timesheet.segments[index].checkoutTime = checkoutTime;
+        await timesheet.save();
+
+        console.log(timesheet.segments[index])
+        console.log(timesheet.segments[index].checkoutTime)
+
         res
             .status(200)
             .json({ success: true, message: "Checkout successfully" });
