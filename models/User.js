@@ -57,6 +57,11 @@ const userSchema = new mongoose.Schema({
         type: String,
     },
 
+    // Địa chỉ
+    address: {
+        type: String,
+    },
+
     //  Mã công ty
     companyId: {
         type: String,

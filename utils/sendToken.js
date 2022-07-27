@@ -16,6 +16,7 @@ const sendToken = (res, user, statusCode, message) => {
         avatar: user.avatar,
         birth: user.birth,
         gender: user.gender,
+        address: user.address,
         companyId: user.companyId,
         userId: user.userId,
         startWorkingDate: user.startWorkingDate,

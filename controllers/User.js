@@ -46,7 +46,7 @@ const register = async (req, res) => {
                 .json({ success: false, message: "Phone number already exists" });
         }
 
-        const otp = Math.floor(Math.random() * 1000000);
+        const otp = Math.floor(Math.floor(100000 + Math.random() * 900000));
 
         // kiểm tra và định dạng lại Date
         var dateMomentObject = moment(startWorkingDate, "DD/MM/YYYY", true); // 1st argument - string, 2nd argument - format
@@ -140,13 +140,14 @@ const updateProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
 
-        const { birth, gender } = req.body;
+        const { birth, gender, address } = req.body;
 
         if (birth) {
             var dateMomentObject = moment(birth, "DD/MM/YYYY", true);
             user.birth = dateMomentObject;
         }
         if (gender) user.gender = gender;
+        if (address) user.address = address;
 
         await user.save();
         res
@@ -241,7 +242,7 @@ const forgetPassword = async (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid email" });
         }
 
-        const otp = Math.floor(Math.random() * 1000000);
+        const otp = Math.floor(Math.floor(100000 + Math.random() * 900000));
 
         user.resetPasswordOtp = otp;
         user.resetPasswordOtpExpiry = Date.now() + 10 * 60 * 1000;
