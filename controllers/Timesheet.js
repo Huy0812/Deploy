@@ -8,6 +8,7 @@ const checkin = async (req, res) => {
         let timesheetSegment = {
             date: date,
             checkinTime: checkinTime,
+            checkoutTime: "",
         };
 
         const user = await User.findById(req.user._id);
@@ -38,13 +39,20 @@ const checkout = async (req, res) => {
         const user = await User.findById(req.user._id);
         const userId = user.userId;
         let timesheet = await Timesheet.findOne({ "userId": userId });
-        let index = timesheet.segments.findIndex(x => x.date === date);
+        const index = timesheet.segments.findIndex(x => x.date === date);
         timesheet = await Timesheet.findOne({ "userId": userId, "segments[index].date": date });
-        timesheet.segments[index].checkoutTime = checkoutTime;
-        await timesheet.save();
 
-        console.log(timesheet.segments[index])
-        console.log(timesheet.segments[index].checkoutTime)
+        timesheet.segments[index].checkoutTime = checkoutTime;
+
+        let timesheetSegment = {
+            date: date,
+            checkinTime: timesheet.segments[index].checkinTime,
+            checkoutTime: checkoutTime,
+        };
+
+        timesheet.segments.pop();
+        timesheet.segments.push(timesheetSegment);
+        await timesheet.save();
 
         res
             .status(200)

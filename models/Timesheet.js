@@ -19,16 +19,19 @@ const timesheetSchema = new mongoose.Schema({
             // Ngày
             date: {
                 type: String,
+                required: true,
             },
 
             // Thời gian checkin
             checkinTime: {
                 type: String,
+                required: true,
             },
 
             // Thời gian checkout
             checkoutTime: {
                 type: String,
+                required: true,
             },
 
         },
