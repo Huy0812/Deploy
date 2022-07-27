@@ -4,7 +4,7 @@ const moment = require("moment")
 const checkin = async (req, res) => {
     try {
         const date = moment().format("DD/MM/YYYY");
-        const checkinTime = moment().format("hh:mm:ss");
+        const checkinTime = moment().format("HH:mm:ss");
         let timesheetSegment = {
             date: date,
             checkinTime: checkinTime,
@@ -34,7 +34,7 @@ const checkin = async (req, res) => {
 const checkout = async (req, res) => {
     try {
         const date = moment().format("DD/MM/YYYY");
-        const checkoutTime = moment().format("hh:mm:ss");
+        const checkoutTime = moment().format("HH:mm:ss");
 
         const user = await User.findById(req.user._id);
         const userId = user.userId;
