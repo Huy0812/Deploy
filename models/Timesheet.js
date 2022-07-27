@@ -30,7 +30,7 @@ const timesheetSchema = new mongoose.Schema({
 
             // Thời gian checkout
             checkoutTime: {
-                type: String,
+                type: Date,
                 required: true,
             },
 

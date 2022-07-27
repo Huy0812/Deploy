@@ -63,9 +63,6 @@ const register = async (req, res) => {
                 .status(400)
                 .json({ success: false, message: "Wrong date format. Must be dd/mm/yyyy" });
         }
-        //var formatStartWorkingDate = dateMomentObject.toDate(); // convert moment.js object to Date object
-
-        //console.log(formatStartWorkingDate.toString())
 
         user = await User.create({
             name,
@@ -76,7 +73,6 @@ const register = async (req, res) => {
                 public_id: mycloud.public_id,
                 url: mycloud.secure_url,
             },
-            //startWorkingDate: formatStartWorkingDate,
             startWorkingDate: dateMomentObject,
             contractStatus,
             typeOfEmployee,
@@ -156,11 +152,13 @@ const updateProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
 
-        const { name, birth, gender } = req.body;
+        const { birth, gender } = req.body;
         const avatar = req.files.avatar.tempFilePath;
 
-        if (name) user.name = name;
-        if (birth) user.birth = birth;
+        if (birth) {
+            var dateMomentObject = moment(birth, "DD/MM/YYYY", true);
+            user.birth = dateMomentObject;
+        }
         if (gender) user.gender = gender;
 
         if (avatar) {

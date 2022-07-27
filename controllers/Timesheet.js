@@ -8,7 +8,7 @@ const checkin = async (req, res) => {
         let timesheetSegment = {
             date: date,
             checkinTime: checkinTime,
-            checkoutTime: "",
+            checkoutTime: null,
         };
 
         const user = await User.findById(req.user._id);
@@ -20,11 +20,19 @@ const checkin = async (req, res) => {
             segments: [],
         });
 
+        let index = timesheet.segments.findIndex(x => x.date === date);
+        if (index != -1) {
+            return res
+                .status(400)
+                .json({ success: false, message: "Checkin for today already" });
+        }
+
         timesheet.segments.push(timesheetSegment);
         await timesheet.save();
         res
             .status(200)
             .json({ success: true, message: "Checkin successfully" });
+
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -45,7 +53,7 @@ const checkout = async (req, res) => {
         timesheet.segments[index].checkoutTime = checkoutTime;
 
         let timesheetSegment = {
-            date: date,
+            date: timesheet.segments[index].date,
             checkinTime: timesheet.segments[index].checkinTime,
             checkoutTime: checkoutTime,
         };

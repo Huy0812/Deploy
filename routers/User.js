@@ -1,6 +1,5 @@
 const express = require("express")
 const { register, verify, login, logout, getProfile, updateProfile, deleteProfile, updatePassword, forgetPassword, resetPassword } = require("../controllers/User")
-//const verify = require("../controllers/User")
 const isAuthenticated = require("../middleware/auth")
 const router = express.Router()
 router.route("/register").post(register)
