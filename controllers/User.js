@@ -32,10 +32,7 @@ const register = async (req, res) => {
     try {
         const { name, email, phoneNumber, password, startWorkingDate, contractStatus, typeOfEmployee } = req.body;
 
-        const avatar = req.files.avatar.tempFilePath;
-
         let user = await User.findOne({ email });
-
         if (user) {
             return res
                 .status(400)
@@ -43,7 +40,6 @@ const register = async (req, res) => {
         }
 
         user = await User.findOne({ phoneNumber });
-
         if (user) {
             return res
                 .status(400)
@@ -51,10 +47,6 @@ const register = async (req, res) => {
         }
 
         const otp = Math.floor(Math.random() * 1000000);
-
-        const mycloud = await cloudinary.v2.uploader.upload(avatar);
-
-        fs.rmSync("./tmp", { recursive: true });
 
         // kiểm tra và định dạng lại Date
         var dateMomentObject = moment(startWorkingDate, "DD/MM/YYYY", true); // 1st argument - string, 2nd argument - format
@@ -69,10 +61,6 @@ const register = async (req, res) => {
             email,
             phoneNumber,
             password,
-            avatar: {
-                public_id: mycloud.public_id,
-                url: mycloud.secure_url,
-            },
             startWorkingDate: dateMomentObject,
             contractStatus,
             typeOfEmployee,
@@ -153,7 +141,6 @@ const updateProfile = async (req, res) => {
         const user = await User.findById(req.user._id);
 
         const { birth, gender } = req.body;
-        const avatar = req.files.avatar.tempFilePath;
 
         if (birth) {
             var dateMomentObject = moment(birth, "DD/MM/YYYY", true);
@@ -161,24 +148,38 @@ const updateProfile = async (req, res) => {
         }
         if (gender) user.gender = gender;
 
-        if (avatar) {
-            await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+        await user.save();
+        res
+            .status(200)
+            .json({ success: true, message: "Profile updated successfully" });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
 
+const updateAvatar = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        const avatar = req.files.avatar.tempFilePath;
+
+        if (!user.avatar.public_id && !user.avatar.url) {
             const mycloud = await cloudinary.v2.uploader.upload(avatar);
-
             fs.rmSync("./tmp", { recursive: true });
-
             user.avatar = {
                 public_id: mycloud.public_id,
                 url: mycloud.secure_url,
             };
+            await user.save();
         }
-
+        await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+        const mycloud = await cloudinary.v2.uploader.upload(avatar);
+        fs.rmSync("./tmp", { recursive: true });
+        user.avatar = {
+            public_id: mycloud.public_id,
+            url: mycloud.secure_url,
+        };
         await user.save();
-
-        res
-            .status(200)
-            .json({ success: true, message: "Profile updated successfully" });
+        res.status(500).json({ success: true, message: "Avatar updated successfully" });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -291,4 +292,4 @@ const resetPassword = async (req, res) => {
     }
 };
 
-module.exports = { register, verify, login, logout, getProfile, updateProfile, deleteProfile, updatePassword, forgetPassword, resetPassword }
+module.exports = { register, verify, login, logout, getProfile, updateProfile, updateAvatar, deleteProfile, updatePassword, forgetPassword, resetPassword }
