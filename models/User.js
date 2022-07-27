@@ -47,6 +47,15 @@ const userSchema = new mongoose.Schema({
         url: String,
     },
 
+    // Ngày sinh
+    birth: {
+        type: String,
+    },
+
+    // Giới tính
+    gender: {
+        type: String,
+    },
 
     //  Mã công ty
     companyId: {
@@ -65,7 +74,6 @@ const userSchema = new mongoose.Schema({
     // Ngày bắt đầu làm việc
     startWorkingDate: {
         type: String,
-        //match: /^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/,
         required: true,
     },
 

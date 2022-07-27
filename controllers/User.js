@@ -156,10 +156,13 @@ const updateProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
 
-        const { name } = req.body;
+        const { name, birth, gender } = req.body;
         const avatar = req.files.avatar.tempFilePath;
 
         if (name) user.name = name;
+        if (birth) user.birth = birth;
+        if (gender) user.gender = gender;
+
         if (avatar) {
             await cloudinary.v2.uploader.destroy(user.avatar.public_id);
 
