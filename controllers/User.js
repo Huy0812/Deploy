@@ -187,7 +187,7 @@ const updateProfile = async (req, res) => {
 const deleteProfile = async (req, res) => {
     try {
         const { userId } = req.body;
-        await User.findByIdAndDelete(userId)
+        await User.findOneAndDelete({ userId });
         res.status(204).json({
             status: 'Deleted successfully',
             data: {}
