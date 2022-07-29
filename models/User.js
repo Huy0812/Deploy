@@ -78,7 +78,7 @@ const userSchema = new mongoose.Schema({
 
     // Ngày bắt đầu làm việc
     startWorkingDate: {
-        type: Date,
+        type: String,
         required: true,
     },
 
