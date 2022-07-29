@@ -46,7 +46,7 @@ const register = async (req, res) => {
                 .json({ success: false, message: "Phone number already exists" });
         }
 
-        const otp = Math.floor(Math.floor(100000 + Math.random() * 900000));
+        // const otp = Math.floor(Math.floor(100000 + Math.random() * 900000));
 
         // kiểm tra và định dạng lại Date
         var dateMomentObject = moment(startWorkingDate, "DD/MM/YYYY", true); // 1st argument - string, 2nd argument - format
@@ -64,11 +64,11 @@ const register = async (req, res) => {
             startWorkingDate: dateMomentObject,
             contractStatus,
             typeOfEmployee,
-            otp,
-            otp_expiry: new Date(Date.now() + process.env.OTP_EXPIRE * 60 * 1000),
+            // otp,
+            // otp_expiry: new Date(Date.now() + process.env.OTP_EXPIRE * 60 * 1000),
         });
 
-        await sendMail(email, "Verify your account", `Your OTP is ${otp}`);
+        // await sendMail(email, "Verify your account", `Your OTP is ${otp}`);
 
         sendToken(
             res,
