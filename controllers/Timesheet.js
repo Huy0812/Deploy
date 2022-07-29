@@ -88,7 +88,22 @@ const getTop5 = async (req, res) => {
 };
 
 const getMyRank = async (req, res) => {
-    
+    try {
+        let timesheet = await Timesheet.find();
+        sort = timesheet.sort((a, b) => moment(a.segments[a.segments.length - 1].checkinTime, "HH:mm:ss", true) - moment(b.segments[b.segments.length - 1].checkinTime, "HH:mm:ss", true));
+
+        const user = await User.findById(req.user._id);
+        const userId = user.userId;
+
+        let rank = sort.findIndex(x => x.userId === userId);
+
+        res
+            .status(400)
+            .json(rank);
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
 };
 
 module.exports = { checkin, checkout, getTop5, getMyRank }
