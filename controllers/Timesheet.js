@@ -73,7 +73,6 @@ const checkout = async (req, res) => {
 
 const getTop5 = async (req, res) => {
     try {
-        const date = moment().format("DD/MM/YYYY");
         let timesheet = await Timesheet.find();
         sort = timesheet.sort((a, b) => moment(a.segments[a.segments.length - 1].checkinTime, "HH:mm:ss", true) - moment(b.segments[b.segments.length - 1].checkinTime, "HH:mm:ss", true));
 
@@ -88,4 +87,8 @@ const getTop5 = async (req, res) => {
     }
 };
 
-module.exports = { checkin, checkout, getTop5 }
+const getMyRank = async (req, res) => {
+    
+};
+
+module.exports = { checkin, checkout, getTop5, getMyRank }
