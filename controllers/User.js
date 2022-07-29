@@ -48,7 +48,7 @@ const register = async (req, res) => {
 
         // const otp = Math.floor(Math.floor(100000 + Math.random() * 900000));
 
-        var dateMomentObject = moment(startWorkingDate, "MM-DD-YYYY", true).toDate();
+        var dateMomentObject = moment(startWorkingDate, "YYYY-MM-DD", true).toDate();
         // kiểm tra và định dạng lại Date
         //if (!dateMomentObject.isValid()) {
         //    return res
