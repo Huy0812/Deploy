@@ -78,7 +78,7 @@ const userSchema = new mongoose.Schema({
 
     // Ngày bắt đầu làm việc
     startWorkingDate: {
-        type: String,
+        type: Date,
         required: true,
     },
 
@@ -97,7 +97,7 @@ const userSchema = new mongoose.Schema({
     // Xác thực
     verified: {
         type: Boolean,
-        default: false,
+        default: true,
     },
     otp: Number,
     otp_expiry: Date,

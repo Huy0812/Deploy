@@ -48,13 +48,13 @@ const register = async (req, res) => {
 
         // const otp = Math.floor(Math.floor(100000 + Math.random() * 900000));
 
+        var dateMomentObject = moment(startWorkingDate).toDate();
         // kiểm tra và định dạng lại Date
-        var dateMomentObject = moment(startWorkingDate, "DD/MM/YYYY", true); // 1st argument - string, 2nd argument - format
-        if (!dateMomentObject.isValid()) {
-            return res
-                .status(400)
-                .json({ success: false, message: "Wrong date format. Must be dd/mm/yyyy" });
-        }
+        //if (!dateMomentObject.isValid()) {
+        //    return res
+        //       .status(400)
+        //       .json({ success: false, message: "Wrong date format. Must be dd/mm/yyyy" });
+        //}
 
         user = await User.create({
             name,
