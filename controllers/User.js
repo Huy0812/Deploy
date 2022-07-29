@@ -30,7 +30,7 @@ const verify = async (req, res) => {
 
 const register = async (req, res) => {
     try {
-        const { name, email, phoneNumber, password, startWorkingDate, contractStatus, typeOfEmployee } = req.body;
+        const { name, email, phoneNumber, password, role, startWorkingDate, contractStatus, typeOfEmployee } = req.body;
 
         let user = await User.findOne({ email });
         if (user) {
@@ -61,6 +61,7 @@ const register = async (req, res) => {
             email,
             phoneNumber,
             password,
+            role,
             startWorkingDate: dateMomentObject,
             contractStatus,
             typeOfEmployee,
