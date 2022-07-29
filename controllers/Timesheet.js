@@ -71,4 +71,21 @@ const checkout = async (req, res) => {
     }
 };
 
-module.exports = { checkin, checkout }
+const getTop5 = async (req, res) => {
+    try {
+        const date = moment().format("DD/MM/YYYY");
+        let timesheet = await Timesheet.find();
+        sort = timesheet.sort((a, b) => moment(a.segments[a.segments.length - 1].checkinTime, "HH:mm:ss", true) - moment(b.segments[b.segments.length - 1].checkinTime, "HH:mm:ss", true));
+
+        let top = sort.slice(0, 4);
+
+        res
+            .status(400)
+            .json(top);
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+module.exports = { checkin, checkout, getTop5 }
