@@ -31,6 +31,7 @@ const checkin = async (req, res) => {
             date: date,
             checkinTime: checkinTime,
             checkoutTime: null,
+            //workingTime,
         };
 
         let timesheet = await Timesheet.findOne({ "userId": req.user._id });
@@ -62,12 +63,13 @@ const checkout = async (req, res) => {
         const index = timesheet.segments.findIndex(x => x.date === date);
         timesheet = await Timesheet.findOne({ "userId": req.user._id, "segments[index].date": date });
 
-        timesheet.segments[index].checkoutTime = checkoutTime;
+        let workingTime = moment.duration(moment(timesheet.segments[index].checkoutTime, "HH:mm:ss").diff(moment(timesheet.segments[index].checkinTime, "HH:mm:ss"))).asHours();
 
         let timesheetSegment = {
             date: timesheet.segments[index].date,
             checkinTime: timesheet.segments[index].checkinTime,
             checkoutTime: checkoutTime,
+            workingTime: workingTime,
         };
 
         timesheet.segments.pop();
@@ -202,25 +204,6 @@ const isCheckoutLate = async (req, res) => {
     }
 }
 
-const getWorkingTime = async (req, res) => {
-    try {
-        const date = moment().format("DD/MM/YYYY");
-        const user = await User.findById(req.user._id);
-        const userId = user.userId;
-        let timesheet = await Timesheet.findOne({ userId: userId });
-        let index = timesheet.segments.findIndex(x => x.date === date);
-
-        let workingTime = moment.duration(moment(timesheet.segments[index].checkoutTime, "HH:mm:ss").diff(moment(timesheet.segments[index].checkinTime, "HH:mm:ss"))).asHours();
-
-        res
-            .status(400)
-            .json(workingTime);
-
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-}
-
 const getDiffCheckin = async (req, res) => {
     try {
         const date = moment().format("DD/MM/YYYY");
@@ -259,4 +242,4 @@ const getDiffCheckout = async (req, res) => {
 }
 
 
-module.exports = { createTimesheet, checkin, checkout, getTop5, getMyRank, isCheckinEarly, isCheckinLate, isCheckoutEarly, isCheckoutLate, getWorkingTime, getDiffCheckin, getDiffCheckout }
+module.exports = { createTimesheet, checkin, checkout, getTop5, getMyRank, isCheckinEarly, isCheckinLate, isCheckoutEarly, isCheckoutLate, getDiffCheckin, getDiffCheckout }

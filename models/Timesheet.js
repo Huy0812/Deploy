@@ -36,6 +36,13 @@ const timesheetSchema = new mongoose.Schema({
                 required: true,
             },
 
+            // Thời gian làm việc
+            workingTime: {
+                type: Number,
+                required: true,
+                default: 0,
+            },
+
         },
 
     }
