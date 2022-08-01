@@ -5,7 +5,7 @@ const companySchema = new mongoose.Schema({
     companyId: {
         type: String,
         required: true,
-        default: "VKG",
+        default: "62e78db56e5a9d0f5386ad92",
         unique: true,
     },
 
