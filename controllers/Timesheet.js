@@ -1,6 +1,29 @@
 const Timesheet = require("../models/Timesheet")
 const User = require("../models/User")
 const moment = require("moment")
+const createTimesheet = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        const userId = user.userId;
+
+        let timesheet = await Timesheet.findOne({ userId: userId });
+        if (timesheet) {
+            return res
+                .status(400)
+                .json({ success: false, message: "Created timesheet already" });
+        }
+        timesheet = await Timesheet.create({
+            userId: userId,
+            segments: [],
+        })
+        res
+            .status(200)
+            .json({ success: false, message: "Created timesheet successfully" });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
 const checkin = async (req, res) => {
     try {
         const date = moment().format("DD/MM/YYYY");
@@ -13,13 +36,7 @@ const checkin = async (req, res) => {
 
         const user = await User.findById(req.user._id);
         const userId = user.userId;
-
-        let timesheet = await Timesheet.findOne({ userId: userId });
-        if (!timesheet) timesheet = await Timesheet.create({
-            userId: userId,
-            segments: [],
-        });
-
+        let timesheet = await Timesheet.findOne({ "userId": userId });
         let index = timesheet.segments.findIndex(x => x.date === date);
         if (index != -1) {
             return res
@@ -247,4 +264,4 @@ const getDiffCheckout = async (req, res) => {
 }
 
 
-module.exports = { checkin, checkout, getTop5, getMyRank, isCheckinEarly, isCheckinLate, isCheckoutEarly, isCheckoutLate, getWorkingTime, getDiffCheckin, getDiffCheckout }
+module.exports = { createTimesheet, checkin, checkout, getTop5, getMyRank, isCheckinEarly, isCheckinLate, isCheckoutEarly, isCheckoutLate, getWorkingTime, getDiffCheckin, getDiffCheckout }

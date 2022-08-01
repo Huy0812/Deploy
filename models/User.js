@@ -35,7 +35,7 @@ const userSchema = new mongoose.Schema({
     },
 
     // Vai trò: admin, manager, hoặc user (mặc định)
-    role: {
+    privilege: {
         type: String,
         required: true,
         default: "user"
@@ -82,14 +82,20 @@ const userSchema = new mongoose.Schema({
         required: true,
     },
 
-    // Tình trạng hợp đồng: Full-time, Part-time
+    // Trạng thái hợp đồng: Đang làm việc, Đã nghỉ việc
     contractStatus: {
         type: String,
         required: true,
     },
 
-    // Loại hình nhân viên
+    // Loại hình nhân sự: Nhân viên Full-time, Nhân viên Part-time, Internship (Thực tập sinh)
     typeOfEmployee: {
+        type: String,
+        required: true,
+    },
+
+    // Vai trò: Developer, Tester, ...
+    role: {
         type: String,
         required: true,
     },

@@ -76,7 +76,7 @@ const register = async (req, res) => {
             res,
             user,
             201,
-            "OTP has been sent to your email, please verify your account"
+            "Created account successfully"
         );
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
