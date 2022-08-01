@@ -64,7 +64,8 @@ const userSchema = new mongoose.Schema({
 
     //  Mã công ty
     companyId: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Company' ,
         required: true,
         default: "VKG",
         unique: true,
