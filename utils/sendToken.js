@@ -22,6 +22,7 @@ const sendToken = (res, user, statusCode, message) => {
         startWorkingDate: user.startWorkingDate,
         contractStatus: user.contractStatus,
         typeOfEmployee: user.typeOfEmployee,
+        role: user.role,
         verified: user.verified,
     };
 
