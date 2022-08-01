@@ -62,10 +62,11 @@ const register = async (req, res) => {
             email: emailFix,
             phoneNumber,
             password,
-            role,
+            privilege,
             startWorkingDate,//: dateMomentObject,
             contractStatus,
             typeOfEmployee,
+            role,
             // otp,
             // otp_expiry: new Date(Date.now() + process.env.OTP_EXPIRE * 60 * 1000),
         });

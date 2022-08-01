@@ -38,7 +38,6 @@ const userSchema = new mongoose.Schema({
     privilege: {
         type: String,
         required: true,
-        default: "user"
     },
 
     // Avatar
@@ -65,7 +64,7 @@ const userSchema = new mongoose.Schema({
     //  Mã công ty
     companyId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Company' ,
+        ref: 'Company',
         required: true,
         default: "VKG",
         unique: true,
