@@ -112,7 +112,7 @@ const getMyRank = async (req, res) => {
         let rank = sort.findIndex(x => x.userId === userId) + 1;
 
         res
-            .status(400)
+            .status(200)
             .json(rank);
 
     } catch (error) {
@@ -129,12 +129,12 @@ const isCheckinEarly = async (req, res) => {
         let index = timesheet.segments.findIndex(x => x.date === date);
         if (moment(timesheet.segments[index].checkinTime, "HH:mm:ss").isBefore(moment("08:30:00", "HH:mm:ss"))) {
             return res
-                .status(400)
+                .status(200)
                 .json(true);
         }
         res
-            .status(400)
-            .json(false);
+            .status(200)
+            .json(true);
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -150,11 +150,11 @@ const isCheckinLate = async (req, res) => {
         let index = timesheet.segments.findIndex(x => x.date === date);
         if (moment(timesheet.segments[index].checkinTime, "HH:mm:ss").isAfter(moment("08:30:00", "HH:mm:ss"))) {
             return res
-                .status(400)
+                .status(200)
                 .json(true);
         }
         res
-            .status(400)
+            .status(200)
             .json(false);
 
     } catch (error) {
@@ -171,11 +171,11 @@ const isCheckoutEarly = async (req, res) => {
         let index = timesheet.segments.findIndex(x => x.date === date);
         if (moment(timesheet.segments[index].checkoutTime, "HH:mm:ss").isBefore(moment("18:00:00", "HH:mm:ss"))) {
             return res
-                .status(400)
+                .status(200)
                 .json(true);
         }
         res
-            .status(400)
+            .status(200)
             .json(false);
 
     } catch (error) {
@@ -192,11 +192,11 @@ const isCheckoutLate = async (req, res) => {
         let index = timesheet.segments.findIndex(x => x.date === date);
         if (moment(timesheet.segments[index].checkoutTime, "HH:mm:ss").isAfter(moment("18:00:00", "HH:mm:ss"))) {
             return res
-                .status(400)
+                .status(200)
                 .json(true);
         }
         res
-            .status(400)
+            .status(200)
             .json(false);
 
     } catch (error) {
@@ -214,7 +214,7 @@ const getDiffCheckin = async (req, res) => {
 
         let diff = moment.duration(moment("08:30:00", "HH:mm:ss").diff(moment(timesheet.segments[index].checkinTime, "HH:mm:ss"))).asHours();
         return res
-            .status(400)
+            .status(200)
             .json(diff);
 
     } catch (error) {
@@ -233,7 +233,7 @@ const getDiffCheckout = async (req, res) => {
 
         let diff = moment.duration(moment("18:00:00", "HH:mm:ss").diff(moment(timesheet.segments[index].checkoutTime, "HH:mm:ss"))).asHours();
         return res
-            .status(400)
+            .status(200)
             .json(diff);
 
     } catch (error) {
