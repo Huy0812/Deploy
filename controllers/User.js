@@ -56,9 +56,10 @@ const register = async (req, res) => {
         //       .json({ success: false, message: "Wrong date format. Must be dd/mm/yyyy" });
         //}
 
+        emailFix = email.trim();
         user = await User.create({
             name,
-            email,
+            email: emailFix,
             phoneNumber,
             password,
             role,
