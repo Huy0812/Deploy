@@ -3,8 +3,7 @@ const User = require("../models/User")
 const moment = require("moment")
 const createTimesheet = async (req, res) => {
     try {
-        const user = await User.findById(req.user._id);
-        const userId = user.userId;
+        const userId = req.user._id;
 
         let timesheet = await Timesheet.findOne({ userId: userId });
         if (timesheet) {
@@ -34,9 +33,7 @@ const checkin = async (req, res) => {
             checkoutTime: null,
         };
 
-        const user = await User.findById(req.user._id);
-        const userId = user.userId;
-        let timesheet = await Timesheet.findOne({ "userId": userId });
+        let timesheet = await Timesheet.findOne({ "userId": req.user._id });
         let index = timesheet.segments.findIndex(x => x.date === date);
         if (index != -1) {
             return res
@@ -61,11 +58,9 @@ const checkout = async (req, res) => {
         const date = moment().format("DD/MM/YYYY");
         const checkoutTime = moment().format("HH:mm:ss");
 
-        const user = await User.findById(req.user._id);
-        const userId = user.userId;
-        let timesheet = await Timesheet.findOne({ "userId": userId });
+        let timesheet = await Timesheet.findOne({ "userId": req.user._id });
         const index = timesheet.segments.findIndex(x => x.date === date);
-        timesheet = await Timesheet.findOne({ "userId": userId, "segments[index].date": date });
+        timesheet = await Timesheet.findOne({ "userId": req.user._id, "segments[index].date": date });
 
         timesheet.segments[index].checkoutTime = checkoutTime;
 

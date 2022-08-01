@@ -3,8 +3,10 @@ const timesheetSchema = new mongoose.Schema({
 
     //  Mã nhân viên
     userId: {
-        type: Number,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Timesheet',
         required: true,
+        unique: true,
     },
 
     //  Array
