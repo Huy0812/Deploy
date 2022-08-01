@@ -95,7 +95,7 @@ const getMyRank = async (req, res) => {
         const user = await User.findById(req.user._id);
         const userId = user.userId;
 
-        let rank = sort.findIndex(x => x.userId === userId);
+        let rank = sort.findIndex(x => x.userId === userId) + 1;
 
         res
             .status(400)
@@ -106,4 +106,145 @@ const getMyRank = async (req, res) => {
     }
 };
 
-module.exports = { checkin, checkout, getTop5, getMyRank }
+const isCheckinEarly = async (req, res) => {
+    try {
+        const date = moment().format("DD/MM/YYYY");
+        const user = await User.findById(req.user._id);
+        const userId = user.userId;
+        let timesheet = await Timesheet.findOne({ userId: userId });
+        let index = timesheet.segments.findIndex(x => x.date === date);
+        if (moment(timesheet.segments[index].checkinTime, "HH:mm:ss").isBefore(moment("08:30:00", "HH:mm:ss"))) {
+            return res
+                .status(400)
+                .json(true);
+        }
+        res
+            .status(400)
+            .json(false);
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+const isCheckinLate = async (req, res) => {
+    try {
+        const date = moment().format("DD/MM/YYYY");
+        const user = await User.findById(req.user._id);
+        const userId = user.userId;
+        let timesheet = await Timesheet.findOne({ userId: userId });
+        let index = timesheet.segments.findIndex(x => x.date === date);
+        if (moment(timesheet.segments[index].checkinTime, "HH:mm:ss").isAfter(moment("08:30:00", "HH:mm:ss"))) {
+            return res
+                .status(400)
+                .json(true);
+        }
+        res
+            .status(400)
+            .json(false);
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+const isCheckoutEarly = async (req, res) => {
+    try {
+        const date = moment().format("DD/MM/YYYY");
+        const user = await User.findById(req.user._id);
+        const userId = user.userId;
+        let timesheet = await Timesheet.findOne({ userId: userId });
+        let index = timesheet.segments.findIndex(x => x.date === date);
+        if (moment(timesheet.segments[index].checkoutTime, "HH:mm:ss").isBefore(moment("18:00:00", "HH:mm:ss"))) {
+            return res
+                .status(400)
+                .json(true);
+        }
+        res
+            .status(400)
+            .json(false);
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+const isCheckoutLate = async (req, res) => {
+    try {
+        const date = moment().format("DD/MM/YYYY");
+        const user = await User.findById(req.user._id);
+        const userId = user.userId;
+        let timesheet = await Timesheet.findOne({ userId: userId });
+        let index = timesheet.segments.findIndex(x => x.date === date);
+        if (moment(timesheet.segments[index].checkoutTime, "HH:mm:ss").isAfter(moment("18:00:00", "HH:mm:ss"))) {
+            return res
+                .status(400)
+                .json(true);
+        }
+        res
+            .status(400)
+            .json(false);
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+const getWorkingTime = async (req, res) => {
+    try {
+        const date = moment().format("DD/MM/YYYY");
+        const user = await User.findById(req.user._id);
+        const userId = user.userId;
+        let timesheet = await Timesheet.findOne({ userId: userId });
+        let index = timesheet.segments.findIndex(x => x.date === date);
+
+        let workingTime = moment.duration(moment(timesheet.segments[index].checkoutTime, "HH:mm:ss").diff(moment(timesheet.segments[index].checkinTime, "HH:mm:ss"))).asHours();
+
+        res
+            .status(400)
+            .json(workingTime);
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+const getDiffCheckin = async (req, res) => {
+    try {
+        const date = moment().format("DD/MM/YYYY");
+        const user = await User.findById(req.user._id);
+        const userId = user.userId;
+        let timesheet = await Timesheet.findOne({ userId: userId });
+        let index = timesheet.segments.findIndex(x => x.date === date);
+
+        let diff = moment.duration(moment("08:30:00", "HH:mm:ss").diff(moment(timesheet.segments[index].checkinTime, "HH:mm:ss"))).asHours();
+        return res
+            .status(400)
+            .json(diff);
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+
+const getDiffCheckout = async (req, res) => {
+    try {
+        const date = moment().format("DD/MM/YYYY");
+        const user = await User.findById(req.user._id);
+        const userId = user.userId;
+        let timesheet = await Timesheet.findOne({ userId: userId });
+        let index = timesheet.segments.findIndex(x => x.date === date);
+
+        let diff = moment.duration(moment("18:00:00", "HH:mm:ss").diff(moment(timesheet.segments[index].checkoutTime, "HH:mm:ss"))).asHours();
+        return res
+            .status(400)
+            .json(diff);
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+
+module.exports = { checkin, checkout, getTop5, getMyRank, isCheckinEarly, isCheckinLate, isCheckoutEarly, isCheckoutLate, getWorkingTime, getDiffCheckin, getDiffCheckout }
