@@ -248,9 +248,9 @@ const forgetPassword = async (req, res) => {
 
         const message = `Your OTP for reseting the password is ${otp}. If you did not request for this, please ignore this email.`;
 
-        await sendMail(email, "Request for reseting password", message);
+        await sendMail(emailFix, "Request for reseting password", message);
 
-        res.status(200).json({ success: true, message: `OTP has been sent to ${email}` });
+        res.status(200).json({ success: true, message: `OTP has been sent to ${emailFix}` });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }

@@ -1,20 +1,28 @@
-const { createTransport } = require("nodemailer");
+var nodemailer = require('nodemailer'); // khai báo sử dụng module nodemailer
 
-const sendMail = async (email, subject, text) => {
-    const transport = createTransport({
-        host: process.env.SMTP_HOST,
-        port: process.env.SMTP_PORT,
+
+var sendMail = async (email, subject, text) => {
+    var transporter = nodemailer.createTransport({ // config mail server
+
+        service: 'Gmail',
         auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
-        },
+            user: 'dangphanthanhconggg@gmail.com',
+            pass: 'otjkfjzhtrojykek'
+        }
     });
-
-    await transport.sendMail({
-        from: process.env.SMTP_USER,
+    var mainOptions = { // thiết lập đối tượng, nội dung gửi mail
+        from: 'Công',
         to: email,
         subject,
         text,
+    }
+
+    transporter.sendMail(mainOptions, function (err, info) {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log('Message sent: ' + info.response);
+        }
     });
 };
 module.exports = sendMail
