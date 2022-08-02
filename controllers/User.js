@@ -133,7 +133,8 @@ const updateProfile = async (req, res) => {
 
         if (name) user.name = name;
 
-        if (email) user.email = email;
+        emailFix = email.trim();
+        if (email) user.email = emailFix;
 
         if (phoneNumber) user.phoneNumber = phoneNumber;
 
