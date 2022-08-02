@@ -93,7 +93,7 @@ const getTop5 = async (req, res) => {
         let top = sort.slice(0, 4);
 
         res
-            .status(400)
+            .status(200)
             .json(top);
 
     } catch (error) {
@@ -106,10 +106,7 @@ const getMyRank = async (req, res) => {
         let timesheet = await Timesheet.find();
         sort = timesheet.sort((a, b) => moment(a.segments[a.segments.length - 1].checkinTime, "HH:mm:ss", true) - moment(b.segments[b.segments.length - 1].checkinTime, "HH:mm:ss", true));
 
-        const user = await User.findById(req.user._id);
-        const userId = user.userId;
-
-        let rank = sort.findIndex(x => x.userId === userId) + 1;
+        let rank = sort.findIndex(x => x.userId.equals(req.user._id)) + 1;
 
         res
             .status(200)
