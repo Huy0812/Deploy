@@ -18,9 +18,18 @@ const getInformation = async (req, res) => {
         const companyId = user.companyId;
         const company = await Company.findById(companyId);
 
+        const companyData = {
+            _id: company._id,
+            name: company.name,
+            size: company.size,
+            hotline: company.hotline,
+            introduction: company.introduction,
+            website: company.website,
+        };
+
         res
             .status(200)
-            .json({ success: true, message: `Company Information`, company: company });
+            .json({ success: true, message: `Company Information`, company: companyData });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
