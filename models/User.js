@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema({
     // Mật khẩu
     password: {
         type: String,
-        match: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+        match: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/,
         required: true,
         minlength: [8, "Password must be at least 8 characters long, one uppercase letter, one lowercase letter, one number and one special character"],
         select: false,
