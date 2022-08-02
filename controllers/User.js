@@ -46,7 +46,7 @@ const register = async (req, res) => {
                 .json({ success: false, message: "Phone number already exists" });
         }
 
-        // const otp = Math.floor(Math.floor(100000 + Math.random() * 900000));
+        //const otp = Math.floor(Math.floor(100000 + Math.random() * 900000));
 
         //var dateMomentObject = moment(startWorkingDate).toDate();
         // kiểm tra và định dạng lại Date

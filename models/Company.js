@@ -1,14 +1,6 @@
 const mongoose = require("mongoose")
 const companySchema = new mongoose.Schema({
 
-    //  Mã công ty
-    companyId: {
-        type: String,
-        required: true,
-        default: "62e78db56e5a9d0f5386ad92",
-        unique: true,
-    },
-
     // Tên
     name: {
         type: String,

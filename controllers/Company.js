@@ -3,9 +3,7 @@ const Company = require("../models/Company")
 
 const create = async (req, res) => {
     try {
-        company = await Company.create({
-
-        });
+        company = await Company.create({});
         res
             .status(200)
             .json({ success: true, message: "Created successfully" });
