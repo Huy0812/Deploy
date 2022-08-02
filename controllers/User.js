@@ -46,16 +46,6 @@ const register = async (req, res) => {
                 .json({ success: false, message: "Phone number already exists" });
         }
 
-        //const otp = Math.floor(Math.floor(100000 + Math.random() * 900000));
-
-        //var dateMomentObject = moment(startWorkingDate).toDate();
-        // kiểm tra và định dạng lại Date
-        //if (!dateMomentObject.isValid()) {
-        //    return res
-        //       .status(400)
-        //       .json({ success: false, message: "Wrong date format. Must be dd/mm/yyyy" });
-        //}
-
         emailFix = email.trim();
         user = await User.create({
             name,
@@ -63,15 +53,11 @@ const register = async (req, res) => {
             phoneNumber,
             password,
             privilege,
-            startWorkingDate,//: dateMomentObject,
+            startWorkingDate,
             contractStatus,
             typeOfEmployee,
             role,
-            // otp,
-            // otp_expiry: new Date(Date.now() + process.env.OTP_EXPIRE * 60 * 1000),
         });
-
-        // await sendMail(email, "Verify your account", `Your OTP is ${otp}`);
 
         sendToken(
             res,
@@ -143,7 +129,13 @@ const updateProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
 
-        const { birth, gender, address } = req.body;
+        const { name, email, phoneNumber, birth, gender, address } = req.body;
+
+        if (name) user.name = name;
+
+        if (email) user.email = email;
+
+        if (phoneNumber) user.phoneNumber = phoneNumber;
 
         if (birth) {
             var dateMomentObject = moment(birth, "DD/MM/YYYY", true);

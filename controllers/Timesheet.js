@@ -31,7 +31,6 @@ const checkin = async (req, res) => {
             date: date,
             checkinTime: checkinTime,
             checkoutTime: null,
-            //workingTime,
         };
 
         let timesheet = await Timesheet.findOne({ "userId": req.user._id });

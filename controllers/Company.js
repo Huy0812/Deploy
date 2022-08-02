@@ -33,10 +33,11 @@ const getInformation = async (req, res) => {
     }
 };
 
-// need to fix
 const updateInformation = async (req, res) => {
     try {
-        const company = await company.findById(req.company._id);
+        const user = await User.findById(req.user._id);
+        const companyId = user.companyId;
+        const company = await Company.findById(companyId);
 
         const { name, size, hotline, introduction, website } = req.body;
 
