@@ -132,7 +132,7 @@ const getAllProfile = async (req, res) => {
 
         return res
             .status(200)
-            .json({ success: true, message: `All profiles (sort by userId)`, Object: users });
+            .json({ success: true, message: `All profiles (sort by userId)`, Array: users });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
