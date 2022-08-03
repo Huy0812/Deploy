@@ -221,7 +221,7 @@ const getDiffCheckin = async (req, res) => {
         let diff = moment.duration(moment("08:30:00", "HH:mm:ss").diff(moment(timesheet.segments[index].checkinTime, "HH:mm:ss"))).asHours();
         return res
             .status(200)
-            .json(diff);
+            .json({ success: true, message: `Different from checkin`, Number: diff });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -238,7 +238,7 @@ const getDiffCheckout = async (req, res) => {
         let diff = moment.duration(moment(timesheet.segments[index].checkoutTime, "HH:mm:ss").diff(moment("18:00:00", "HH:mm:ss"))).asHours();
         return res
             .status(200)
-            .json(diff);
+            .json({ success: true, message: `Different from checkout`, Number: diff });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });

@@ -115,11 +115,24 @@ const logout = async (req, res) => {
     }
 };
 
-const getProfile = async (req, res) => {
+const getMyProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
 
         sendToken(res, user, 201, `Welcome back ${user.name}`);
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+const getAllProfile = async (req, res) => {
+    try {
+        const users = await User.find();
+        sort = users.sort((a, b) => a.userId - b.userId);
+
+        return res
+            .status(200)
+            .json({ success: true, message: `All profiles (sort by userId)`, Object: users });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -162,14 +175,14 @@ const updateAvatar = async (req, res) => {
         const avatar = req.files.avatar.tempFilePath;
 
         if (avatar) {
-        await cloudinary.v2.uploader.destroy(user.avatar.public_id);
-        const mycloud = await cloudinary.v2.uploader.upload(avatar);
-        fs.rmSync("./tmp", { recursive: true });
-        user.avatar = {
-            public_id: mycloud.public_id,
-            url: mycloud.secure_url,
-        };
-    }
+            await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+            const mycloud = await cloudinary.v2.uploader.upload(avatar);
+            fs.rmSync("./tmp", { recursive: true });
+            user.avatar = {
+                public_id: mycloud.public_id,
+                url: mycloud.secure_url,
+            };
+        }
         await user.save();
         res.status(500).json({ success: true, message: "Avatar updated successfully" });
     } catch (error) {
@@ -286,4 +299,4 @@ const resetPassword = async (req, res) => {
     }
 };
 
-module.exports = { register, verify, login, logout, getProfile, updateProfile, updateAvatar, deleteProfile, updatePassword, forgetPassword, resetPassword }
+module.exports = { register, verify, login, logout, getMyProfile, getAllProfile, updateProfile, updateAvatar, deleteProfile, updatePassword, forgetPassword, resetPassword }
