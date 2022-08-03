@@ -31,7 +31,7 @@ const verify = async (req, res) => {
 const register = async (req, res) => {
     try {
         let user = await User.findById(req.user._id);
-        if (user.privilege !== "Quản trị viên" || user.privilege !== "Quản lý") {
+        if (user.privilege !== "Quản trị viên" && user.privilege !== "Quản lý") {
             return res
                 .status(403)
                 .json({ success: false, message: "Forbidden: You don't have permisson to access this" });
