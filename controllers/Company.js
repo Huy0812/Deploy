@@ -38,6 +38,12 @@ const getInformation = async (req, res) => {
 const updateInformation = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
+        if (!user.privilege.equals("Quản trị viên")) {
+            return res
+                .status(403)
+                .json({ success: false, message: "Forbidden: You don't have permisson to access this" });
+        }
+
         const companyId = user.companyId;
         const company = await Company.findById(companyId);
 
