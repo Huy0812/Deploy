@@ -184,7 +184,7 @@ const updateAvatar = async (req, res) => {
             };
         }
         await user.save();
-        res.status(500).json({ success: true, message: "Avatar updated successfully" });
+        res.status(200).json({ success: true, message: "Avatar updated successfully" });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
