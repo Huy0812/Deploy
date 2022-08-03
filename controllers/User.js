@@ -31,7 +31,7 @@ const verify = async (req, res) => {
 const register = async (req, res) => {
     try {
         let user = await User.findById(req.user._id);
-        if (!user.privilege.equals("Quản trị viên") || !user.privilege.equals("Quản lý")) {
+        if (user.privilege !== "Quản trị viên" || user.privilege !== "Quản lý") {
             return res
                 .status(403)
                 .json({ success: false, message: "Forbidden: You don't have permisson to access this" });
@@ -200,7 +200,7 @@ const updateAvatar = async (req, res) => {
 const deleteProfile = async (req, res) => {
     try {
         let user = await User.findById(req.user._id);
-        if (!user.privilege.equals("Quản trị viên")) {
+        if (user.privilege !== "Quản trị viên") {
             return res
                 .status(403)
                 .json({ success: false, message: "Forbidden: You don't have permisson to access this" });
