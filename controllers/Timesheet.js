@@ -84,128 +84,138 @@ const checkout = async (req, res) => {
     }
 };
 
+// Lấy bảng xếp hạng top 5 nhân viên checkin trong ngày
 const getTop5 = async (req, res) => {
     try {
         let timesheet = await Timesheet.find();
         sort = timesheet.sort((a, b) => moment(a.segments[a.segments.length - 1].checkinTime, "HH:mm:ss", true) - moment(b.segments[b.segments.length - 1].checkinTime, "HH:mm:ss", true));
 
-        let top = sort.slice(0, 4);
+        sort = sort.slice(0, 4);
+        let ranking = []
+        for (i = 0; i < 5; i++) {
+            if (!sort[i]) break;
+            let user = await User.findById(sort[i].userId);
+            let userTemp = {
+                _id: sort[i].userId,
+                userId: user.userId,
+                name: user.name,
+                avatar: user.avatar,
+                checkinTime: sort[i].segments[sort[i].segments.length - 1].checkinTime,
+            }
+            ranking.push(userTemp);
+        }
 
         res
             .status(200)
-            .json(top);
+            .json({ success: true, message: `Ranking Information`, array: ranking });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 };
 
+// Lấy xếp hạng checkin trong ngày của nhân viên
 const getMyRank = async (req, res) => {
     try {
         let timesheet = await Timesheet.find();
         sort = timesheet.sort((a, b) => moment(a.segments[a.segments.length - 1].checkinTime, "HH:mm:ss", true) - moment(b.segments[b.segments.length - 1].checkinTime, "HH:mm:ss", true));
 
-        let rank = sort.findIndex(x => x.userId.equals(req.user._id)) + 1;
+        let myRank = sort.findIndex(x => x.userId.equals(req.user._id)) + 1;
 
         res
             .status(200)
-            .json(rank);
+            .json({ success: true, message: `My ranking`, number: myRank });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 };
 
+// Kiểm tra checkin sớm (trong ngày)
 const isCheckinEarly = async (req, res) => {
     try {
         const date = moment().format("DD/MM/YYYY");
-        const user = await User.findById(req.user._id);
-        const userId = user.userId;
-        let timesheet = await Timesheet.findOne({ userId: userId });
+        let timesheet = await Timesheet.findOne({ userId: req.user._id });
         let index = timesheet.segments.findIndex(x => x.date === date);
         if (moment(timesheet.segments[index].checkinTime, "HH:mm:ss").isBefore(moment("08:30:00", "HH:mm:ss"))) {
             return res
                 .status(200)
-                .json(true);
+                .json({ success: true, message: `Is checkin early`, Boolean: true });
         }
         res
             .status(200)
-            .json(true);
+            .json({ success: true, message: `Is checkin early`, Boolean: false });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 }
 
+// Kiểm tra checkin muộn (trong ngày)
 const isCheckinLate = async (req, res) => {
     try {
         const date = moment().format("DD/MM/YYYY");
-        const user = await User.findById(req.user._id);
-        const userId = user.userId;
-        let timesheet = await Timesheet.findOne({ userId: userId });
+        let timesheet = await Timesheet.findOne({ userId: req.user._id });
         let index = timesheet.segments.findIndex(x => x.date === date);
         if (moment(timesheet.segments[index].checkinTime, "HH:mm:ss").isAfter(moment("08:30:00", "HH:mm:ss"))) {
             return res
                 .status(200)
-                .json(true);
+                .json({ success: true, message: `Is checkin early`, Boolean: true });
         }
         res
             .status(200)
-            .json(false);
+            .json({ success: true, message: `Is checkin early`, Boolean: false });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 }
 
+// Kiểm tra checkout sớm (trong ngày)
 const isCheckoutEarly = async (req, res) => {
     try {
         const date = moment().format("DD/MM/YYYY");
-        const user = await User.findById(req.user._id);
-        const userId = user.userId;
-        let timesheet = await Timesheet.findOne({ userId: userId });
+        let timesheet = await Timesheet.findOne({ userId: req.user._id });
         let index = timesheet.segments.findIndex(x => x.date === date);
         if (moment(timesheet.segments[index].checkoutTime, "HH:mm:ss").isBefore(moment("18:00:00", "HH:mm:ss"))) {
             return res
                 .status(200)
-                .json(true);
+                .json({ success: true, message: `Is checkout early`, Boolean: true });
         }
         res
             .status(200)
-            .json(false);
+            .json({ success: true, message: `Is checkout early`, Boolean: false });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 }
 
+// Kiểm tra checkout muộn (trong ngày)
 const isCheckoutLate = async (req, res) => {
     try {
         const date = moment().format("DD/MM/YYYY");
-        const user = await User.findById(req.user._id);
-        const userId = user.userId;
-        let timesheet = await Timesheet.findOne({ userId: userId });
+        let timesheet = await Timesheet.findOne({ userId: req.user._id });
         let index = timesheet.segments.findIndex(x => x.date === date);
         if (moment(timesheet.segments[index].checkoutTime, "HH:mm:ss").isAfter(moment("18:00:00", "HH:mm:ss"))) {
             return res
                 .status(200)
-                .json(true);
+                .json({ success: true, message: `Is checkout early`, Boolean: true });
         }
         res
             .status(200)
-            .json(false);
+            .json({ success: true, message: `Is checkout early`, Boolean: false });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 }
 
+// Tính thời gian chênh lệch so với thời gian checkin mặc định
 const getDiffCheckin = async (req, res) => {
     try {
         const date = moment().format("DD/MM/YYYY");
-        const user = await User.findById(req.user._id);
-        const userId = user.userId;
-        let timesheet = await Timesheet.findOne({ userId: userId });
+        let timesheet = await Timesheet.findOne({ userId: req.user._id });
         let index = timesheet.segments.findIndex(x => x.date === date);
 
         let diff = moment.duration(moment("08:30:00", "HH:mm:ss").diff(moment(timesheet.segments[index].checkinTime, "HH:mm:ss"))).asHours();
@@ -218,16 +228,14 @@ const getDiffCheckin = async (req, res) => {
     }
 }
 
-
+// Tính thời gian chênh lệch so với thời gian checkout mặc định
 const getDiffCheckout = async (req, res) => {
     try {
         const date = moment().format("DD/MM/YYYY");
-        const user = await User.findById(req.user._id);
-        const userId = user.userId;
-        let timesheet = await Timesheet.findOne({ userId: userId });
+        let timesheet = await Timesheet.findOne({ userId: req.user._id });
         let index = timesheet.segments.findIndex(x => x.date === date);
 
-        let diff = moment.duration(moment("18:00:00", "HH:mm:ss").diff(moment(timesheet.segments[index].checkoutTime, "HH:mm:ss"))).asHours();
+        let diff = moment.duration(moment(timesheet.segments[index].checkoutTime, "HH:mm:ss").diff(moment("18:00:00", "HH:mm:ss"))).asHours();
         return res
             .status(200)
             .json(diff);
