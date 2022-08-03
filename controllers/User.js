@@ -181,14 +181,12 @@ const updateAvatar = async (req, res) => {
         const user = await User.findById(req.user._id);
         const avatar = req.files.avatar.tempFilePath;
 
-        if (avatar) {
             await cloudinary.v2.uploader.destroy(user.avatar.public_id);
             const mycloud = await cloudinary.v2.uploader.upload(avatar);
             fs.rmSync("./tmp", { recursive: true });
             user.avatar = {
                 public_id: mycloud.public_id,
-                url: mycloud.secure_url,
-            };
+                url: mycloud.secure_url
         }
         await user.save();
         res.status(200).json({ success: true, message: "Avatar updated successfully" });
