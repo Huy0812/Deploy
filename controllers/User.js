@@ -161,15 +161,7 @@ const updateAvatar = async (req, res) => {
         const user = await User.findById(req.user._id);
         const avatar = req.files.avatar.tempFilePath;
 
-        if (!user.avatar.public_id && !user.avatar.url) {
-            const mycloud = await cloudinary.v2.uploader.upload(avatar);
-            fs.rmSync("./tmp", { recursive: true });
-            user.avatar = {
-                public_id: mycloud.public_id,
-                url: mycloud.secure_url,
-            };
-            await user.save();
-        }
+        if (avatar) {
         await cloudinary.v2.uploader.destroy(user.avatar.public_id);
         const mycloud = await cloudinary.v2.uploader.upload(avatar);
         fs.rmSync("./tmp", { recursive: true });
@@ -177,6 +169,7 @@ const updateAvatar = async (req, res) => {
             public_id: mycloud.public_id,
             url: mycloud.secure_url,
         };
+    }
         await user.save();
         res.status(500).json({ success: true, message: "Avatar updated successfully" });
     } catch (error) {
