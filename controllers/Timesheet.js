@@ -254,9 +254,15 @@ const getTimesheetData = async (req, res) => {
             return moment(segment.date, "DD/MM/YYYY") >= moment().startOf('month') &&
                 moment(segment.date, "DD/MM/YYYY") <= moment().endOf('month')
         });
-        console.log(segments)
+
+        numberOfWorkingDate = segments.length + "/" + moment.duration(moment(moment().endOf('month').format("DD/MM/YYYY"), "DD/MM/YYYY").diff(moment(moment().startOf('month').format("DD/MM/YYYY"), "DD/MM/YYYY"))).asDays();
+        totalworkingTime = segments.reduce((accumulator, segment) => {
+            return accumulator + segment.workingTime;
+        }, 0);
 
         let timesheetData = {
+            numberOfWorkingDate: numberOfWorkingDate,
+            totalworkingTime: totalworkingTime,
             userId: timesheet.userId,
             segments: segments,
         }
