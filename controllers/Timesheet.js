@@ -245,5 +245,28 @@ const getDiffCheckout = async (req, res) => {
     }
 }
 
+// Lấy thông tin chấm công (tháng hiện tại)
+const getTimesheetData = async (req, res) => {
+    try {
+        const date = moment().format("DD/MM/YYYY");
+        let timesheet = await Timesheet.findOne({ userId: req.user._id });
+        segments = timesheet.segments.filter(function (segment) {
+            return segment.date >= moment().startOf('month').format('DD/MM/YYYY') &&
+                segment.date <= moment().endOf('month').format('DD/MM/YYYY')
+        });
 
-module.exports = { createTimesheet, checkin, checkout, getTop5, getMyRank, isCheckinEarly, isCheckinLate, isCheckoutEarly, isCheckoutLate, getDiffCheckin, getDiffCheckout }
+        let timesheetData = {
+            userId: timesheet.userId,
+            segments: segments,
+        }
+
+        return res
+            .status(200)
+            .json({ success: true, message: `Different from checkout`, Object: timesheetData });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+module.exports = { createTimesheet, checkin, checkout, getTop5, getMyRank, isCheckinEarly, isCheckinLate, isCheckoutEarly, isCheckoutLate, getDiffCheckin, getDiffCheckout, getTimesheetData }
