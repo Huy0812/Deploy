@@ -251,9 +251,10 @@ const getTimesheetData = async (req, res) => {
         const date = moment().format("DD/MM/YYYY");
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
         segments = timesheet.segments.filter(function (segment) {
-            return segment.date >= moment().startOf('month').format('DD/MM/YYYY') &&
-                segment.date <= moment().endOf('month').format('DD/MM/YYYY')
+            return moment(segment.date, "DD/MM/YYYY") >= moment().startOf('month') &&
+                moment(segment.date, "DD/MM/YYYY") <= moment().endOf('month')
         });
+        console.log(segments)
 
         let timesheetData = {
             userId: timesheet.userId,
@@ -262,7 +263,7 @@ const getTimesheetData = async (req, res) => {
 
         return res
             .status(200)
-            .json({ success: true, message: `Different from checkout`, Object: timesheetData });
+            .json({ success: true, message: `Timesheet data for current month`, Object: timesheetData });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
