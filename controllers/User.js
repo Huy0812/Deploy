@@ -53,7 +53,7 @@ const register = async (req, res) => {
                 .json({ success: false, message: "Phone number already exists" });
         }
 
-        emailFix = email.trim();
+        emailFix = email.trim().toLowerCase();
         user = await User.create({
             name,
             email: emailFix,
@@ -154,7 +154,7 @@ const updateProfile = async (req, res) => {
         if (name) user.name = name;
 
         if (email) {
-            emailFix = email.trim();
+            emailFix = email.trim().toLowerCase();
             user.email = emailFix;
         }
 
@@ -255,7 +255,7 @@ const forgetPassword = async (req, res) => {
     try {
         const { email } = req.body;
 
-        emailFix = email.trim();
+        emailFix = email.trim().toLowerCase();
 
         let user = await User.findOne({ email: emailFix });
 
