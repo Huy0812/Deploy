@@ -257,7 +257,7 @@ const forgetPassword = async (req, res) => {
         const user = await User.findOne({ emailFix });
 
         if (!user) {
-            return res.status(400).json({ success: false, message: "Invalid email" });
+            return res.status(500).json({ success: false, message: "Invalid email" });
         }
 
         const otp = Math.floor(Math.floor(100000 + Math.random() * 900000));
