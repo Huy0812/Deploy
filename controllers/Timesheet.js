@@ -3,7 +3,6 @@ const User = require("../models/User")
 const moment = require("moment")
 const createTimesheet = async (req, res) => {
     try {
-
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
         if (timesheet) {
             return res
@@ -11,7 +10,7 @@ const createTimesheet = async (req, res) => {
                 .json({ success: false, message: "Created timesheet already" });
         }
         timesheet = await Timesheet.create({
-            userId: userId,
+            userId: req.user._id,
             segments: [],
         })
         res
@@ -129,148 +128,280 @@ const getMyRank = async (req, res) => {
     }
 };
 
-// Kiểm tra checkin sớm (trong ngày)
-const isCheckinEarly = async (req, res) => {
-    try {
-        const date = moment().format("DD/MM/YYYY");
-        let timesheet = await Timesheet.findOne({ userId: req.user._id });
-        let index = timesheet.segments.findIndex(x => x.date === date);
-        if (moment(timesheet.segments[index].checkinTime, "HH:mm:ss").isBefore(moment("08:30:00", "HH:mm:ss"))) {
-            return res
-                .status(200)
-                .json({ success: true, message: `Is checkin early`, Boolean: true });
-        }
-        res
-            .status(200)
-            .json({ success: true, message: `Is checkin early`, Boolean: false });
-
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
+// Kiểm tra checkin sớm
+function isCheckinEarly(checkinTime) {
+    return moment(checkinTime, "HH:mm:ss").isBefore(moment("08:30:00", "HH:mm:ss"));
 }
 
-// Kiểm tra checkin muộn (trong ngày)
-const isCheckinLate = async (req, res) => {
-    try {
-        const currentDate = moment().format("DD/MM/YYYY");
-        let timesheet = await Timesheet.findOne({ userId: req.user._id });
-        let index = timesheet.segments.findIndex(x => x.date === currentDate);
-        if (moment(timesheet.segments[index].checkinTime, "HH:mm:ss").isAfter(moment("08:30:00", "HH:mm:ss"))) {
-            return res
-                .status(200)
-                .json({ success: true, message: `Is checkin early`, Boolean: true });
-        }
-        res
-            .status(200)
-            .json({ success: true, message: `Is checkin early`, Boolean: false });
-
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
+// Kiểm tra checkin muộn
+function isCheckinLate(checkinTime) {
+    return moment(checkinTime, "HH:mm:ss").isAfter(moment("08:30:00", "HH:mm:ss"));
 }
 
-// Kiểm tra checkout sớm (trong ngày)
-const isCheckoutEarly = async (req, res) => {
-    try {
-        const currentDate = moment().format("DD/MM/YYYY");
-        let timesheet = await Timesheet.findOne({ userId: req.user._id });
-        let index = timesheet.segments.findIndex(x => x.date === currentDate);
-        if (moment(timesheet.segments[index].checkoutTime, "HH:mm:ss").isBefore(moment("18:00:00", "HH:mm:ss"))) {
-            return res
-                .status(200)
-                .json({ success: true, message: `Is checkout early`, Boolean: true });
-        }
-        res
-            .status(200)
-            .json({ success: true, message: `Is checkout early`, Boolean: false });
-
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
+// Kiểm tra checkout sớm
+function isCheckoutEarly(checkoutTime) {
+    return moment(checkoutTime, "HH:mm:ss").isBefore(moment("18:00:00", "HH:mm:ss"));
 }
 
-// Kiểm tra checkout muộn (trong ngày)
-const isCheckoutLate = async (req, res) => {
-    try {
-        const currentDate = moment().format("DD/MM/YYYY");
-        let timesheet = await Timesheet.findOne({ userId: req.user._id });
-        let index = timesheet.segments.findIndex(x => x.date === currentDate);
-        if (moment(timesheet.segments[index].checkoutTime, "HH:mm:ss").isAfter(moment("18:00:00", "HH:mm:ss"))) {
-            return res
-                .status(200)
-                .json({ success: true, message: `Is checkout early`, Boolean: true });
-        }
-        res
-            .status(200)
-            .json({ success: true, message: `Is checkout early`, Boolean: false });
-
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
+// Kiểm tra checkout muộn
+function isCheckoutLate(checkoutTime) {
+    return moment(checkoutTime, "HH:mm:ss").isAfter(moment("18:30:00", "HH:mm:ss"));
 }
 
-// Tính thời gian chênh lệch so với thời gian checkin mặc định
-const getDiffCheckin = async (req, res) => {
+// Tính thời gian checkin muộn
+function getCheckinLate(checkinTime) {
+    if (isCheckinLate(checkinTime))
+        return Math.round(moment.duration(moment(checkinTime, "HH:mm:ss").diff(moment("08:30:00", "HH:mm:ss"))).asMinutes());
+    return 0;
+}
+
+// Tính thời gian checkout sớm
+function getCheckoutEarly(checkoutTime) {
+    if (isCheckoutEarly(checkoutTime))
+        return Math.round(moment.duration(moment("18:00:00", "HH:mm:ss").diff(moment(checkoutTime, "HH:mm:ss"))).asMinutes());
+    return 0;
+}
+
+// Tính thời gian checkout muộn
+function getCheckoutLate(checkoutTime) {
+    if (isCheckoutLate(checkoutTime))
+        return Math.round(moment.duration(moment(checkoutTime, "HH:mm:ss").diff(moment("18:00:00", "HH:mm:ss"))).asMinutes());
+    return 0;
+}
+
+// Lọc thông tin chấm công (hôm nay)
+const filterTimesheetDataByToday = async (req, res) => {
     try {
         const currentDate = moment().format("DD/MM/YYYY");
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
         let index = timesheet.segments.findIndex(x => x.date === currentDate);
 
-        let diff = moment.duration(moment(timesheet.segments[index].checkinTime, "HH:mm:ss").diff(moment("08:30:00", "HH:mm:ss"))).asHours();
-        return res
-            .status(200)
-            .json({ success: true, message: `Different from checkin`, Number: diff });
+        if (index === -1)
+            return res.status(401).json({ success: false, message: "Have't checkin today" });
 
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-}
-
-// Tính thời gian chênh lệch so với thời gian checkout mặc định
-const getDiffCheckout = async (req, res) => {
-    try {
-        const date = moment().format("DD/MM/YYYY");
-        let timesheet = await Timesheet.findOne({ userId: req.user._id });
-        let index = timesheet.segments.findIndex(x => x.date === date);
-
-        let diff = moment.duration(moment(timesheet.segments[index].checkoutTime, "HH:mm:ss").diff(moment("18:00:00", "HH:mm:ss"))).asHours();
-        return res
-            .status(200)
-            .json({ success: true, message: `Different from checkout`, Number: diff });
-
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-}
-
-// Lấy thông tin chấm công (tháng hiện tại)
-const getTimesheetData = async (req, res) => {
-    try {
-        let timesheet = await Timesheet.findOne({ userId: req.user._id });
-        segments = timesheet.segments.filter(function (segment) {
-            return moment(segment.date, "DD/MM/YYYY") >= moment().startOf('month') &&
-                moment(segment.date, "DD/MM/YYYY") <= moment().endOf('month')
-        });
-
-        numberOfWorkingDate = segments.length + "/ " + moment.duration(moment(moment().endOf('month').format("DD/MM/YYYY"), "DD/MM/YYYY").diff(moment(moment().startOf('month').format("DD/MM/YYYY"), "DD/MM/YYYY"))).asDays();
-        totalworkingTime = segments.reduce((accumulator, segment) => {
-            return accumulator + segment.workingTime;
-        }, 0);
+        checkinLate = getCheckinLate(timesheet.segments[index].checkinTime) + " phút/ 1 lần";
+        checkoutEarly = getCheckoutEarly(timesheet.segments[index].checkoutTime) + " phút/ 1 lần";
+        checkoutLate = getCheckoutLate(timesheet.segments[index].checkoutTime) + " phút/ 1 lần";
 
         let timesheetData = {
-            numberOfWorkingDate: numberOfWorkingDate,
-            totalworkingTime: totalworkingTime,
-            userId: timesheet.userId,
-            segments: segments,
+            checkinLate: checkinLate,
+            checkoutEarly: checkoutEarly,
+            checkoutLate: checkoutLate,
         }
 
         return res
             .status(200)
-            .json({ success: true, message: `Timesheet data for current month`, Object: timesheetData });
+            .json({ success: true, message: `Timesheet data`, Object: timesheetData });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 }
 
-module.exports = { createTimesheet, checkin, checkout, getTop5, getMyRank, isCheckinEarly, isCheckinLate, isCheckoutEarly, isCheckoutLate, getDiffCheckin, getDiffCheckout, getTimesheetData }
+// Lọc thông tin chấm công (hôm qua)
+const filterTimesheetDataByYesterday = async (req, res) => {
+    try {
+        const currentDate = moment().subtract(1, 'day').format("DD/MM/YYYY");
+        let timesheet = await Timesheet.findOne({ userId: req.user._id });
+        let index = timesheet.segments.findIndex(x => x.date === currentDate);
+
+        if (index === -1)
+            return res.status(401).json({ success: false, message: "Have't checkin yesterday" });
+
+        checkinLate = getCheckinLate(timesheet.segments[index].checkinTime) + " phút/ 1 lần";
+        checkoutEarly = getCheckoutEarly(timesheet.segments[index].checkoutTime) + " phút/ 1 lần";
+        checkoutLate = getCheckoutLate(timesheet.segments[index].checkoutTime) + " phút/ 1 lần";
+
+        let timesheetData = {
+            checkinLate: checkinLate,
+            checkoutEarly: checkoutEarly,
+            checkoutLate: checkoutLate,
+        }
+
+        return res
+            .status(200)
+            .json({ success: true, message: `Timesheet data`, Object: timesheetData });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+// Lọc thông tin chấm công (tuần này)
+const filterTimesheetDataByThisWeek = async (req, res) => {
+    try {
+        var weekStart = moment().startOf('isoWeek');
+        var weekEnd = moment().endOf('isoWeek');
+        let timesheet = await Timesheet.findOne({ userId: req.user._id });
+        let segments = timesheet.segments;
+
+        segments = segments.filter(function (segment) {
+            return moment(segment.date, "DD/MM/YYYY") >= weekStart && moment(segment.date, "DD/MM/YYYY") <= weekEnd;
+        });
+        checkinLateNum = segments.filter(function (segment) { return isCheckinLate(segment.checkinTime) }).length;
+        checkoutEarlyNum = segments.filter(function (segment) { return isCheckoutEarly(segment.checkinTime) }).length;
+        checkoutLateNum = segments.filter(function (segment) { return isCheckoutLate(segment.checkinTime) }).length;
+
+        checkinLateValue = segments.reduce((accumulator, segment) => {
+            return accumulator + getCheckinLate(segment.checkinTime);
+        }, 0);
+        checkoutEarlyValue = segments.reduce((accumulator, segment) => {
+            return accumulator + getCheckoutEarly(segment.checkoutTime);
+        }, 0);
+        checkoutLateValue = segments.reduce((accumulator, segment) => {
+            return accumulator + getCheckoutLate(segment.checkoutTime);
+        }, 0);
+
+        checkinLateData = checkinLateValue + " phút/ " + checkinLateNum + " lần";
+        checkoutEarlyData = checkoutEarlyValue + " phút/ " + checkoutEarlyNum + " lần";
+        checkoutLateData = checkoutLateValue + " phút/ " + checkoutLateNum + " lần";
+
+        let timesheetData = {
+            checkinLate: checkinLateData,
+            checkoutEarly: checkoutEarlyData,
+            checkoutLate: checkoutLateData,
+        }
+
+        return res
+            .status(200)
+            .json({ success: true, message: `Timesheet data`, Object: timesheetData });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+// Lọc thông tin chấm công (tuần trước)
+const filterTimesheetDataByLastWeek = async (req, res) => {
+    try {
+        var weekStart = moment().subtract(1, 'weeks').startOf('isoWeek');
+        var weekEnd = moment().subtract(1, 'weeks').endOf('isoWeek');
+        let timesheet = await Timesheet.findOne({ userId: req.user._id });
+        let segments = timesheet.segments;
+
+        segments = segments.filter(function (segment) {
+            return moment(segment.date, "DD/MM/YYYY") >= weekStart && moment(segment.date, "DD/MM/YYYY") <= weekEnd;
+        });
+        checkinLateNum = segments.filter(function (segment) { return isCheckinLate(segment.checkinTime) }).length;
+        checkoutEarlyNum = segments.filter(function (segment) { return isCheckoutEarly(segment.checkinTime) }).length;
+        checkoutLateNum = segments.filter(function (segment) { return isCheckoutLate(segment.checkinTime) }).length;
+
+        checkinLateValue = segments.reduce((accumulator, segment) => {
+            return accumulator + getCheckinLate(segment.checkinTime);
+        }, 0);
+        checkoutEarlyValue = segments.reduce((accumulator, segment) => {
+            return accumulator + getCheckoutEarly(segment.checkoutTime);
+        }, 0);
+        checkoutLateValue = segments.reduce((accumulator, segment) => {
+            return accumulator + getCheckoutLate(segment.checkoutTime);
+        }, 0);
+
+        checkinLateData = checkinLateValue + " phút/ " + checkinLateNum + " lần";
+        checkoutEarlyData = checkoutEarlyValue + " phút/ " + checkoutEarlyNum + " lần";
+        checkoutLateData = checkoutLateValue + " phút/ " + checkoutLateNum + " lần";
+
+        let timesheetData = {
+            checkinLate: checkinLateData,
+            checkoutEarly: checkoutEarlyData,
+            checkoutLate: checkoutLateData,
+        }
+
+        return res
+            .status(200)
+            .json({ success: true, message: `Timesheet data`, Object: timesheetData });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+// Lọc thông tin chấm công (tháng này)
+const filterTimesheetDataByThisMonth = async (req, res) => {
+    try {
+        var monthStart = moment().startOf('month');
+        var monthEnd = moment().endOf('month');
+        let timesheet = await Timesheet.findOne({ userId: req.user._id });
+        let segments = timesheet.segments;
+
+        segments = segments.filter(function (segment) {
+            return moment(segment.date, "DD/MM/YYYY") >= monthStart && moment(segment.date, "DD/MM/YYYY") <= monthEnd;
+        });
+        checkinLateNum = segments.filter(function (segment) { return isCheckinLate(segment.checkinTime) }).length;
+        checkoutEarlyNum = segments.filter(function (segment) { return isCheckoutEarly(segment.checkinTime) }).length;
+        checkoutLateNum = segments.filter(function (segment) { return isCheckoutLate(segment.checkinTime) }).length;
+
+        checkinLateValue = segments.reduce((accumulator, segment) => {
+            return accumulator + getCheckinLate(segment.checkinTime);
+        }, 0);
+        checkoutEarlyValue = segments.reduce((accumulator, segment) => {
+            return accumulator + getCheckoutEarly(segment.checkoutTime);
+        }, 0);
+        checkoutLateValue = segments.reduce((accumulator, segment) => {
+            return accumulator + getCheckoutLate(segment.checkoutTime);
+        }, 0);
+
+        checkinLateData = checkinLateValue + " phút/ " + checkinLateNum + " lần";
+        checkoutEarlyData = checkoutEarlyValue + " phút/ " + checkoutEarlyNum + " lần";
+        checkoutLateData = checkoutLateValue + " phút/ " + checkoutLateNum + " lần";
+
+        let timesheetData = {
+            checkinLate: checkinLateData,
+            checkoutEarly: checkoutEarlyData,
+            checkoutLate: checkoutLateData,
+        }
+
+        return res
+            .status(200)
+            .json({ success: true, message: `Timesheet data`, Object: timesheetData });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+// Lọc thông tin chấm công (tháng trước)
+const filterTimesheetDataByLastMonth = async (req, res) => {
+    try {
+        var monthStart = moment().startOf('month').subtract(1, 'month');
+        var monthEnd = moment().endOf('month').subtract(1, 'month');
+        let timesheet = await Timesheet.findOne({ userId: req.user._id });
+        let segments = timesheet.segments;
+
+        segments = segments.filter(function (segment) {
+            return moment(segment.date, "DD/MM/YYYY") >= monthStart && moment(segment.date, "DD/MM/YYYY") <= monthEnd;
+        });
+        checkinLateNum = segments.filter(function (segment) { return isCheckinLate(segment.checkinTime) }).length;
+        checkoutEarlyNum = segments.filter(function (segment) { return isCheckoutEarly(segment.checkinTime) }).length;
+        checkoutLateNum = segments.filter(function (segment) { return isCheckoutLate(segment.checkinTime) }).length;
+
+        checkinLateValue = segments.reduce((accumulator, segment) => {
+            return accumulator + getCheckinLate(segment.checkinTime);
+        }, 0);
+        checkoutEarlyValue = segments.reduce((accumulator, segment) => {
+            return accumulator + getCheckoutEarly(segment.checkoutTime);
+        }, 0);
+        checkoutLateValue = segments.reduce((accumulator, segment) => {
+            return accumulator + getCheckoutLate(segment.checkoutTime);
+        }, 0);
+
+        checkinLateData = checkinLateValue + " phút/ " + checkinLateNum + " lần";
+        checkoutEarlyData = checkoutEarlyValue + " phút/ " + checkoutEarlyNum + " lần";
+        checkoutLateData = checkoutLateValue + " phút/ " + checkoutLateNum + " lần";
+
+        let timesheetData = {
+            checkinLate: checkinLateData,
+            checkoutEarly: checkoutEarlyData,
+            checkoutLate: checkoutLateData,
+        }
+
+        return res
+            .status(200)
+            .json({ success: true, message: `Timesheet data`, Object: timesheetData });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+
+module.exports = { createTimesheet, checkin, checkout, getTop5, getMyRank, filterTimesheetDataByToday, filterTimesheetDataByYesterday, filterTimesheetDataByThisWeek, filterTimesheetDataByLastWeek, filterTimesheetDataByThisMonth, filterTimesheetDataByLastMonth }

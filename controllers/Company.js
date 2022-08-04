@@ -25,6 +25,7 @@ const getInformation = async (req, res) => {
             hotline: company.hotline,
             introduction: company.introduction,
             website: company.website,
+            fanpage: company.fanpage,
         };
 
         res
