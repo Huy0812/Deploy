@@ -34,7 +34,7 @@ const userSchema = new mongoose.Schema({
         select: false,
     },
 
-    // Vai trò: admin, manager, hoặc user (mặc định)
+    // Vai trò: Quản trị viên, Quản lý, hoặc Người dùng (mặc định)
     privilege: {
         type: String,
         required: true,

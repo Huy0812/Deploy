@@ -181,12 +181,12 @@ const updateAvatar = async (req, res) => {
         const user = await User.findById(req.user._id);
         const avatar = req.files.avatar.tempFilePath;
 
-            await cloudinary.v2.uploader.destroy(user.avatar.public_id);
-            const mycloud = await cloudinary.v2.uploader.upload(avatar);
-            fs.rmSync("./tmp", { recursive: true });
-            user.avatar = {
-                public_id: mycloud.public_id,
-                url: mycloud.secure_url
+        await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+        const mycloud = await cloudinary.v2.uploader.upload(avatar);
+        fs.rmSync("./tmp", { recursive: true });
+        user.avatar = {
+            public_id: mycloud.public_id,
+            url: mycloud.secure_url
         }
         await user.save();
         res.status(200).json({ success: true, message: "Avatar updated successfully" });
@@ -205,11 +205,10 @@ const deleteProfile = async (req, res) => {
         }
 
         const { userId } = req.body;
-        await User.findOneAndDelete({ userId });
-        res.status(204).json({
-            status: 'Deleted successfully',
-            data: {}
-        })
+        await User.findByIdAndDelete({ userId });
+        res
+            .status(200)
+            .json({ success: true, message: 'Deleted successfully' });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
