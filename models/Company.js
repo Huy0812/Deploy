@@ -25,13 +25,19 @@ const companySchema = new mongoose.Schema({
     // Giới thiệu công ty
     introduction: {
         type: String,
-        default: "Web, Mobile, Blockchain",
+        default: "https://vkg.vn/services",
     },
 
     // Website
     website: {
         type: String,
         default: "https://vkg.vn/",
+    },
+
+    // Fanpage
+    fanpage: {
+        type: String,
+        default: "https://www.facebook.com/vikinology",
     },
 
 });
