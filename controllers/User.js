@@ -31,7 +31,7 @@ const verify = async (req, res) => {
 const register = async (req, res) => {
     try {
         let user = await User.findById(req.user._id);
-        if (!user.privilege.equals("Quản trị viên") || !user.privilege.equals("Quản lý")) {
+        if ((user.privilege !== "Quản trị viên") && (user.privilege.equals !== "Quản lý")) {
             return res
                 .status(403)
                 .json({ success: false, message: "Forbidden: You don't have permisson to access this" });
@@ -181,12 +181,12 @@ const updateAvatar = async (req, res) => {
         const user = await User.findById(req.user._id);
         const avatar = req.files.avatar.tempFilePath;
 
-            await cloudinary.v2.uploader.destroy(user.avatar.public_id);
-            const mycloud = await cloudinary.v2.uploader.upload(avatar);
-            fs.rmSync("./tmp", { recursive: true });
-            user.avatar = {
-                public_id: mycloud.public_id,
-                url: mycloud.secure_url
+        await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+        const mycloud = await cloudinary.v2.uploader.upload(avatar);
+        fs.rmSync("./tmp", { recursive: true });
+        user.avatar = {
+            public_id: mycloud.public_id,
+            url: mycloud.secure_url
         }
         await user.save();
         res.status(200).json({ success: true, message: "Avatar updated successfully" });
