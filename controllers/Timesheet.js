@@ -245,5 +245,35 @@ const getDiffCheckout = async (req, res) => {
     }
 }
 
+// Lấy thông tin chấm công (tháng hiện tại)
+const getTimesheetData = async (req, res) => {
+    try {
+        const date = moment().format("DD/MM/YYYY");
+        let timesheet = await Timesheet.findOne({ userId: req.user._id });
+        segments = timesheet.segments.filter(function (segment) {
+            return moment(segment.date, "DD/MM/YYYY") >= moment().startOf('month') &&
+                moment(segment.date, "DD/MM/YYYY") <= moment().endOf('month')
+        });
 
-module.exports = { createTimesheet, checkin, checkout, getTop5, getMyRank, isCheckinEarly, isCheckinLate, isCheckoutEarly, isCheckoutLate, getDiffCheckin, getDiffCheckout }
+        numberOfWorkingDate = segments.length + "/" + moment.duration(moment(moment().endOf('month').format("DD/MM/YYYY"), "DD/MM/YYYY").diff(moment(moment().startOf('month').format("DD/MM/YYYY"), "DD/MM/YYYY"))).asDays();
+        totalworkingTime = segments.reduce((accumulator, segment) => {
+            return accumulator + segment.workingTime;
+        }, 0);
+
+        let timesheetData = {
+            numberOfWorkingDate: numberOfWorkingDate,
+            totalworkingTime: totalworkingTime,
+            userId: timesheet.userId,
+            segments: segments,
+        }
+
+        return res
+            .status(200)
+            .json({ success: true, message: `Timesheet data for current month`, Object: timesheetData });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+module.exports = { createTimesheet, checkin, checkout, getTop5, getMyRank, isCheckinEarly, isCheckinLate, isCheckoutEarly, isCheckoutLate, getDiffCheckin, getDiffCheckout, getTimesheetData }

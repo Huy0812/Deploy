@@ -4,7 +4,7 @@ const timesheetSchema = new mongoose.Schema({
     //  Mã nhân viên
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Timesheet',
+        ref: 'User',
         required: true,
         unique: true,
     },
@@ -32,7 +32,7 @@ const timesheetSchema = new mongoose.Schema({
 
             // Thời gian checkout
             checkoutTime: {
-                type: Date,
+                type: String,
                 required: true,
             },
 

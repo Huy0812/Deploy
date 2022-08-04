@@ -1,5 +1,5 @@
 const express = require("express")
-const { createTimesheet, checkin, checkout, getTop5, getMyRank, isCheckinEarly, isCheckinLate, isCheckoutEarly, isCheckoutLate, getDiffCheckin, getDiffCheckout } = require("../controllers/Timesheet")
+const { createTimesheet, checkin, checkout, getTop5, getMyRank, isCheckinEarly, isCheckinLate, isCheckoutEarly, isCheckoutLate, getDiffCheckin, getDiffCheckout, getTimesheetData } = require("../controllers/Timesheet")
 const isAuthenticated = require("../middleware/auth")
 const router = express.Router()
 router.route("/createtimesheet").post(isAuthenticated, createTimesheet)
@@ -13,4 +13,5 @@ router.route("/ischeckoutearly").get(isAuthenticated, isCheckoutEarly)
 router.route("/ischeckoutlate").get(isAuthenticated, isCheckoutLate)
 router.route("/diffcheckin").get(isAuthenticated, getDiffCheckin)
 router.route("/diffcheckout").get(isAuthenticated, getDiffCheckout)
+router.route("/timesheetdata").get(isAuthenticated, getTimesheetData)
 module.exports = router
