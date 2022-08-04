@@ -42,8 +42,14 @@ const userSchema = new mongoose.Schema({
 
     // Avatar
     avatar: {
-        public_id: String,
-        url: String,
+        public_id: {
+            type: String,
+            default: null,
+        },
+        url: {
+            type: String,
+            default: null,
+        }
     },
 
     // Ngày sinh
