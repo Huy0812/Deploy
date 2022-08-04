@@ -3,9 +3,8 @@ const User = require("../models/User")
 const moment = require("moment")
 const createTimesheet = async (req, res) => {
     try {
-        const userId = req.user._id;
 
-        let timesheet = await Timesheet.findOne({ userId: userId });
+        let timesheet = await Timesheet.findOne({ userId: req.user._id });
         if (timesheet) {
             return res
                 .status(400)
@@ -25,28 +24,28 @@ const createTimesheet = async (req, res) => {
 
 const checkin = async (req, res) => {
     try {
-        const date = moment().format("DD/MM/YYYY");
+        const currentDate = moment().format("DD/MM/YYYY");
         const checkinTime = moment().format("HH:mm:ss");
-        let timesheetSegment = {
-            date: date,
-            checkinTime: checkinTime,
-            checkoutTime: null,
-        };
 
         let timesheet = await Timesheet.findOne({ "userId": req.user._id });
-        let index = timesheet.segments.findIndex(x => x.date === date);
+        let index = timesheet.segments.findIndex(x => x.date === currentDate);
         if (index != -1) {
             return res
                 .status(400)
                 .json({ success: false, message: "Checkin for today already" });
         }
 
+        let timesheetSegment = {
+            date: currentDate,
+            checkinTime: checkinTime,
+            checkoutTime: null,
+        };
         timesheet.segments.push(timesheetSegment);
+
         await timesheet.save();
         res
             .status(200)
             .json({ success: true, message: "Checkin successfully" });
-
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -55,12 +54,12 @@ const checkin = async (req, res) => {
 
 const checkout = async (req, res) => {
     try {
-        const date = moment().format("DD/MM/YYYY");
+        const currentDate = moment().format("DD/MM/YYYY");
         const checkoutTime = moment().format("HH:mm:ss");
 
         let timesheet = await Timesheet.findOne({ "userId": req.user._id });
-        const index = timesheet.segments.findIndex(x => x.date === date);
-        timesheet = await Timesheet.findOne({ "userId": req.user._id, "segments[index].date": date });
+        let index = timesheet.segments.findIndex(x => x.date === currentDate);
+        timesheet = await Timesheet.findOne({ "userId": req.user._id, "segments[index].date": currentDate });
 
         let workingTime = moment.duration(moment(timesheet.segments[index].checkoutTime, "HH:mm:ss").diff(moment(timesheet.segments[index].checkinTime, "HH:mm:ss"))).asHours();
 
@@ -74,7 +73,6 @@ const checkout = async (req, res) => {
         timesheet.segments.pop();
         timesheet.segments.push(timesheetSegment);
         await timesheet.save();
-
         res
             .status(200)
             .json({ success: true, message: "Checkout successfully" });
@@ -91,7 +89,7 @@ const getTop5 = async (req, res) => {
         sort = timesheet.sort((a, b) => moment(a.segments[a.segments.length - 1].checkinTime, "HH:mm:ss", true) - moment(b.segments[b.segments.length - 1].checkinTime, "HH:mm:ss", true));
 
         sort = sort.slice(0, 4);
-        let ranking = []
+        let ranking = [];
         for (i = 0; i < 5; i++) {
             if (!sort[i]) break;
             let user = await User.findById(sort[i].userId);
@@ -154,9 +152,9 @@ const isCheckinEarly = async (req, res) => {
 // Kiểm tra checkin muộn (trong ngày)
 const isCheckinLate = async (req, res) => {
     try {
-        const date = moment().format("DD/MM/YYYY");
+        const currentDate = moment().format("DD/MM/YYYY");
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
-        let index = timesheet.segments.findIndex(x => x.date === date);
+        let index = timesheet.segments.findIndex(x => x.date === currentDate);
         if (moment(timesheet.segments[index].checkinTime, "HH:mm:ss").isAfter(moment("08:30:00", "HH:mm:ss"))) {
             return res
                 .status(200)
@@ -174,9 +172,9 @@ const isCheckinLate = async (req, res) => {
 // Kiểm tra checkout sớm (trong ngày)
 const isCheckoutEarly = async (req, res) => {
     try {
-        const date = moment().format("DD/MM/YYYY");
+        const currentDate = moment().format("DD/MM/YYYY");
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
-        let index = timesheet.segments.findIndex(x => x.date === date);
+        let index = timesheet.segments.findIndex(x => x.date === currentDate);
         if (moment(timesheet.segments[index].checkoutTime, "HH:mm:ss").isBefore(moment("18:00:00", "HH:mm:ss"))) {
             return res
                 .status(200)
@@ -194,9 +192,9 @@ const isCheckoutEarly = async (req, res) => {
 // Kiểm tra checkout muộn (trong ngày)
 const isCheckoutLate = async (req, res) => {
     try {
-        const date = moment().format("DD/MM/YYYY");
+        const currentDate = moment().format("DD/MM/YYYY");
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
-        let index = timesheet.segments.findIndex(x => x.date === date);
+        let index = timesheet.segments.findIndex(x => x.date === currentDate);
         if (moment(timesheet.segments[index].checkoutTime, "HH:mm:ss").isAfter(moment("18:00:00", "HH:mm:ss"))) {
             return res
                 .status(200)
@@ -214,11 +212,11 @@ const isCheckoutLate = async (req, res) => {
 // Tính thời gian chênh lệch so với thời gian checkin mặc định
 const getDiffCheckin = async (req, res) => {
     try {
-        const date = moment().format("DD/MM/YYYY");
+        const currentDate = moment().format("DD/MM/YYYY");
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
-        let index = timesheet.segments.findIndex(x => x.date === date);
+        let index = timesheet.segments.findIndex(x => x.date === currentDate);
 
-        let diff = moment.duration(moment("08:30:00", "HH:mm:ss").diff(moment(timesheet.segments[index].checkinTime, "HH:mm:ss"))).asHours();
+        let diff = moment.duration(moment(timesheet.segments[index].checkinTime, "HH:mm:ss").diff(moment("08:30:00", "HH:mm:ss"))).asHours();
         return res
             .status(200)
             .json({ success: true, message: `Different from checkin`, Number: diff });
@@ -248,14 +246,13 @@ const getDiffCheckout = async (req, res) => {
 // Lấy thông tin chấm công (tháng hiện tại)
 const getTimesheetData = async (req, res) => {
     try {
-        const date = moment().format("DD/MM/YYYY");
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
         segments = timesheet.segments.filter(function (segment) {
             return moment(segment.date, "DD/MM/YYYY") >= moment().startOf('month') &&
                 moment(segment.date, "DD/MM/YYYY") <= moment().endOf('month')
         });
 
-        numberOfWorkingDate = segments.length + "/" + moment.duration(moment(moment().endOf('month').format("DD/MM/YYYY"), "DD/MM/YYYY").diff(moment(moment().startOf('month').format("DD/MM/YYYY"), "DD/MM/YYYY"))).asDays();
+        numberOfWorkingDate = segments.length + "/ " + moment.duration(moment(moment().endOf('month').format("DD/MM/YYYY"), "DD/MM/YYYY").diff(moment(moment().startOf('month').format("DD/MM/YYYY"), "DD/MM/YYYY"))).asDays();
         totalworkingTime = segments.reduce((accumulator, segment) => {
             return accumulator + segment.workingTime;
         }, 0);
