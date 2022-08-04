@@ -31,7 +31,7 @@ const verify = async (req, res) => {
 const register = async (req, res) => {
     try {
         let user = await User.findById(req.user._id);
-        if (user.privilege !== "Quản trị viên" && user.privilege !== "Quản lý") {
+        if (!user.privilege.equals("Quản trị viên") || !user.privilege.equals("Quản lý")) {
             return res
                 .status(403)
                 .json({ success: false, message: "Forbidden: You don't have permisson to access this" });
@@ -181,12 +181,12 @@ const updateAvatar = async (req, res) => {
         const user = await User.findById(req.user._id);
         const avatar = req.files.avatar.tempFilePath;
 
-        await cloudinary.v2.uploader.destroy(user.avatar.public_id);
-        const mycloud = await cloudinary.v2.uploader.upload(avatar);
-        fs.rmSync("./tmp", { recursive: true });
-        user.avatar = {
-            public_id: mycloud.public_id,
-            url: mycloud.secure_url
+            await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+            const mycloud = await cloudinary.v2.uploader.upload(avatar);
+            fs.rmSync("./tmp", { recursive: true });
+            user.avatar = {
+                public_id: mycloud.public_id,
+                url: mycloud.secure_url
         }
         await user.save();
         res.status(200).json({ success: true, message: "Avatar updated successfully" });
@@ -198,17 +198,18 @@ const updateAvatar = async (req, res) => {
 const deleteProfile = async (req, res) => {
     try {
         let user = await User.findById(req.user._id);
-        if (user.privilege !== "Quản trị viên") {
+        if (!user.privilege.equals("Quản trị viên")) {
             return res
                 .status(403)
                 .json({ success: false, message: "Forbidden: You don't have permisson to access this" });
         }
 
         const { userId } = req.body;
-        await User.findByIdAndDelete({ userId });
-        res
-            .status(200)
-            .json({ success: true, message: 'Deleted successfully' });
+        await User.findOneAndDelete({ userId });
+        res.status(204).json({
+            status: 'Deleted successfully',
+            data: {}
+        })
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
