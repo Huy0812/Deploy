@@ -253,7 +253,7 @@ const forgetPassword = async (req, res) => {
 
         emailFix = email.trim();
 
-        const user = await User.findOne({ emailFix });
+        let user = await User.findOne({ email: emailFix });
 
         if (!user) {
             return res.status(400).json({ success: false, message: "Invalid email" });
