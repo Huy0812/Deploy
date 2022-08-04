@@ -70,10 +70,8 @@ const register = async (req, res) => {
             res,
             user,
             201,
+            "Create account successfully"
         );
-        return res
-                .status(200)
-                .json({ success: false, message: "Create account successfully" });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
