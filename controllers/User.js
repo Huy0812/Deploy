@@ -180,12 +180,13 @@ const updateAvatar = async (req, res) => {
     try {
         let user = await User.findById(req.user._id);
         const avatar = req.files.avatar.tempFilePath;
-        
-        await cloudinary.v2.uploader.destroy(user.avatar.public_id);
-        
+        if (user.avatar.public_id != null) {
+            await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+        }
         user = await User.findById(req.user._id);
         const mycloud = await cloudinary.v2.uploader.upload(avatar);
         fs.rmSync("./tmp", { recursive: true });
+            
         user.avatar = {
             public_id: mycloud.public_id,
             url: mycloud.secure_url
