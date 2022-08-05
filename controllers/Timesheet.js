@@ -84,7 +84,17 @@ const checkout = async (req, res) => {
 // Lấy bảng xếp hạng top 5 nhân viên checkin trong ngày
 const getTop5 = async (req, res) => {
     try {
+        const currentDate = moment().format("DD/MM/YYYY");
         let timesheet = await Timesheet.find();
+
+        timesheet.forEach(myFunction);
+        function myFunction(timesheet) {
+            timesheet.segments.filter(function (segment) {
+                return segment.date === currentDate;
+            });
+        }
+        timesheet.
+            console.log(timesheet)
         sort = timesheet.sort((a, b) => moment(a.segments[a.segments.length - 1].checkinTime, "HH:mm:ss", true) - moment(b.segments[b.segments.length - 1].checkinTime, "HH:mm:ss", true));
 
         sort = sort.slice(0, 4);
