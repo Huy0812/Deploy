@@ -55,6 +55,7 @@ const userSchema = new mongoose.Schema({
     // Ngày sinh
     birth: {
         type: String,
+        default: "",
     },
 
     // // Giới tính
@@ -65,6 +66,7 @@ const userSchema = new mongoose.Schema({
     // Địa chỉ
     address: {
         type: String,
+        default: "",
     },
 
     //  Mã công ty
