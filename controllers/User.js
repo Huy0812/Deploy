@@ -174,8 +174,8 @@ const updateProfile = async (req, res) => {
         if (phoneNumber) user.phoneNumber = phoneNumber;
 
         if (birth) {
-            var dateMomentObject = moment(birth, "DD/MM/YYYY", true);
-            user.birth = dateMomentObject;
+            //var dateMomentObject = moment(birth, "DD/MM/YYYY", true);
+            user.birth = birth;
         }
         // if (gender) user.gender = gender;
         if (address) user.address = address;
