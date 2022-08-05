@@ -70,7 +70,7 @@ const register = async (req, res) => {
             res,
             user,
             201,
-            "Created account successfully"
+            "Create account successfully"
         );
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
