@@ -149,7 +149,8 @@ const updateProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
 
-        const { name, email, phoneNumber, birth, gender, address } = req.body;
+        // const { name, email, phoneNumber, birth, gender, address } = req.body;
+        const { name, email, phoneNumber, birth, address } = req.body;
 
         if (name) user.name = name;
 
@@ -164,7 +165,7 @@ const updateProfile = async (req, res) => {
             var dateMomentObject = moment(birth, "DD/MM/YYYY", true);
             user.birth = dateMomentObject;
         }
-        if (gender) user.gender = gender;
+        // if (gender) user.gender = gender;
         if (address) user.address = address;
 
         await user.save();
@@ -186,7 +187,7 @@ const updateAvatar = async (req, res) => {
         user = await User.findById(req.user._id);
         const mycloud = await cloudinary.v2.uploader.upload(avatar);
         fs.rmSync("./tmp", { recursive: true });
-            
+
         user.avatar = {
             public_id: mycloud.public_id,
             url: mycloud.secure_url

@@ -57,10 +57,10 @@ const userSchema = new mongoose.Schema({
         type: String,
     },
 
-    // Giới tính
-    gender: {
-        type: String,
-    },
+    // // Giới tính
+    // gender: {
+    //     type: String,
+    // },
 
     // Địa chỉ
     address: {
