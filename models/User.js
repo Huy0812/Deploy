@@ -55,16 +55,18 @@ const userSchema = new mongoose.Schema({
     // Ngày sinh
     birth: {
         type: String,
+        default: "",
     },
 
-    // Giới tính
-    gender: {
-        type: String,
-    },
+    // // Giới tính
+    // gender: {
+    //     type: String,
+    // },
 
     // Địa chỉ
     address: {
         type: String,
+        default: "",
     },
 
     //  Mã công ty
