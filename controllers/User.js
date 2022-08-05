@@ -147,10 +147,22 @@ const getAllProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
     try {
-        const user = await User.findById(req.user._id);
+        let user = await User.findById(req.user._id);
+        const avatar = req.files.avatar.tempFilePath;
+        if (user.avatar.public_id != null) {
+            await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+        }
+        user = await User.findById(req.user._id);
+        const mycloud = await cloudinary.v2.uploader.upload(avatar);
+        fs.rmSync("./tmp", { recursive: true });
 
-        // const { name, email, phoneNumber, birth, gender, address } = req.body;
-        const { name, email, phoneNumber, birth, address } = req.body;
+        user.avatar = {
+            public_id: mycloud.public_id,
+            url: mycloud.secure_url
+        }
+
+        const { name, email, phoneNumber, birth, gender, address } = req.body;
+        //const { name, email, phoneNumber, birth, address } = req.body;
 
         if (name) user.name = name;
 
@@ -167,7 +179,7 @@ const updateProfile = async (req, res) => {
         }
         // if (gender) user.gender = gender;
         if (address) user.address = address;
-
+        
         await user.save();
         res
             .status(200)
