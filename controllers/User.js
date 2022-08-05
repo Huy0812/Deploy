@@ -162,7 +162,6 @@ const updateProfile = async (req, res) => {
         }
 
         const { name, email, phoneNumber, birth, gender, address } = req.body;
-        //const { name, email, phoneNumber, birth, address } = req.body;
 
         if (name) user.name = name;
 
