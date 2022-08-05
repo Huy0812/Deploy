@@ -69,7 +69,7 @@ const register = async (req, res) => {
         sendToken(
             res,
             user,
-            201,
+            200,
             "Create account successfully"
         );
     } catch (error) {
