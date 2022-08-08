@@ -118,8 +118,8 @@ const getTop5 = async (req, res) => {
             checkinTimeStrB = b.segments[b.segments.length - 1].date + " " + b.segments[b.segments.length - 1].checkinTime;
             return moment(checkinTimeStrA, "DD/MM/YYYY HH:mm:ss") - moment(checkinTimeStrB, "DD/MM/YYYY HH:mm:ss")
         });
-        sort = sort.filter(function (element) { return element.segments[0].date === currentDate });
-        sort = sort.slice(0, 4);
+        sort = sort.filter(function (element) { return element.segments[element.segments.length - 1].date === currentDate });
+        sort = sort.slice(0, 5);
         let ranking = [];
         for (i = 0; i < 5; i++) {
             if (!sort[i]) break;
@@ -153,7 +153,7 @@ const getMyRank = async (req, res) => {
             checkinTimeStrB = b.segments[b.segments.length - 1].date + " " + b.segments[b.segments.length - 1].checkinTime;
             return moment(checkinTimeStrA, "DD/MM/YYYY HH:mm:ss") - moment(checkinTimeStrB, "DD/MM/YYYY HH:mm:ss")
         });
-        sort = sort.filter(function (element) { return element.segments[0].date === currentDate });
+        sort = sort.filter(function (element) { return element.segments[element.segments.length - 1].date === currentDate });
 
         let myRank = sort.findIndex(x => x.userId.equals(req.user._id)) + 1;
         if (myRank === -1) {
