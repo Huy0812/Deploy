@@ -70,7 +70,7 @@ const checkout = async (req, res) => {
     }
 };
 
-const getCheckin = async (req, res) => {
+const getTimesheetInfo = async (req, res) => {
     try {
         const currentDate = moment().format("DD/MM/YYYY");
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
@@ -78,30 +78,15 @@ const getCheckin = async (req, res) => {
         if (index === -1) {
             return res
                 .status(400)
-                .json({ success: false, message: "You haven't checkin today" });
+                .json({ success: false, message: error.message });
+        }
+        timesheetData = {
+            checkinTime: timesheet.segments[index].checkinTime,
+            checkoutTime: timesheet.segments[index].checkoutTime,
         }
         res
             .status(200)
-            .json({ success: true, message: "Checkin time", String: timesheet.segments[index].checkinTime });
-
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
-
-const getCheckout = async (req, res) => {
-    try {
-        const currentDate = moment().format("DD/MM/YYYY");
-        let timesheet = await Timesheet.findOne({ userId: req.user._id });
-        let index = timesheet.segments.findIndex(x => x.date === currentDate);
-        if (index === -1) {
-            return res
-                .status(400)
-                .json({ success: false, message: "You haven't checkout today" });
-        }
-        res
-            .status(200)
-            .json({ success: true, message: "Checkin time", String: timesheet.segments[index].checkoutTime });
+            .json({ success: true, message: "Checkin time", Object: timesheetData });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -447,4 +432,4 @@ const filterTimesheetDataByLastMonth = async (req, res) => {
 }
 
 
-module.exports = { checkin, checkout, getCheckin, getCheckout, getTop5, getMyRank, filterTimesheetDataByToday, filterTimesheetDataByYesterday, filterTimesheetDataByThisWeek, filterTimesheetDataByLastWeek, filterTimesheetDataByThisMonth, filterTimesheetDataByLastMonth }
+module.exports = { checkin, checkout, getTimesheetInfo, getTop5, getMyRank, filterTimesheetDataByToday, filterTimesheetDataByYesterday, filterTimesheetDataByThisWeek, filterTimesheetDataByLastWeek, filterTimesheetDataByThisMonth, filterTimesheetDataByLastMonth }
