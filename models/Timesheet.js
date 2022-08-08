@@ -40,7 +40,6 @@ const timesheetSchema = new mongoose.Schema({
             workingTime: {
                 type: Number,
                 required: true,
-                default: 0,
             },
 
         },

@@ -25,7 +25,7 @@ const checkin = async (req, res) => {
         let timesheetSegment = {
             date: currentDate,
             checkinTime: checkinTime,
-            checkoutTime: null,
+            checkoutTime: 0,
         };
         timesheet.segments.push(timesheetSegment);
 
