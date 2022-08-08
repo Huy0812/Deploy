@@ -1,32 +1,20 @@
 const Timesheet = require("../models/Timesheet")
 const User = require("../models/User")
 const moment = require("moment")
-const createTimesheet = async (req, res) => {
-    try {
-        let timesheet = await Timesheet.findOne({ userId: req.user._id });
-        if (timesheet) {
-            return res
-                .status(400)
-                .json({ success: false, message: "Created timesheet already" });
-        }
-        timesheet = await Timesheet.create({
-            userId: req.user._id,
-            segments: [],
-        })
-        res
-            .status(200)
-            .json({ success: false, message: "Created timesheet successfully" });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
 
 const checkin = async (req, res) => {
     try {
+        let timesheet = await Timesheet.findOne({ userId: req.user._id });
+        if (!timesheet) {
+            timesheet = await Timesheet.create({
+                userId: req.user._id,
+                segments: [],
+            })
+        }
+
         const currentDate = moment().format("DD/MM/YYYY");
         const checkinTime = moment().format("HH:mm:ss");
 
-        let timesheet = await Timesheet.findOne({ "userId": req.user._id });
         let index = timesheet.segments.findIndex(x => x.date === currentDate);
         if (index != -1) {
             return res
@@ -37,7 +25,7 @@ const checkin = async (req, res) => {
         let timesheetSegment = {
             date: currentDate,
             checkinTime: checkinTime,
-            checkoutTime: null,
+            checkoutTime: 0,
         };
         timesheet.segments.push(timesheetSegment);
 
@@ -61,6 +49,7 @@ const checkout = async (req, res) => {
         timesheet = await Timesheet.findOne({ "userId": req.user._id, "segments[index].date": currentDate });
 
         let workingTime = moment.duration(moment(timesheet.segments[index].checkoutTime, "HH:mm:ss").diff(moment(timesheet.segments[index].checkinTime, "HH:mm:ss"))).asHours();
+        workingTime = Math.round(workingTime * 100) / 100;
 
         let timesheetSegment = {
             date: timesheet.segments[index].date,
@@ -81,13 +70,56 @@ const checkout = async (req, res) => {
     }
 };
 
+const getCheckin = async (req, res) => {
+    try {
+        const currentDate = moment().format("DD/MM/YYYY");
+        let timesheet = await Timesheet.findOne({ userId: req.user._id });
+        let index = timesheet.segments.findIndex(x => x.date === currentDate);
+        if (index === -1) {
+            return res
+                .status(400)
+                .json({ success: false, message: "You haven't checkin today" });
+        }
+        res
+            .status(200)
+            .json({ success: true, message: "Checkin time", String: timesheet.segments[index].checkinTime });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+const getCheckout = async (req, res) => {
+    try {
+        const currentDate = moment().format("DD/MM/YYYY");
+        let timesheet = await Timesheet.findOne({ userId: req.user._id });
+        let index = timesheet.segments.findIndex(x => x.date === currentDate);
+        if (index === -1) {
+            return res
+                .status(400)
+                .json({ success: false, message: "You haven't checkout today" });
+        }
+        res
+            .status(200)
+            .json({ success: true, message: "Checkin time", String: timesheet.segments[index].checkoutTime });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
 // Lấy bảng xếp hạng top 5 nhân viên checkin trong ngày
 const getTop5 = async (req, res) => {
     try {
+        const currentDate = moment().format("DD/MM/YYYY");
         let timesheet = await Timesheet.find();
-        sort = timesheet.sort((a, b) => moment(a.segments[a.segments.length - 1].checkinTime, "HH:mm:ss", true) - moment(b.segments[b.segments.length - 1].checkinTime, "HH:mm:ss", true));
-
-        sort = sort.slice(0, 4);
+        sort = timesheet.sort(function (a, b) {
+            checkinTimeStrA = a.segments[a.segments.length - 1].date + " " + a.segments[a.segments.length - 1].checkinTime;
+            checkinTimeStrB = b.segments[b.segments.length - 1].date + " " + b.segments[b.segments.length - 1].checkinTime;
+            return moment(checkinTimeStrA, "DD/MM/YYYY HH:mm:ss") - moment(checkinTimeStrB, "DD/MM/YYYY HH:mm:ss")
+        });
+        sort = sort.filter(function (element) { return element.segments[element.segments.length - 1].date === currentDate });
+        sort = sort.slice(0, 5);
         let ranking = [];
         for (i = 0; i < 5; i++) {
             if (!sort[i]) break;
@@ -114,10 +146,21 @@ const getTop5 = async (req, res) => {
 // Lấy xếp hạng checkin trong ngày của nhân viên
 const getMyRank = async (req, res) => {
     try {
+        const currentDate = moment().format("DD/MM/YYYY");
         let timesheet = await Timesheet.find();
-        sort = timesheet.sort((a, b) => moment(a.segments[a.segments.length - 1].checkinTime, "HH:mm:ss", true) - moment(b.segments[b.segments.length - 1].checkinTime, "HH:mm:ss", true));
+        sort = timesheet.sort(function (a, b) {
+            checkinTimeStrA = a.segments[a.segments.length - 1].date + " " + a.segments[a.segments.length - 1].checkinTime;
+            checkinTimeStrB = b.segments[b.segments.length - 1].date + " " + b.segments[b.segments.length - 1].checkinTime;
+            return moment(checkinTimeStrA, "DD/MM/YYYY HH:mm:ss") - moment(checkinTimeStrB, "DD/MM/YYYY HH:mm:ss")
+        });
+        sort = sort.filter(function (element) { return element.segments[element.segments.length - 1].date === currentDate });
 
         let myRank = sort.findIndex(x => x.userId.equals(req.user._id)) + 1;
+        if (myRank === -1) {
+            return res
+                .status(400)
+                .json({ success: true, message: `You haven't checkin today` });
+        }
 
         res
             .status(200)
@@ -404,4 +447,4 @@ const filterTimesheetDataByLastMonth = async (req, res) => {
 }
 
 
-module.exports = { createTimesheet, checkin, checkout, getTop5, getMyRank, filterTimesheetDataByToday, filterTimesheetDataByYesterday, filterTimesheetDataByThisWeek, filterTimesheetDataByLastWeek, filterTimesheetDataByThisMonth, filterTimesheetDataByLastMonth }
+module.exports = { checkin, checkout, getCheckin, getCheckout, getTop5, getMyRank, filterTimesheetDataByToday, filterTimesheetDataByYesterday, filterTimesheetDataByThisWeek, filterTimesheetDataByLastWeek, filterTimesheetDataByThisMonth, filterTimesheetDataByLastMonth }
