@@ -2,8 +2,11 @@ const Timesheet = require("../models/Timesheet")
 const User = require("../models/User")
 const moment = require("moment")
 
-const checkin = async (req, res) => {
+const checking = async (req, res) => {
     try {
+        const currentDate = moment().format("DD/MM/YYYY");
+        const currentTime = moment().format("HH:mm:ss");
+
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
         if (!timesheet) {
             timesheet = await Timesheet.create({
@@ -12,40 +15,20 @@ const checkin = async (req, res) => {
             })
         }
 
-        const currentDate = moment().format("DD/MM/YYYY");
-        const checkinTime = moment().format("HH:mm:ss");
-
         let index = timesheet.segments.findIndex(x => x.date === currentDate);
-        if (index != -1) {
+        if (index === -1) {
+            let timesheetSegment = {
+                date: currentDate,
+                checkinTime: currentTime,
+                checkoutTime: 0,
+            };
+            timesheet.segments.push(timesheetSegment);
+
+            await timesheet.save();
             return res
-                .status(400)
-                .json({ success: false, message: "Checkin for today already" });
+                .status(200)
+                .json({ success: true, message: "Checkin successfully" });
         }
-
-        let timesheetSegment = {
-            date: currentDate,
-            checkinTime: checkinTime,
-            checkoutTime: 0,
-        };
-        timesheet.segments.push(timesheetSegment);
-
-        await timesheet.save();
-        res
-            .status(200)
-            .json({ success: true, message: "Checkin successfully" });
-
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
-
-const checkout = async (req, res) => {
-    try {
-        const currentDate = moment().format("DD/MM/YYYY");
-        const checkoutTime = moment().format("HH:mm:ss");
-
-        let timesheet = await Timesheet.findOne({ "userId": req.user._id });
-        let index = timesheet.segments.findIndex(x => x.date === currentDate);
         timesheet = await Timesheet.findOne({ "userId": req.user._id, "segments[index].date": currentDate });
 
         let workingTime = moment.duration(moment(timesheet.segments[index].checkoutTime, "HH:mm:ss").diff(moment(timesheet.segments[index].checkinTime, "HH:mm:ss"))).asHours();
@@ -54,14 +37,14 @@ const checkout = async (req, res) => {
         let timesheetSegment = {
             date: timesheet.segments[index].date,
             checkinTime: timesheet.segments[index].checkinTime,
-            checkoutTime: checkoutTime,
+            checkoutTime: currentTime,
             workingTime: workingTime,
         };
 
         timesheet.segments.pop();
         timesheet.segments.push(timesheetSegment);
         await timesheet.save();
-        res
+        return res
             .status(200)
             .json({ success: true, message: "Checkout successfully" });
 
@@ -432,4 +415,4 @@ const filterTimesheetDataByLastMonth = async (req, res) => {
 }
 
 
-module.exports = { checkin, checkout, getTimesheetInfo, getTop5, getMyRank, filterTimesheetDataByToday, filterTimesheetDataByYesterday, filterTimesheetDataByThisWeek, filterTimesheetDataByLastWeek, filterTimesheetDataByThisMonth, filterTimesheetDataByLastMonth }
+module.exports = { checking, getTimesheetInfo, getTop5, getMyRank, filterTimesheetDataByToday, filterTimesheetDataByYesterday, filterTimesheetDataByThisWeek, filterTimesheetDataByLastWeek, filterTimesheetDataByThisMonth, filterTimesheetDataByLastMonth }
