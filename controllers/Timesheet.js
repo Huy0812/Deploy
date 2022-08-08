@@ -84,9 +84,14 @@ const checkout = async (req, res) => {
 // Lấy bảng xếp hạng top 5 nhân viên checkin trong ngày
 const getTop5 = async (req, res) => {
     try {
+        const currentDate = moment().format("DD/MM/YYYY");
         let timesheet = await Timesheet.find();
-        sort = timesheet.sort((a, b) => moment(a.segments[a.segments.length - 1].checkinTime, "HH:mm:ss", true) - moment(b.segments[b.segments.length - 1].checkinTime, "HH:mm:ss", true));
-
+        sort = timesheet.sort(function (a, b) {
+            checkinTimeStrA = a.segments[a.segments.length - 1].date + " " + a.segments[a.segments.length - 1].checkinTime;
+            checkinTimeStrB = b.segments[b.segments.length - 1].date + " " + b.segments[b.segments.length - 1].checkinTime;
+            return moment(checkinTimeStrA, "DD/MM/YYYY HH:mm:ss") - moment(checkinTimeStrB, "DD/MM/YYYY HH:mm:ss")
+        });
+        sort = sort.filter(function (element) { return element.segments[0].date === currentDate });
         sort = sort.slice(0, 4);
         let ranking = [];
         for (i = 0; i < 5; i++) {
@@ -114,10 +119,21 @@ const getTop5 = async (req, res) => {
 // Lấy xếp hạng checkin trong ngày của nhân viên
 const getMyRank = async (req, res) => {
     try {
+        const currentDate = moment().format("DD/MM/YYYY");
         let timesheet = await Timesheet.find();
-        sort = timesheet.sort((a, b) => moment(a.segments[a.segments.length - 1].checkinTime, "HH:mm:ss", true) - moment(b.segments[b.segments.length - 1].checkinTime, "HH:mm:ss", true));
+        sort = timesheet.sort(function (a, b) {
+            checkinTimeStrA = a.segments[a.segments.length - 1].date + " " + a.segments[a.segments.length - 1].checkinTime;
+            checkinTimeStrB = b.segments[b.segments.length - 1].date + " " + b.segments[b.segments.length - 1].checkinTime;
+            return moment(checkinTimeStrA, "DD/MM/YYYY HH:mm:ss") - moment(checkinTimeStrB, "DD/MM/YYYY HH:mm:ss")
+        });
+        sort = sort.filter(function (element) { return element.segments[0].date === currentDate });
 
         let myRank = sort.findIndex(x => x.userId.equals(req.user._id)) + 1;
+        if (index === -1) {
+            return res
+                .status(400)
+                .json({ success: true, message: `You haven' t checkin today` });
+        }
 
         res
             .status(200)
