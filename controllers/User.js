@@ -144,7 +144,32 @@ const getAllProfile = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+const updateAdmin = async (req, res) => {
+    try {
+        user = await User.findById(req.user._id);
+        const { name, email, phoneNumber, startWorkingDate, contractStatus, typeOfEmployee, role, privilege } = req.body;
 
+        if (name) user.name = name;
+
+        if (email) {
+            emailFix = email.trim().toLowerCase();
+            user.email = emailFix;
+        }
+
+        if (phoneNumber) user.phoneNumber = phoneNumber;
+        if (startWorkingDate) user.startWorkingDate = starWorkingDate  
+        if (contractStatus) user.contractStatus = contractStatus 
+        if (typeOfEmployee) user.typeOfEmployee = typeOfEmployee
+        if (role) user.role = role 
+        if (privilege) user.privilege = privilege
+        await user.save();
+        res
+            .status(200)
+            .json({ success: true, message: "Profile updated successfully" });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
 const updateProfile = async (req, res) => {
     try {
         let user = await User.findById(req.user._id);
@@ -326,4 +351,4 @@ const resetPassword = async (req, res) => {
     }
 };
 
-module.exports = { register, verify, login, logout, getMyProfile, getAllProfile, updateProfile, updateAvatar, deleteProfile, updatePassword, forgetPassword, resetPassword }
+module.exports = { register, verify, login, logout, getMyProfile, getAllProfile, updateProfile, updateAvatar, deleteProfile, updatePassword, forgetPassword, resetPassword, updateAdmin }
