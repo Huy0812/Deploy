@@ -49,6 +49,7 @@ const checkout = async (req, res) => {
         timesheet = await Timesheet.findOne({ "userId": req.user._id, "segments[index].date": currentDate });
 
         let workingTime = moment.duration(moment(timesheet.segments[index].checkoutTime, "HH:mm:ss").diff(moment(timesheet.segments[index].checkinTime, "HH:mm:ss"))).asHours();
+        workingTime = Math.round(workingTime * 100) / 100;
 
         let timesheetSegment = {
             date: timesheet.segments[index].date,
@@ -155,7 +156,7 @@ const getMyRank = async (req, res) => {
         sort = sort.filter(function (element) { return element.segments[0].date === currentDate });
 
         let myRank = sort.findIndex(x => x.userId.equals(req.user._id)) + 1;
-        if (index === -1) {
+        if (myRank === -1) {
             return res
                 .status(400)
                 .json({ success: true, message: `You haven't checkin today` });
