@@ -69,7 +69,7 @@ const getTimesheetInfo = async (req, res) => {
         }
         res
             .status(200)
-            .json({ success: true, message: "Checkin time", Object: timesheetData });
+            .json({ success: true, message: "Checking time", Object: timesheetData });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
