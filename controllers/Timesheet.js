@@ -2,6 +2,7 @@ const Timesheet = require("../models/Timesheet")
 const User = require("../models/User")
 const moment = require("moment")
 
+// checkin + checkout (lần đầu là checkin, các lần sau là checkout, tự động lấy lần checkout cuối cùng trong ngày)
 const checking = async (req, res) => {
     try {
         const currentDate = moment().format("DD/MM/YYYY");
@@ -20,7 +21,7 @@ const checking = async (req, res) => {
             let timesheetSegment = {
                 date: currentDate,
                 checkinTime: currentTime,
-                checkoutTime: 0,
+                checkoutTime: null,
             };
             timesheet.segments.push(timesheetSegment);
 
@@ -53,23 +54,29 @@ const checking = async (req, res) => {
     }
 };
 
+// Lấy thông tin checkin, checkout
 const getTimesheetInfo = async (req, res) => {
     try {
         const currentDate = moment().format("DD/MM/YYYY");
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
         let index = timesheet.segments.findIndex(x => x.date === currentDate);
         if (index === -1) {
+            timesheetData = {
+                checkinTime: null,
+                checkoutTime: null,
+            }
             return res
                 .status(400)
-                .json({ success: false, message: error.message });
+                .json({ success: true, message: "Checking time", Object: timesheetData });
         }
+
         timesheetData = {
             checkinTime: timesheet.segments[index].checkinTime,
             checkoutTime: timesheet.segments[index].checkoutTime,
         }
         res
             .status(200)
-            .json({ success: true, message: "Checkin time", Object: timesheetData });
+            .json({ success: true, message: "Checking time", Object: timesheetData });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -123,7 +130,7 @@ const getMyRank = async (req, res) => {
         });
         sort = sort.filter(function (element) { return element.segments[element.segments.length - 1].date === currentDate });
 
-        let myRank = sort.findIndex(x => x.userId.equals(req.user._id)) + 1;
+        let myRank = sort.findIndex(x => x.userId.equals(req.user._id));
         if (myRank === -1) {
             return res
                 .status(400)
@@ -132,7 +139,7 @@ const getMyRank = async (req, res) => {
 
         res
             .status(200)
-            .json({ success: true, message: `My ranking`, number: myRank });
+            .json({ success: true, message: `My ranking`, number: myRank + 1 });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -414,5 +421,48 @@ const filterTimesheetDataByLastMonth = async (req, res) => {
     }
 }
 
+// Lọc thông tin chấm công (trong khoảng)
+const filterTimesheetDataByRange = async (req, res) => {
+    try {
+        const { start, end } = req.body;
 
-module.exports = { checking, getTimesheetInfo, getTop5, getMyRank, filterTimesheetDataByToday, filterTimesheetDataByYesterday, filterTimesheetDataByThisWeek, filterTimesheetDataByLastWeek, filterTimesheetDataByThisMonth, filterTimesheetDataByLastMonth }
+        let timesheet = await Timesheet.findOne({ userId: req.user._id });
+        let segments = timesheet.segments;
+
+        segments = segments.filter(function (segment) {
+            return moment(segment.date, "DD/MM/YYYY") >= moment(start, "DD/MM/YYYY") && moment(segment.date, "DD/MM/YYYY") <= moment(end, "DD/MM/YYYY");
+        });
+        checkinLateNum = segments.filter(function (segment) { return isCheckinLate(segment.checkinTime) }).length;
+        checkoutEarlyNum = segments.filter(function (segment) { return isCheckoutEarly(segment.checkinTime) }).length;
+        checkoutLateNum = segments.filter(function (segment) { return isCheckoutLate(segment.checkinTime) }).length;
+
+        checkinLateValue = segments.reduce((accumulator, segment) => {
+            return accumulator + getCheckinLate(segment.checkinTime);
+        }, 0);
+        checkoutEarlyValue = segments.reduce((accumulator, segment) => {
+            return accumulator + getCheckoutEarly(segment.checkoutTime);
+        }, 0);
+        checkoutLateValue = segments.reduce((accumulator, segment) => {
+            return accumulator + getCheckoutLate(segment.checkoutTime);
+        }, 0);
+
+        checkinLateData = checkinLateValue + " phút/ " + checkinLateNum + " lần";
+        checkoutEarlyData = checkoutEarlyValue + " phút/ " + checkoutEarlyNum + " lần";
+        checkoutLateData = checkoutLateValue + " phút/ " + checkoutLateNum + " lần";
+
+        let timesheetData = {
+            checkinLate: checkinLateData,
+            checkoutEarly: checkoutEarlyData,
+            checkoutLate: checkoutLateData,
+        }
+
+        return res
+            .status(200)
+            .json({ success: true, message: `Timesheet data`, Object: timesheetData });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+module.exports = { checking, getTimesheetInfo, getTop5, getMyRank, filterTimesheetDataByToday, filterTimesheetDataByYesterday, filterTimesheetDataByThisWeek, filterTimesheetDataByLastWeek, filterTimesheetDataByThisMonth, filterTimesheetDataByLastMonth, filterTimesheetDataByRange }
