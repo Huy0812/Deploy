@@ -6,7 +6,7 @@ const moment = require("moment")
 const checking = async (req, res) => {
     try {
         const currentDate = moment().format("DD/MM/YYYY");
-        const currentTime = moment().format("HH:mm:ss");
+        const currentTime = req.body
 
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
         if (!timesheet) {
