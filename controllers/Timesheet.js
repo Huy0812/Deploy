@@ -60,6 +60,7 @@ const getTimesheetInfo = async (req, res) => {
         const currentDate = moment().format("DD/MM/YYYY");
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
         let index = timesheet.segments.findIndex(x => x.date === currentDate);
+        let timesheetData
         if (index === -1) {
             timesheetData = {
                 checkinTime: null,
@@ -425,7 +426,6 @@ const filterTimesheetDataByLastMonth = async (req, res) => {
 const filterTimesheetDataByRange = async (req, res) => {
     try {
         const { start, end } = req.body;
-
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
         let segments = timesheet.segments;
 

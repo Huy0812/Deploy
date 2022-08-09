@@ -14,4 +14,5 @@ router.route("/deleteprofile").delete(isAuthenticated, deleteProfile)
 router.route("/updatepassword").put(isAuthenticated, updatePassword)
 router.route("/forgetpassword").post(forgetPassword)
 router.route("/resetpassword").put(resetPassword)
+router.route("/updateadmin").put()
 module.exports = router
