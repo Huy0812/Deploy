@@ -198,7 +198,7 @@ const updateProfile = async (req, res) => {
         if (phoneNumber) user.phoneNumber = phoneNumber;
 
         if (birth) {
-            user.birth = moment().format("HH:mm:ss");
+            user.birth = birth //moment().format("HH:mm:ss");
         }
         if (gender) user.gender = gender;
         if (address) user.address = address;
