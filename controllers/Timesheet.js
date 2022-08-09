@@ -5,8 +5,8 @@ const moment = require("moment")
 // checkin + checkout (lần đầu là checkin, các lần sau là checkout, tự động lấy lần checkout cuối cùng trong ngày)
 const checking = async (req, res) => {
     try {
-        const currentDate = moment().format("DD/MM/YYYY");
-        const currentTime = moment().format("HH:mm:ss");
+        const currentDate = moment().tz('Asia/Ho_Chi_Minh').format("DD/MM/YYYY");
+        const currentTime = moment().tz('Asia/Ho_Chi_Minh').format("HH:mm:ss");
 
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
         if (!timesheet) {
