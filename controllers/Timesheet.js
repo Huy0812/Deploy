@@ -425,6 +425,7 @@ const filterTimesheetDataByLastMonth = async (req, res) => {
 const filterTimesheetDataByRange = async (req, res) => {
     try {
         const { start, end } = req.body;
+        console.log(start, end)
 
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
         let segments = timesheet.segments;
