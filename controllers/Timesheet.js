@@ -2,11 +2,13 @@ const Timesheet = require("../models/Timesheet")
 const User = require("../models/User")
 const moment = require("moment")
 const momenttz = require("moment-timezone")
+
 // checkin + checkout (lần đầu là checkin, các lần sau là checkout, tự động lấy lần checkout cuối cùng trong ngày)
 const checking = async (req, res) => {
     try {
-        const currentDate = moment().tz('Asia/Ho_Chi_Minh').format("DD/MM/YYYY");
-        const currentTime = moment().tz('Asia/Ho_Chi_Minh').format("HH:mm:ss");
+        const current = moment();
+        const currentDate = current.tz('Asia/Ho_Chi_Minh').format("DD/MM/YYYY");
+        const currentTime = current.tz('Asia/Ho_Chi_Minh').format("HH:mm:ss");
 
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
         if (!timesheet) {
@@ -21,7 +23,6 @@ const checking = async (req, res) => {
             let timesheetSegment = {
                 date: currentDate,
                 checkinTime: currentTime,
-                checkoutTime: null,
             };
             timesheet.segments.push(timesheetSegment);
 
@@ -60,7 +61,7 @@ const getTimesheetInfo = async (req, res) => {
         const currentDate = moment().format("DD/MM/YYYY");
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
         let index = timesheet.segments.findIndex(x => x.date === currentDate);
-        let timesheetData
+
         if (index === -1) {
             timesheetData = {
                 checkinTime: null,

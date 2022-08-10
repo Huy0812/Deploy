@@ -55,6 +55,7 @@ const updateInformation = async (req, res) => {
         if (hotline) company.hotline = hotline;
         if (introduction) company.introduction = introduction;
         if (website) company.website = website;
+        if (fanpage) company.fanpage = fanpage;
 
         await company.save();
 

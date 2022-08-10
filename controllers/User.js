@@ -3,7 +3,7 @@ const sendMail = require("../utils/sendMail")
 const sendToken = require("../utils/sendToken")
 const cloudinary = require("cloudinary")
 const fs = require("fs")
-const moment = require("moment")
+
 const verify = async (req, res) => {
     try {
         const otp = Number(req.body.otp);
@@ -157,10 +157,10 @@ const updateAdmin = async (req, res) => {
         }
 
         if (phoneNumber) user.phoneNumber = phoneNumber;
-        if (startWorkingDate) user.startWorkingDate = starWorkingDate  
-        if (contractStatus) user.contractStatus = contractStatus 
+        if (startWorkingDate) user.startWorkingDate = starWorkingDate
+        if (contractStatus) user.contractStatus = contractStatus
         if (typeOfEmployee) user.typeOfEmployee = typeOfEmployee
-        if (role) user.role = role 
+        if (role) user.role = role
         if (privilege) user.privilege = privilege
         await user.save();
         res
@@ -198,11 +198,11 @@ const updateProfile = async (req, res) => {
         if (phoneNumber) user.phoneNumber = phoneNumber;
 
         if (birth) {
-            user.birth = birth //moment().format("HH:mm:ss");
+            user.birth = birth;
         }
         if (gender) user.gender = gender;
         if (address) user.address = address;
-        
+
         await user.save();
         res
             .status(200)
@@ -245,10 +245,10 @@ const deleteProfile = async (req, res) => {
 
         const { userId } = req.body;
         await User.findOneAndDelete({ userId });
-        res.status(204).json({
-            status: 'Deleted successfully',
-            data: {}
-        })
+        return res
+            .status(204)
+            .json({ success: false, message: "Deleted successfully" });
+
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
