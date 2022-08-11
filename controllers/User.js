@@ -318,14 +318,44 @@ const updatePassword = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
-
+const phonePassword = async (req, res) => {
+    try {
+      const { phoneNumber } = req.body;
+  
+      // emailFix = email.trim().toLowerCase();
+  
+      let user = await User.findOne({ phoneNumber: phoneNumber });
+  
+      if (!user) {
+        return res.status(400).json({ success: false, message: "Invalid phone number" });
+      }
+  
+      const otp = Math.floor(Math.floor(100000 + Math.random() * 900000));
+  
+      user.resetPasswordOtp = otp;
+      user.resetPasswordOtpExpiry = Date.now() + 10 * 60 * 1000;
+  
+      await user.save();
+  
+      const message = `Your OTP for reseting the password is ${otp}. If you did not request for this, please ignore this email.`;
+  
+      // await sendMail(emailFix, "Request for reseting password", message);
+      await sendPhone(phoneNumber, message);
+  
+      res
+        .status(200)
+        .json({ success: true, message: `OTP has been sent to ${phoneNumber}` });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  };
 const forgetPassword = async (req, res) => {
   try {
-    const { phoneNumber } = req.body;
+    const { email } = req.body;
 
-    // emailFix = email.trim().toLowerCase();
+    emailFix = email.trim().toLowerCase();
 
-    let user = await User.findOne({ phoneNumber: phoneNumber });
+    let user = await User.findOne({ email: emailFix });
 
     if (!user) {
       return res.status(400).json({ success: false, message: "Invalid phone number" });
@@ -340,8 +370,7 @@ const forgetPassword = async (req, res) => {
 
     const message = `Your OTP for reseting the password is ${otp}. If you did not request for this, please ignore this email.`;
 
-    // await sendMail(emailFix, "Request for reseting password", message);
-    await sendPhone(phoneNumber, message);
+    await sendMail(emailFix, "Request for reseting password", message);
 
     res
       .status(200)
