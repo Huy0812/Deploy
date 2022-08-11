@@ -52,6 +52,7 @@ const register = async (req, res) => {
       email,
       phoneNumber,
       password,
+      confirmPassword, 
       privilege,
       startWorkingDate,
       contractStatus,
@@ -72,7 +73,14 @@ const register = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Phone number already exists" });
     }
-
+    if (password != confirmPassword) {
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message: "The password or confirm password is incorrect",
+          });
+      }
     emailFix = email.trim().toLowerCase();
     user = await User.create({
       name,
