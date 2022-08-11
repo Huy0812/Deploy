@@ -433,4 +433,5 @@ module.exports = {
   forgetPassword,
   resetPassword,
   updateAdmin,
+  phonePassword
 };
