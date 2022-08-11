@@ -157,7 +157,7 @@ const getAllProfile = async (req, res) => {
       .json({
         success: true,
         message: `All profiles (sort by userId)`,
-        array: users,
+        array: sort,
       });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
