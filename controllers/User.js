@@ -150,7 +150,7 @@ const getMyProfile = async (req, res) => {
 const getAllProfile = async (req, res) => {
   try {
     const users = await User.find();
-    //sort = users.sort((a, b) => a.userId - b.userId);
+    sort = users.sort((a, b) => a.userId - b.userId);
 
     return res
       .status(200)
