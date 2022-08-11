@@ -86,7 +86,7 @@ const register = async (req, res) => {
       role,
     });
 
-    sendToken(res, user, 200, "Create account successfully");
+    return res.status(200).json({success: true, message: "Create account successfully" });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
