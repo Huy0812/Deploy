@@ -25,7 +25,7 @@ const sendToken = (res, user, statusCode, message) => {
         deviceId: user.deviceId,
         firstLogin: user.firstLogin,
         verified: user.verified,
-        
+
     };
 
     res
