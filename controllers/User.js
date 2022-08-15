@@ -208,7 +208,7 @@ const updateAdmin = async (req, res) => {
 };
 const updateProfile = async (req, res) => {
   try {
-    let user = await User.findById(req.user._id);
+    let user = await User.findById(req.user._id).select("+password");
     const avatar = req.files.avatar.tempFilePath;
     if (user.avatar.public_id != null) {
       await cloudinary.v2.uploader.destroy(user.avatar.public_id);
