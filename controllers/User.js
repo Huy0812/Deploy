@@ -52,7 +52,7 @@ const register = async (req, res) => {
       email,
       phoneNumber,
       password,
-      confirmPassword, 
+      confirmPassword,
       privilege,
       startWorkingDate,
       contractStatus,
@@ -74,13 +74,13 @@ const register = async (req, res) => {
         .json({ success: false, message: "Phone number already exists" });
     }
     if (password != confirmPassword) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "The password or confirm password is incorrect",
-          });
-      }
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "The password or confirm password is incorrect",
+        });
+    }
     emailFix = email.trim().toLowerCase();
     user = await User.create({
       name,
@@ -94,7 +94,7 @@ const register = async (req, res) => {
       role,
     });
 
-    return res.status(200).json({success: true, message: "Create account successfully" });
+    return res.status(200).json({ success: true, message: "Create account successfully" });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -230,7 +230,7 @@ const updateProfile = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Passwords does not match" });
     }
-    
+
     if (name) user.name = name;
 
     if (email) {
@@ -280,50 +280,50 @@ const updateAvatar = async (req, res) => {
 };
 
 const deleteProfile = async (req, res) => {
-    try {
-        let user = await User.findById(req.user._id);
-        if (!user.privilege  === "Quản trị viên") {
-            return res
-                .status(403)
-                .json({ success: false, message: "Forbidden: You don't have permisson to access this" });
-        }
+  try {
+    let user = await User.findById(req.user._id);
+    if (!user.privilege === "Quản trị viên") {
+      return res
+        .status(403)
+        .json({ success: false, message: "Forbidden: You don't have permisson to access this" });
+    }
 
-        const { userId } = req.body;
-        user = await User.findById(userId)
-        if (!user) {
-            return res
-                .status(404)
-                .json({ success: false, message: "None exists" });
-        }
-        await User.findByIdAndDelete(userId)
-        res
-            .status(200)
-            .json({ success: true, message: "Deleted user successfully" });
+    const { userId } = req.body;
+    user = await User.findById(userId)
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "None exists" });
+    }
+    await User.findByIdAndDelete(userId)
+    res
+      .status(200)
+      .json({ success: true, message: "Deleted user successfully" });
 
-    } catch (error) {
+  } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 const updateDeviceId = async (req, res) => {
-    try {
-      const user = await User.findById(req.user._id)
-      const {deviceId}  = req.body;
-      
-      userAll = await User.findOne({ deviceId });
-      if (userAll) {
-        return res
-          .status(400)
-          .json({ success: false, message: "deviceId already exists" });
-      }
-    user.deviceId = deviceId;
-      await user.save();
-      res
-        .status(200)
-        .json({ success: true, message: "DeviceId updated successfully" });
-    } catch (error) {
-      res.status(500).json({ success: false, message: error.message });
+  try {
+    const user = await User.findById(req.user._id)
+    const { deviceId } = req.body;
+
+    userAll = await User.findOne({ deviceId });
+    if (userAll) {
+      return res
+        .status(400)
+        .json({ success: false, message: "deviceId already exists" });
     }
-  };
+    user.deviceId = deviceId;
+    await user.save();
+    res
+      .status(200)
+      .json({ success: true, message: "DeviceId updated successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 const updatePassword = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select("+password");
@@ -344,15 +344,15 @@ const updatePassword = async (req, res) => {
         .json({ success: false, message: "Passwords does not match" });
     }
     if (newPassword == confirmPassword) {
-        user.password = newPassword;
-          } else {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "The password or confirm password is incorrect",
-          });
-      }
+      user.password = newPassword;
+    } else {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "The password or confirm password is incorrect",
+        });
+    }
     await user.save();
     res
       .status(200)
@@ -362,36 +362,36 @@ const updatePassword = async (req, res) => {
   }
 };
 const phonePassword = async (req, res) => {
-    try {
-      const { phoneNumber } = req.body;
-  
-      // emailFix = email.trim().toLowerCase();
-  
-      let user = await User.findOne({ phoneNumber: phoneNumber });
-  
-      if (!user) {
-        return res.status(400).json({ success: false, message: "Invalid phone number" });
-      }
-  
-      const otp = Math.floor(Math.floor(100000 + Math.random() * 900000));
-  
-      user.resetPasswordOtp = otp;
-      user.resetPasswordOtpExpiry = Date.now() + 10 * 60 * 1000;
-  
-      await user.save();
-  
-      const message = `Your OTP for reseting the password is ${otp}. If you did not request for this, please ignore this email.`;
-  
-      // await sendMail(emailFix, "Request for reseting password", message);
-      await sendPhone(phoneNumber, message);
-  
-      res
-        .status(200)
-        .json({ success: true, message: `OTP has been sent to ${phoneNumber}` });
-    } catch (error) {
-      res.status(500).json({ success: false, message: error.message });
+  try {
+    const { phoneNumber } = req.body;
+
+    // emailFix = email.trim().toLowerCase();
+
+    let user = await User.findOne({ phoneNumber: phoneNumber });
+
+    if (!user) {
+      return res.status(400).json({ success: false, message: "Invalid phone number" });
     }
-  };
+
+    const otp = Math.floor(Math.floor(100000 + Math.random() * 900000));
+
+    user.resetPasswordOtp = otp;
+    user.resetPasswordOtpExpiry = Date.now() + 10 * 60 * 1000;
+
+    await user.save();
+
+    const message = `Your OTP for reseting the password is ${otp}. If you did not request for this, please ignore this email.`;
+
+    // await sendMail(emailFix, "Request for reseting password", message);
+    await sendPhone(phoneNumber, message);
+
+    res
+      .status(200)
+      .json({ success: true, message: `OTP has been sent to ${phoneNumber}` });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 const forgetPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -462,24 +462,23 @@ const resetPassword = async (req, res) => {
   }
 };
 const searchUser = async (req, res) => {
-    try {
-        const keyword = req.query.name
-            ? {
-                $or: [
-                    { name: { $regex: req.query.name, $options: "i" } },
-                ],
-            }
-            : {};
+  try {
+    const keyword = req.query.name
+      ? {
+        $or: [
+          { name: { $regex: req.query.name, $options: "i" } },
+        ],
+      }
+      : {};
 
-        const users = await User.find(keyword);
-        res
-            .status(200)
-            .json({ success: false, message: "Users", array: users })
+    const users = await User.find(keyword);
+    res
+      .status(200)
+      .json({ success: false, message: "Users", array: users })
 
-            .json({ success: true, message: `Password changed successfully` });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 
 };
 module.exports = {
