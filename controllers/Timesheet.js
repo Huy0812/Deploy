@@ -15,16 +15,16 @@ const checking = async (req, res) => {
         const user = await User.findById(req.user._id)
         const companyId = user.companyId;
         const company = await Company.findById(companyId);
-        const {networkIp, deviceId} = req.body 
+        const { networkIp, deviceId } = req.body
         if (company.companyIp != networkIp) {
             return res
-          .status(400)
-          .json({ success: false, message: "You need to access the company network" });
+                .status(400)
+                .json({ success: false, message: "You need to access the company network" });
         }
         if (user.deviceId != deviceId) {
             return res
-          .status(400)
-          .json({ success: false, message: "deviceId is Incorrect. Please update your deviceId" });
+                .status(400)
+                .json({ success: false, message: "deviceId is Incorrect. Please update your deviceId" });
         }
         if (!timesheet) {
             timesheet = await Timesheet.create({

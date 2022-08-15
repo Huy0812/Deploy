@@ -1,5 +1,5 @@
 const express = require("express")
-const { register, verify, login, logout, getMyProfile, getAllProfile, updateProfile, updateAvatar, deleteProfile, updatePassword, forgetPassword, resetPassword } = require("../controllers/User")
+const { register, verify, login, logout, getMyProfile, getAllProfile, updateProfile, updateAvatar, deleteProfile, updatePassword, forgetPassword, resetPassword, phonePassword } = require("../controllers/User")
 const isAuthenticated = require("../middleware/auth")
 const router = express.Router()
 router.route("/register").post(isAuthenticated, register)
