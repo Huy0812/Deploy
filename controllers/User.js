@@ -288,7 +288,7 @@ const deleteProfile = async (req, res) => {
         .json({ success: false, message: "Forbidden: You don't have permisson to access this" });
     }
 
-    const { userId } = req.body;
+    const { userId } = req.params;
     user = await User.findById(userId)
     if (!user) {
       return res
