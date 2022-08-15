@@ -37,7 +37,7 @@ const register = async (req, res) => {
     let user = await User.findById(req.user._id);
     if (
       user.privilege !== "Quản trị viên" &&
-      user.privilege.equals !== "Quản lý"
+      user.privilege !== "Quản lý"
     ) {
       return res
         .status(403)
