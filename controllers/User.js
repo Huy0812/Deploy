@@ -282,7 +282,7 @@ const updateAvatar = async (req, res) => {
 const deleteProfile = async (req, res) => {
   try {
     let user = await User.findById(req.user._id);
-    if (!user.privilege === "Quản trị viên") {
+    if (user.privilege !== "Quản trị viên") {
       return res
         .status(403)
         .json({ success: false, message: "Forbidden: You don't have permisson to access this" });
