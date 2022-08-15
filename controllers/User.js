@@ -208,7 +208,8 @@ const updateAdmin = async (req, res) => {
 };
 const updateProfile = async (req, res) => {
   try {
-    let user = await User.findById(req.user._id).select("+password");
+    let user = await User.findById(req.user._id);
+    const userPass = await User.findById(req.user._id).select("+password");
     const avatar = req.files.avatar.tempFilePath;
     if (user.avatar.public_id != null) {
       await cloudinary.v2.uploader.destroy(user.avatar.public_id);
@@ -223,7 +224,7 @@ const updateProfile = async (req, res) => {
     };
 
     const { name, email, phoneNumber, birth, gender, address, password } = req.body;
-    const isMatch = await user.comparePassword(password);
+    const isMatch = await userPass.comparePassword(password);
     if (!isMatch) {
       return res
         .status(400)
