@@ -13,6 +13,11 @@ const createTask = async (req, res) => {
         var description = req.body.description;
         var deadline = req.body.deadline;
 
+        let isDone = [];
+        for (let i = 0; i < req.body.users.length; i++) {
+            isDone.push(false);
+        }
+
         const currentTime = moment().tz('Asia/Ho_Chi_Minh');
 
         task = await Task.create({
@@ -24,6 +29,7 @@ const createTask = async (req, res) => {
             managerId: req.user._id,
             contributorIds: userIds,
             status: "Đã giao",
+            isDone: isDone,
             isApproved: false,
         });
         res.status(200).json({ success: true, message: "Create task successfully" });
@@ -130,9 +136,32 @@ const getAllTask = async (req, res) => {
     }
 };
 
-// Đánh dấu Task là đã hoàn thành
-const checkingTaskAsDone = async (req, res) => {
+// Đánh dấu Task
+const checkingTask = async (req, res) => {
+    try {
+        const { taskId } = req.body;
 
+
+        const task = await Task.findById(taskId)
+
+        let index = task.contributorIds.findIndex(x => x.equals(req.user._id));
+
+        if (!task.isDone[index]) {
+            task.isDone[index] = true;
+            await task.save();
+            return res
+                .status(200)
+                .json({ success: true, message: `Checking Task as Done` });
+        }
+        task.isDone[index] = false;
+        await task.save();
+        return res
+            .status(200)
+            .json({ success: true, message: `Checking Task as Not done` });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
 };
 
-module.exports = { createTask, updateTask, deleteTask, getMyTask, getMyTaskAsManager, getMyTaskAsContributor, getAllTask }
+module.exports = { createTask, updateTask, deleteTask, getMyTask, getMyTaskAsManager, getMyTaskAsContributor, getAllTask, checkingTask }
