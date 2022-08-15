@@ -280,24 +280,27 @@ const updateAvatar = async (req, res) => {
 };
 
 const deleteProfile = async (req, res) => {
-  try {
-    let user = await User.findById(req.user._id);
-    if (!user.privilege.equals("Quản trị viên")) {
-      return res
-        .status(403)
-        .json({
-          success: false,
-          message: "Forbidden: You don't have permisson to access this",
-        });
-    }
+    try {
+        let user = await User.findById(req.user._id);
+        if (!user.privilege  === "Quản trị viên") {
+            return res
+                .status(403)
+                .json({ success: false, message: "Forbidden: You don't have permisson to access this" });
+        }
 
-    const { userId } = req.body;
-    await User.findOneAndDelete({ userId });
-    res.status(204).json({
-      status: "Deleted successfully",
-      data: {},
-    });
-  } catch (error) {
+        const { userId } = req.body;
+        user = await User.findById(userId)
+        if (!user) {
+            return res
+                .status(404)
+                .json({ success: false, message: "None exists" });
+        }
+        await User.findByIdAndDelete(userId)
+        res
+            .status(200)
+            .json({ success: true, message: "Deleted user successfully" });
+
+    } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -458,7 +461,27 @@ const resetPassword = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+const searchUser = async (req, res) => {
+    try {
+        const keyword = req.query.name
+            ? {
+                $or: [
+                    { name: { $regex: req.query.name, $options: "i" } },
+                ],
+            }
+            : {};
 
+        const users = await User.find(keyword);
+        res
+            .status(200)
+            .json({ success: false, message: "Users", array: users })
+
+            .json({ success: true, message: `Password changed successfully` });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+
+};
 module.exports = {
   register,
   verify,
@@ -474,5 +497,6 @@ module.exports = {
   resetPassword,
   updateAdmin,
   phonePassword,
-  updateDeviceId
+  updateDeviceId,
+  searchUser
 };
