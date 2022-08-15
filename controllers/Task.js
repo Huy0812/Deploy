@@ -141,7 +141,6 @@ const checkingTask = async (req, res) => {
     try {
         const { taskId } = req.body;
 
-
         const task = await Task.findById(taskId)
 
         let index = task.contributorIds.findIndex(x => x.equals(req.user._id));
@@ -164,4 +163,67 @@ const checkingTask = async (req, res) => {
     }
 };
 
-module.exports = { createTask, updateTask, deleteTask, getMyTask, getMyTaskAsManager, getMyTaskAsContributor, getAllTask, checkingTask }
+// Đếm Task (đã hoàn thành)
+const countTaskAsDone = async (req, res) => {
+    try {
+        const task = await Task.find()
+
+        let count = task.filter(obj => {
+            if (obj.status === "Đã hoàn thành") {
+                return true;
+            }
+            return false;
+        }).length;
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message, count: count });
+    }
+};
+
+// Đếm Task (chưa hoàn thành)
+const countTaskAsNotDone = async (req, res) => {
+    try {
+        const task = await Task.find()
+
+        let count = task.filter(obj => {
+            if (obj.status === "Chưa hoàn thành") {
+                return true;
+            }
+            return false;
+        }).length;
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message, count: count });
+    }
+};
+
+// Đếm Task (quá hạn)
+const countTaskAsOutOfDate = async (req, res) => {
+    try {
+        const task = await Task.find()
+
+        let count = task.filter(obj => {
+            if (obj.status === "Quá hạn") {
+                return true;
+            }
+            return false;
+        }).length;
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message, count: count });
+    }
+};
+
+// Đếm Task (tất cả)
+const countTaskAll = async (req, res) => {
+    try {
+        const task = await Task.find()
+
+        let count = task.length;
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message, count: count });
+    }
+};
+
+module.exports = { createTask, updateTask, deleteTask, getMyTask, getMyTaskAsManager, getMyTaskAsContributor, getAllTask, checkingTask, countTaskAsDone, countTaskAsNotDone, countTaskAsOutOfDate, countTaskAll }
