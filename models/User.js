@@ -108,11 +108,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-
+    deviceId: {
+        type: String,
+        unique: true ,
+    } ,
     // Xác thực
     verified: {
         type: Boolean,
-        default: true,
+        default: true ,
     },
     otp: Number,
     otp_expiry: Date,

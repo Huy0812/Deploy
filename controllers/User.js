@@ -294,12 +294,31 @@ const deleteProfile = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
-
+const updateDeviceId = async (req, res) => {
+    try {
+      const user = await User.findById(req.user._id)
+      const {deviceId}  = req.body;
+      
+      userAll = await User.findOne({ deviceId });
+      if (userAll) {
+        return res
+          .status(400)
+          .json({ success: false, message: "deviceId already exists" });
+      }
+    user.deviceId = deviceId;
+      await user.save();
+      res
+        .status(200)
+        .json({ success: true, message: "DeviceId updated successfully" });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  };
 const updatePassword = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select("+password");
 
-    const { oldPassword, newPassword } = req.body;
+    const { oldPassword, newPassword, confirmPassword } = req.body;
 
     if (!oldPassword || !newPassword) {
       return res
@@ -314,11 +333,17 @@ const updatePassword = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Passwords does not match" });
     }
-
-    user.password = newPassword;
-
+    if (newPassword == confirmPassword) {
+        user.password = newPassword;
+          } else {
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message: "The password or confirm password is incorrect",
+          });
+      }
     await user.save();
-
     res
       .status(200)
       .json({ success: true, message: "Password updated successfully" });
@@ -441,5 +466,6 @@ module.exports = {
   forgetPassword,
   resetPassword,
   updateAdmin,
-  phonePassword
+  phonePassword,
+  updateDeviceId
 };

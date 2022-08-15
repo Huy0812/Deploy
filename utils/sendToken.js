@@ -22,7 +22,10 @@ const sendToken = (res, user, statusCode, message) => {
         contractStatus: user.contractStatus,
         typeOfEmployee: user.typeOfEmployee,
         role: user.role,
+        deviceId: user.deviceId,
+        firstLogin: user.firstLogin,
         verified: user.verified,
+        
     };
 
     res
