@@ -222,8 +222,13 @@ const updateProfile = async (req, res) => {
       url: mycloud.secure_url,
     };
 
-    const { name, email, phoneNumber, birth, gender, address } = req.body;
-
+    const { name, email, phoneNumber, birth, gender, address, password } = req.body;
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Passwords does not match" });
+      }
     if (name) user.name = name;
 
     if (email) {
