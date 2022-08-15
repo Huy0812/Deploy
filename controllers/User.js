@@ -288,14 +288,14 @@ const deleteProfile = async (req, res) => {
         .json({ success: false, message: "Forbidden: You don't have permisson to access this" });
     }
 
-    const { userId } = req.body;
-    user = await User.findById(userId)
+    const { _id } = req.body;
+    user = await User.findById(_id)
     if (!user) {
       return res
         .status(404)
         .json({ success: false, message: "None exists" });
     }
-    await User.findByIdAndDelete(userId)
+    await User.findByIdAndDelete(_id)
     res
       .status(200)
       .json({ success: true, message: "Deleted user successfully" });
