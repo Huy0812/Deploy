@@ -65,13 +65,7 @@ const register = async (req, res) => {
             typeOfEmployee,
             role,
         });
-
-        sendToken(
-            res,
-            user,
-            200,
-            "Create account successfully"
-        );
+        res.status(200).json({ success: true, message: "Create account successfully" });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -139,7 +133,7 @@ const getAllProfile = async (req, res) => {
 
         return res
             .status(200)
-            .json({ success: true, message: `All profiles (sort by userId)`, Array: users });
+            .json({ success: true, message: `All profiles (sort by userId)`, array: sort });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -244,10 +238,16 @@ const deleteProfile = async (req, res) => {
         }
 
         const { userId } = req.body;
-        await User.findOneAndDelete({ userId });
-        return res
-            .status(204)
-            .json({ success: false, message: "Deleted successfully" });
+        user = await Task.findById(userId)
+        if (!user) {
+            return res
+                .status(404)
+                .json({ success: false, message: "None exists" });
+        }
+        await User.findByIdAndDelete(userId)
+        res
+            .status(200)
+            .json({ success: true, message: "Deleted user successfully" });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -350,4 +350,25 @@ const resetPassword = async (req, res) => {
     }
 };
 
-module.exports = { register, verify, login, logout, getMyProfile, getAllProfile, updateProfile, updateAvatar, deleteProfile, updatePassword, forgetPassword, resetPassword, updateAdmin }
+const searchUser = async (req, res) => {
+    try {
+        const keyword = req.query.name
+            ? {
+                $or: [
+                    { name: { $regex: req.query.name, $options: "i" } },
+                ],
+            }
+            : {};
+
+        const users = await User.find(keyword);
+        res
+            .status(200)
+            .json({ success: false, message: "Users", array: users })
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+
+};
+
+module.exports = { register, verify, login, logout, getMyProfile, getAllProfile, updateProfile, updateAvatar, deleteProfile, updatePassword, forgetPassword, resetPassword, updateAdmin, searchUser }
