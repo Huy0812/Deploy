@@ -1,5 +1,6 @@
 const Timesheet = require("../models/Timesheet")
 const User = require("../models/User")
+const Company = require("../models/Company")
 const moment = require("moment")
 const momenttz = require("moment-timezone")
 
@@ -11,6 +12,20 @@ const checking = async (req, res) => {
         const currentTime = current.tz('Asia/Ho_Chi_Minh').format("HH:mm:ss");
 
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
+        const user = await User.findById(req.user._id)
+        const companyId = user.companyId;
+        const company = await Company.findById(companyId);
+        const {networkIp, deviceId} = req.body 
+        if (company.companyIp != networkIp) {
+            return res
+          .status(400)
+          .json({ success: false, message: "You need to access the company network" });
+        }
+        if (user.deviceId != deviceId) {
+            return res
+          .status(400)
+          .json({ success: false, message: "deviceId is Incorrect. Please update your deviceId" });
+        }
         if (!timesheet) {
             timesheet = await Timesheet.create({
                 userId: req.user._id,

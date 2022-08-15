@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
     // SĐT
     phoneNumber: {
         type: String,
-        match: /^(0)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$/,
+        //match: /^(0)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$/,
         required: true,
         unique: true,
     },
@@ -108,11 +108,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-
+    deviceId: {
+        type: String,
+        unique: true ,
+    } ,
     // Xác thực
     verified: {
         type: Boolean,
-        default: true,
+        default: true ,
     },
     otp: Number,
     otp_expiry: Date,
