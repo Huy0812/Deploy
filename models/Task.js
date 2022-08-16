@@ -42,7 +42,6 @@ const taskSchema = new mongoose.Schema({
     // Người quản lý
     manager: {
         type: String,
-        required: true,
     },
 
     //  Mã người tham gia

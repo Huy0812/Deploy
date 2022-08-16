@@ -1,6 +1,5 @@
 var nodemailer = require('nodemailer'); // khai báo sử dụng module nodemailer
 
-
 var sendMail = async (email, subject, text) => {
     var transporter = nodemailer.createTransport({ // config mail server
 
@@ -25,4 +24,5 @@ var sendMail = async (email, subject, text) => {
         }
     });
 };
+
 module.exports = sendMail

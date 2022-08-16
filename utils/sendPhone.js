@@ -22,4 +22,5 @@ var sendPhone = async (phoneNumber, message) => {
             console.log(error);
         });
 }
+
 module.exports = sendPhone

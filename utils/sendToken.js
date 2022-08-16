@@ -33,4 +33,5 @@ const sendToken = (res, user, statusCode, message) => {
         .cookie("token", token, options)
         .json({ success: true, message, user: userData });
 };
+
 module.exports = sendToken

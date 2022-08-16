@@ -5,6 +5,7 @@ const sendToken = require("../utils/sendToken");
 const cloudinary = require("cloudinary");
 const fs = require("fs");
 const moment = require("moment");
+
 const verify = async (req, res) => {
     try {
         const otp = Number(req.body.otp);
@@ -154,20 +155,19 @@ const getMyProfile = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
 const getProfile = async (req, res) => {
-  try {
-    const {_id} =  req.body
-    const user = await User.findById(_id);
-    if (!user) {
-        return res.status(404).json({ success: false, message: "Can't find user"})
-     }
-    sendToken(res, user, 201, `Welcome back ${user.name}`);
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+    try {
+        const { _id } = req.body
+        const user = await User.findById(_id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "Can't find user" })
+        }
+        sendToken(res, user, 201, `Welcome back ${user.name}`);
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
 };
-
-
 
 const getAllProfile = async (req, res) => {
     try {
@@ -185,26 +185,27 @@ const getAllProfile = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
 const updateAdmin = async (req, res) => {
-  try {
-    let userAdmin = await User.findById(req.user._id);
-    if (userAdmin.privilege !== "Quản trị viên") {
-      return res
-        .status(403)
-        .json({ success: false, message: "Forbidden: You don't have permisson to access this" });
-    }
-    const {
-        _id,
-        name,
-        email,
-        phoneNumber,
-        startWorkingDate,
-        contractStatus,
-        typeOfEmployee,
-        role,
-        privilege,
-      } = req.body;
-    user = await User.findById(_id);
+    try {
+        let userAdmin = await User.findById(req.user._id);
+        if (userAdmin.privilege !== "Quản trị viên") {
+            return res
+                .status(403)
+                .json({ success: false, message: "Forbidden: You don't have permisson to access this" });
+        }
+        const {
+            _id,
+            name,
+            email,
+            phoneNumber,
+            startWorkingDate,
+            contractStatus,
+            typeOfEmployee,
+            role,
+            privilege,
+        } = req.body;
+        user = await User.findById(_id);
 
 
         if (name) user.name = name;
@@ -228,6 +229,7 @@ const updateAdmin = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
 const updateProfile = async (req, res) => {
     try {
         let user = await User.findById(req.user._id);
@@ -263,7 +265,7 @@ const updateProfile = async (req, res) => {
         if (phoneNumber) user.phoneNumber = phoneNumber;
 
         if (birth) {
-            user.birth = birth; //moment().format("HH:mm:ss");
+            user.birth = birth;
         }
         if (gender) user.gender = gender;
         if (address) user.address = address;
@@ -326,6 +328,7 @@ const deleteProfile = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
 const updateDeviceId = async (req, res) => {
     try {
         const user = await User.findById(req.user._id)
@@ -335,13 +338,13 @@ const updateDeviceId = async (req, res) => {
         if (userAll) {
             return res
                 .status(400)
-                .json({ success: false, message: "deviceId already exists" });
+                .json({ success: false, message: "Device Id already exists" });
         }
         user.deviceId = deviceId;
         await user.save();
         res
             .status(200)
-            .json({ success: true, message: "DeviceId updated successfully" });
+            .json({ success: true, message: "Device Id updated successfully" });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -383,6 +386,7 @@ const updatePassword = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
 const phonePassword = async (req, res) => {
     try {
         const { phoneNumber } = req.body;
@@ -414,6 +418,7 @@ const phonePassword = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
 const forgetPassword = async (req, res) => {
     try {
         const { email } = req.body;
@@ -483,6 +488,7 @@ const resetPassword = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
 const searchUser = async (req, res) => {
     try {
         const keyword = req.query.name
@@ -494,6 +500,24 @@ const searchUser = async (req, res) => {
             : {};
 
         const users = await User.find(keyword);
+        res
+            .status(200)
+            .json({ success: false, message: "Users", array: users })
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+
+};
+
+const filterUserByRole = async (req, res) => {
+    try {
+        let user = await User.findOne({ userId: req.user._id });
+        let segments = timesheet.segments;
+
+        segments = segments.filter(function (segment) {
+            return moment(segment.date, "DD/MM/YYYY") >= weekStart && moment(segment.date, "DD/MM/YYYY") <= weekEnd;
+        });
         res
             .status(200)
             .json({ success: false, message: "Users", array: users })
@@ -520,5 +544,5 @@ module.exports = {
     phonePassword,
     updateDeviceId,
     searchUser,
-  getProfile,
+    getProfile,
 };

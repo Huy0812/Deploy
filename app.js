@@ -22,4 +22,5 @@ app.use("/api/v1/company", Company);
 app.get("/", (req, res) => {
     res.send("Server is working");
 });
+
 module.exports = app
