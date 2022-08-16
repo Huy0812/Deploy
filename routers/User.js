@@ -18,5 +18,5 @@ router.route("/searchuser").get(isAuthenticated, searchUser)
 router.route("/forgetpassword").post(forgetPassword)
 router.route("/phonepassword").post(phonePassword)
 router.route("/resetpassword").put(resetPassword)
-router.route("/updateadmin").put(updateAdmin)
+router.route("/updateadmin").put(isAuthenticated, updateAdmin)
 module.exports = router
