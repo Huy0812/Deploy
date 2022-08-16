@@ -270,9 +270,9 @@ const checkingTask = async (req, res) => {
 // Đếm Task (đã hoàn thành)
 const countTaskAsDone = async (req, res) => {
     try {
-        const task = await Task.find()
+        const tasks = await Task.find({ contributorIds: req.user._id });
 
-        let count = task.filter(obj => {
+        let count = tasks.filter(obj => {
             if (obj.status === "Đã hoàn thành") {
                 return true;
             }
@@ -287,9 +287,9 @@ const countTaskAsDone = async (req, res) => {
 // Đếm Task (chưa hoàn thành)
 const countTaskAsNotDone = async (req, res) => {
     try {
-        const task = await Task.find()
+        const tasks = await Task.find({ contributorIds: req.user._id });
 
-        let count = task.filter(obj => {
+        let count = tasks.filter(obj => {
             if (obj.status === "Chưa hoàn thành") {
                 return true;
             }
@@ -304,9 +304,9 @@ const countTaskAsNotDone = async (req, res) => {
 // Đếm Task (quá hạn)
 const countTaskAsOutOfDate = async (req, res) => {
     try {
-        const task = await Task.find()
+        const tasks = await Task.find({ contributorIds: req.user._id });
 
-        let count = task.filter(obj => {
+        let count = tasks.filter(obj => {
             if (obj.status === "Quá hạn") {
                 return true;
             }
@@ -321,9 +321,9 @@ const countTaskAsOutOfDate = async (req, res) => {
 // Đếm Task (tất cả)
 const countTaskAll = async (req, res) => {
     try {
-        const task = await Task.find()
+        const tasks = await Task.find()
 
-        let count = task.length;
+        let count = tasks.length;
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message, count: count });
