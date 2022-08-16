@@ -223,10 +223,16 @@ const updateAdmin = async (req, res) => {
             typeOfEmployee,
             role,
             privilege,
+            password
         } = req.body;
         user = await User.findById(_id);
 
-
+        const isMatch = await userPass.comparePassword(password);
+        if (!isMatch) {
+            return res
+                .status(400)
+                .json({ success: false, message: "Passwords does not match" });
+        }
         if (name) user.name = name;
 
         if (email) {
