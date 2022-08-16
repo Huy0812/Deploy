@@ -279,8 +279,12 @@ const countTaskAsDone = async (req, res) => {
             return false;
         }).length;
 
+        return res
+            .status(200)
+            .json({ success: true, message: `Number of Done Task`, count: count });
+
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message, count: count });
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 
@@ -296,8 +300,12 @@ const countTaskAsNotDone = async (req, res) => {
             return false;
         }).length;
 
+        return res
+            .status(200)
+            .json({ success: true, message: `Number of Done Task`, count: count });
+
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message, count: count });
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 
@@ -313,8 +321,12 @@ const countTaskAsOutOfDate = async (req, res) => {
             return false;
         }).length;
 
+        return res
+            .status(200)
+            .json({ success: true, message: `Number of Done Task`, count: count });
+
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message, count: count });
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 
@@ -325,8 +337,12 @@ const countTaskAll = async (req, res) => {
 
         let count = tasks.length;
 
+        return res
+            .status(200)
+            .json({ success: true, message: `Number of Done Task`, count: count });
+
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message, count: count });
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 
