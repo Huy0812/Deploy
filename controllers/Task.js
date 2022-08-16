@@ -84,7 +84,7 @@ const deleteTask = async (req, res) => {
 const getMyTask = async (req, res) => {
     try {
         const tasks = await Task.find({ $or: [{ managerId: req.user._id }, { contributorIds: req.user._id }] })
-        
+
         myTasks = [];
         for (let i = 0; i < tasks.length; i++) {
             manager = await User.findById(tasks[i].managerId)
@@ -96,6 +96,7 @@ const getMyTask = async (req, res) => {
             }
 
             taskTemp = {
+                _id: tasks[i]._id,
                 name: tasks[i].name,
                 description: tasks[i].description,
                 date: tasks[i].date,
@@ -135,6 +136,7 @@ const getMyTaskAsManager = async (req, res) => {
             }
 
             taskTemp = {
+                _id: tasks[i]._id,
                 name: tasks[i].name,
                 description: tasks[i].description,
                 date: tasks[i].date,
@@ -174,6 +176,7 @@ const getMyTaskAsContributor = async (req, res) => {
             }
 
             taskTemp = {
+                _id: tasks[i]._id,
                 name: tasks[i].name,
                 description: tasks[i].description,
                 date: tasks[i].date,
@@ -213,6 +216,7 @@ const getAllTask = async (req, res) => {
             }
 
             taskTemp = {
+                _id: tasks[i]._id,
                 name: tasks[i].name,
                 description: tasks[i].description,
                 date: tasks[i].date,
