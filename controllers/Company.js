@@ -18,19 +18,9 @@ const getInformation = async (req, res) => {
         const companyId = user.companyId;
         const company = await Company.findById(companyId);
 
-        const companyData = {
-            _id: company._id,
-            name: company.name,
-            size: company.size,
-            hotline: company.hotline,
-            introduction: company.introduction,
-            website: company.website,
-            fanpage: company.fanpage,
-        };
-
         res
             .status(200)
-            .json({ success: true, message: `Company Information`, company: companyData });
+            .json({ success: true, message: `Company Information`, company: company });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -67,4 +57,4 @@ const updateInformation = async (req, res) => {
     }
 };
 
-module.exports = { getInformation, updateInformation, create }
+module.exports = { create, getInformation, updateInformation }

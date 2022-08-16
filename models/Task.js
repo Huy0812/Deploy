@@ -39,8 +39,17 @@ const taskSchema = new mongoose.Schema({
         unique: true,
     },
 
+    // Người quản lý
+    manager: {
+        type: String,
+        required: true,
+    },
+
     //  Mã người tham gia
     contributorIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+
+    //  Người tham gia
+    contributors: [{ type: String }],
 
     // Trạng thái công việc
     status: {
