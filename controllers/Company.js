@@ -25,7 +25,26 @@ const getInformation = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
-
+const updateCompanyIp = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id)
+        if (user.privilege !== "Quản trị viên") {
+            return res
+                .status(403)
+                .json({ success: false, message: "Forbidden: You don't have permisson to access this" });
+        }
+        const companyId = user.companyId;
+        const company = await Company.findById(companyId);
+        const { companyIp } = req.body;
+        company.companyIp = companyIp;
+        await company.save();
+        res
+            .status(200)
+            .json({ success: true, message: "Device Id updated successfully" });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
 const updateInformation = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
@@ -57,4 +76,4 @@ const updateInformation = async (req, res) => {
     }
 };
 
-module.exports = { create, getInformation, updateInformation }
+module.exports = { create, getInformation, updateInformation, updateCompanyIp }
