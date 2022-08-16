@@ -268,85 +268,52 @@ const checkingTask = async (req, res) => {
 };
 
 // Đếm Task (đã hoàn thành)
-const countTaskAsDone = async (req, res) => {
+const countTask = async (req, res) => {
     try {
         const tasks = await Task.find({ contributorIds: req.user._id });
 
-        let count = tasks.filter(obj => {
+        let countTaskAsDone = tasks.filter(obj => {
             if (obj.status === "Đã hoàn thành") {
                 return true;
             }
             return false;
         }).length;
 
-        return res
-            .status(200)
-            .json({ success: true, message: `Number of Done Task`, count: count });
-
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
-
-// Đếm Task (chưa hoàn thành)
-const countTaskAsNotDone = async (req, res) => {
-    try {
-        const tasks = await Task.find({ contributorIds: req.user._id });
-
-        let count = tasks.filter(obj => {
+        let countTaskAsNotDone = tasks.filter(obj => {
             if (obj.status === "Chưa hoàn thành") {
                 return true;
             }
             return false;
         }).length;
 
-        return res
-            .status(200)
-            .json({ success: true, message: `Number of Not Done Task`, count: count });
 
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
-
-// Đếm Task (quá hạn)
-const countTaskAsOutOfDate = async (req, res) => {
-    try {
-        const tasks = await Task.find({ contributorIds: req.user._id });
-
-        let count = tasks.filter(obj => {
+        let countTaskAsOutOfDate = tasks.filter(obj => {
             if (obj.status === "Quá hạn") {
                 return true;
             }
             return false;
         }).length;
 
+
+        let countTaskAll = tasks.length;
+
+        let countTask = {
+            countTaskAsDone: countTaskAsDone,
+            countTaskAsNotDone: countTaskAsNotDone,
+            countTaskAsOutOfDate: countTaskAsOutOfDate,
+            countTaskAll: countTaskAll,
+        }
+
         return res
             .status(200)
-            .json({ success: true, message: `Number of Out of Date Task`, count: count });
+            .json({ success: true, message: `Number of Task`, count: countTask });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 };
 
-// Đếm Task (tất cả)
-const countTaskAll = async (req, res) => {
-    try {
-        const tasks = await Task.find()
-
-        let count = tasks.length;
-
-        return res
-            .status(200)
-            .json({ success: true, message: `Number of All Task`, count: count });
-
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
-
-// Đếm Task (tất cả)
+// Sắp xếp Task (tất cả)
 const sortTask = async (req, res) => {
     try {
         const tasks = await Task.find({ contributorIds: req.user._id });
@@ -423,4 +390,4 @@ const sortTask = async (req, res) => {
     }
 };
 
-module.exports = { createTask, updateTask, deleteTask, getMyTask, getMyTaskAsManager, getMyTaskAsContributor, getAllTask, checkingTask, countTaskAsDone, countTaskAsNotDone, countTaskAsOutOfDate, countTaskAll, sortTask }
+module.exports = { createTask, updateTask, deleteTask, getMyTask, getMyTaskAsManager, getMyTaskAsContributor, getAllTask, checkingTask, countTask, sortTask }
