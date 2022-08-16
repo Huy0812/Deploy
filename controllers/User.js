@@ -168,6 +168,7 @@ const getProfile = async (req, res) => {
         gender: user.gender,
         address: user.address,
         userId: user.userId,
+        privilege: user.privilege,
         startWorkingDate: user.startWorkingDate,
         contractStatus: user.contractStatus,
         typeOfEmployee: user.typeOfEmployee,
