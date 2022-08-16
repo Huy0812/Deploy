@@ -178,7 +178,7 @@ const getProfile = async (req, res) => {
     };
     res
         .status(200)
-        .json({ success: true, message: `User Information`, company: userData });
+        .json({ success: true, message: `User Information`, user: userData });
 } catch (error) {
     res.status(500).json({ success: false, message: error.message });
 }
