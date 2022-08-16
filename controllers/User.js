@@ -227,7 +227,7 @@ const updateAdmin = async (req, res) => {
         } = req.body;
         user = await User.findById(_id);
 
-        const isMatch = await userPass.comparePassword(password);
+        const isMatch = await userAdmin.comparePassword(password);
         if (!isMatch) {
             return res
                 .status(400)
