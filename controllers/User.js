@@ -242,7 +242,7 @@ const updateAdmin = async (req, res) => {
         }
 
         if (phoneNumber) user.phoneNumber = phoneNumber;
-        if (startWorkingDate) user.startWorkingDate = starWorkingDate;
+        if (startWorkingDate) user.startWorkingDate = startWorkingDate;
         if (contractStatus) user.contractStatus = contractStatus;
         if (typeOfEmployee) user.typeOfEmployee = typeOfEmployee;
         if (role) user.role = role;
