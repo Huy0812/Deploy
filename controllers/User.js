@@ -157,34 +157,34 @@ const getMyProfile = async (req, res) => {
 };
 
 const getProfile = async (req, res) => {
-  try {
-    const {_id} =  req.body
-    const user = await User.findById(_id);
-    const userData = {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        phoneNumber: user.phoneNumber,
-        avatar: user.avatar,
-        birth: user.birth,
-        gender: user.gender,
-        address: user.address,
-        userId: user.userId,
-        privilege: user.privilege,
-        startWorkingDate: user.startWorkingDate,
-        contractStatus: user.contractStatus,
-        typeOfEmployee: user.typeOfEmployee,
-        role: user.role,
-        deviceId: user.deviceId,
-        firstLogin: user.firstLogin,
-        verified: user.verified,
-    };
-    res
-        .status(200)
-        .json({ success: true, message: `User Information`, user: userData });
-} catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-}
+    try {
+        const { _id } = req.body
+        const user = await User.findById(_id);
+        const userData = {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            phoneNumber: user.phoneNumber,
+            avatar: user.avatar,
+            birth: user.birth,
+            gender: user.gender,
+            address: user.address,
+            userId: user.userId,
+            privilege: user.privilege,
+            startWorkingDate: user.startWorkingDate,
+            contractStatus: user.contractStatus,
+            typeOfEmployee: user.typeOfEmployee,
+            role: user.role,
+            deviceId: user.deviceId,
+            firstLogin: user.firstLogin,
+            verified: user.verified,
+        };
+        res
+            .status(200)
+            .json({ success: true, message: `User Information`, user: userData });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
 
 };
 
@@ -535,23 +535,20 @@ const searchUser = async (req, res) => {
 
 };
 
-const filterUserByRole = async (req, res) => {
+// Lọc người dùng
+const filterUser = async (req, res) => {
     try {
-        let user = await User.findOne({ userId: req.user._id });
-        let segments = timesheet.segments;
 
-        segments = segments.filter(function (segment) {
-            return moment(segment.date, "DD/MM/YYYY") >= weekStart && moment(segment.date, "DD/MM/YYYY") <= weekEnd;
-        });
-        res
+        return res
             .status(200)
-            .json({ success: false, message: "Users", array: users })
+            .json({ success: false, message: "Users", users: query })
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 
 };
+
 module.exports = {
     register,
     verify,

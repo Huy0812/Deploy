@@ -481,4 +481,26 @@ const filterTimesheetDataByRange = async (req, res) => {
     }
 }
 
-module.exports = { checking, getTimesheetInfo, getTop5, getMyRank, filterTimesheetDataByToday, filterTimesheetDataByYesterday, filterTimesheetDataByThisWeek, filterTimesheetDataByLastWeek, filterTimesheetDataByThisMonth, filterTimesheetDataByLastMonth, filterTimesheetDataByRange }
+// Lấy thông tin bảng chấm công (tháng này)
+const getTimesheetByMonth = async (req, res) => {
+    try {
+        var monthStart = moment().startOf('month');
+        var monthEnd = moment().endOf('month');
+        let timesheet = await Timesheet.findOne({ userId: req.user._id });
+        let segments = timesheet.segments;
+
+        segments = segments.filter(function (segment) {
+            return moment(segment.date, "DD/MM/YYYY") >= monthStart && moment(segment.date, "DD/MM/YYYY") <= monthEnd;
+        });
+
+        return res
+            .status(200)
+            .json({ success: true, message: `Timesheet data`, Object: segments });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+
+module.exports = { checking, getTimesheetInfo, getTop5, getMyRank, filterTimesheetDataByToday, filterTimesheetDataByYesterday, filterTimesheetDataByThisWeek, filterTimesheetDataByLastWeek, filterTimesheetDataByThisMonth, filterTimesheetDataByLastMonth, filterTimesheetDataByRange, getTimesheetByMonth }
