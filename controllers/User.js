@@ -37,7 +37,7 @@ const register = async (req, res) => {
         let user = await User.findById(req.user._id);
         if (
             user.privilege !== "Quản trị viên" &&
-            user.privilege.equals !== "Quản lý"
+            user.privilege !== "Quản lý"
         ) {
             return res
                 .status(403)
@@ -154,6 +154,20 @@ const getMyProfile = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+const getProfile = async (req, res) => {
+  try {
+    const {_id} =  req.body
+    const user = await User.findById(_id);
+    if (!user) {
+        return res.status(404).json({ success: false, message: "Can't find user"})
+     }
+    sendToken(res, user, 201, `Welcome back ${user.name}`);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
 
 const getAllProfile = async (req, res) => {
     try {
@@ -172,18 +186,26 @@ const getAllProfile = async (req, res) => {
     }
 };
 const updateAdmin = async (req, res) => {
-    try {
-        user = await User.findById(req.user._id);
-        const {
-            name,
-            email,
-            phoneNumber,
-            startWorkingDate,
-            contractStatus,
-            typeOfEmployee,
-            role,
-            privilege,
-        } = req.body;
+  try {
+    let userAdmin = await User.findById(req.user._id);
+    if (userAdmin.privilege !== "Quản trị viên") {
+      return res
+        .status(403)
+        .json({ success: false, message: "Forbidden: You don't have permisson to access this" });
+    }
+    const {
+        _id,
+        name,
+        email,
+        phoneNumber,
+        startWorkingDate,
+        contractStatus,
+        typeOfEmployee,
+        role,
+        privilege,
+      } = req.body;
+    user = await User.findById(_id);
+
 
         if (name) user.name = name;
 
@@ -282,7 +304,7 @@ const updateAvatar = async (req, res) => {
 const deleteProfile = async (req, res) => {
     try {
         let user = await User.findById(req.user._id);
-        if (!user.privilege === "Quản trị viên") {
+        if (user.privilege !== "Quản trị viên") {
             return res
                 .status(403)
                 .json({ success: false, message: "Forbidden: You don't have permisson to access this" });
@@ -497,5 +519,6 @@ module.exports = {
     updateAdmin,
     phonePassword,
     updateDeviceId,
-    searchUser
+    searchUser,
+  getProfile,
 };
