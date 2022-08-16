@@ -36,7 +36,6 @@ const taskSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
-        unique: true,
     },
 
     // Người quản lý
@@ -45,7 +44,7 @@ const taskSchema = new mongoose.Schema({
     },
 
     //  Mã người tham gia
-    contributorIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    contributorIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, }],
 
     //  Người tham gia
     contributors: [{ type: String }],
