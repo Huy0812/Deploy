@@ -28,7 +28,7 @@ const createTask = async (req, res) => {
             actualEndedTime: "N/A",
             managerId: req.user._id,
             contributorIds: userIds,
-            status: "Đã giao",
+            status: "Chưa hoàn thành",
             isDone: isDone,
             isApproved: false,
         });
@@ -346,4 +346,55 @@ const countTaskAll = async (req, res) => {
     }
 };
 
-module.exports = { createTask, updateTask, deleteTask, getMyTask, getMyTaskAsManager, getMyTaskAsContributor, getAllTask, checkingTask, countTaskAsDone, countTaskAsNotDone, countTaskAsOutOfDate, countTaskAll }
+// Đếm Task (tất cả)
+const sortTask = async (req, res) => {
+    try {
+        const tasks = await Task.find({ contributorIds: req.user._id });
+
+        tasksDone = tasks.filter(obj => {
+            if (obj.status === "Đã hoàn thành") {
+                return true;
+            }
+            return false;
+        });
+
+        tasksNotDone = tasks.filter(obj => {
+            if (obj.status === "Chưa hoàn thành") {
+                return true;
+            }
+            return false;
+        });
+
+        tasksOutOfDate = tasks.filter(obj => {
+            if (obj.status === "Quá hạn") {
+                return true;
+            }
+            return false;
+        });
+
+        tasksNotDone.sort(function (a, b) {
+            return moment(a.deadline, "HH:mm, DD/MM/YYYY") - moment(b.deadline, "HH:mm, DD/MM/YYYY")
+        });
+        tasksDone.sort(function (a, b) {
+            return moment(a.deadline, "HH:mm, DD/MM/YYYY") - moment(b.deadline, "HH:mm, DD/MM/YYYY")
+        });
+        tasksOutOfDate.sort(function (a, b) {
+            return moment(a.deadline, "HH:mm, DD/MM/YYYY") - moment(b.deadline, "HH:mm, DD/MM/YYYY")
+        });
+
+        tasksAll = {
+            tasksNotDone: tasksNotDone,
+            tasksOutOfDate: tasksOutOfDate,
+            tasksDone: tasksDone,
+        }
+
+        return res
+            .status(200)
+            .json({ success: true, message: `Number of Done Task`, tasks: tasksAll });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+module.exports = { createTask, updateTask, deleteTask, getMyTask, getMyTaskAsManager, getMyTaskAsContributor, getAllTask, checkingTask, countTaskAsDone, countTaskAsNotDone, countTaskAsOutOfDate, countTaskAll, sortTask }
