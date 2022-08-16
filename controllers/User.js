@@ -173,17 +173,25 @@ const getAllProfile = async (req, res) => {
 };
 const updateAdmin = async (req, res) => {
   try {
-    user = await User.findById(req.user._id);
+    let userAdmin = await User.findById(req.user._id);
+    if (userAdmin.privilege !== "Quản trị viên") {
+      return res
+        .status(403)
+        .json({ success: false, message: "Forbidden: You don't have permisson to access this" });
+    }
     const {
-      name,
-      email,
-      phoneNumber,
-      startWorkingDate,
-      contractStatus,
-      typeOfEmployee,
-      role,
-      privilege,
-    } = req.body;
+        _id,
+        name,
+        email,
+        phoneNumber,
+        startWorkingDate,
+        contractStatus,
+        typeOfEmployee,
+        role,
+        privilege,
+      } = req.body;
+    user = await User.findById(_id);
+
 
     if (name) user.name = name;
 
