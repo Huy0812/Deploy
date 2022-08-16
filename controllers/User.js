@@ -154,6 +154,19 @@ const getMyProfile = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+const getProfile = async (req, res) => {
+  try {
+    const {_id} =  req.body
+    const user = await User.findById(_id);
+    if (!user) {
+        return res.status(404).json({ success: false, message: "Can't find user"})
+     }
+    sendToken(res, user, 201, `Welcome back ${user.name}`);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 
 const getAllProfile = async (req, res) => {
   try {
@@ -505,5 +518,6 @@ module.exports = {
   updateAdmin,
   phonePassword,
   updateDeviceId,
-  searchUser
+  searchUser,
+  getProfile,
 };
