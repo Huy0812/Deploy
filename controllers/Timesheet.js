@@ -214,9 +214,18 @@ const filterTimesheetDataByToday = async (req, res) => {
         if (index === -1)
             return res.status(401).json({ success: false, message: "Have't checkin today" });
 
-        checkinLate = getCheckinLate(timesheet.segments[index].checkinTime) + " phút/ 1 lần";
-        checkoutEarly = getCheckoutEarly(timesheet.segments[index].checkoutTime) + " phút/ 1 lần";
-        checkoutLate = getCheckoutLate(timesheet.segments[index].checkoutTime) + " phút/ 1 lần";
+        checkinLate = {
+            value: getCheckinLate(timesheet.segments[index].checkinTime),
+            number: 1,
+        }
+        checkoutEarly = {
+            value: getCheckoutEarly(timesheet.segments[index].checkoutTime),
+            number: 1,
+        }
+        checkoutLate = {
+            value: getCheckoutLate(timesheet.segments[index].checkoutTime),
+            number: 1,
+        }
 
         let timesheetData = {
             checkinLate: checkinLate,
@@ -243,9 +252,18 @@ const filterTimesheetDataByYesterday = async (req, res) => {
         if (index === -1)
             return res.status(401).json({ success: false, message: "Have't checkin yesterday" });
 
-        checkinLate = getCheckinLate(timesheet.segments[index].checkinTime) + " phút/ 1 lần";
-        checkoutEarly = getCheckoutEarly(timesheet.segments[index].checkoutTime) + " phút/ 1 lần";
-        checkoutLate = getCheckoutLate(timesheet.segments[index].checkoutTime) + " phút/ 1 lần";
+        checkinLate = {
+            value: getCheckinLate(timesheet.segments[index].checkinTime),
+            number: 1,
+        }
+        checkoutEarly = {
+            value: getCheckoutEarly(timesheet.segments[index].checkoutTime),
+            number: 1,
+        }
+        checkoutLate = {
+            value: getCheckoutLate(timesheet.segments[index].checkoutTime),
+            number: 1,
+        }
 
         let timesheetData = {
             checkinLate: checkinLate,
@@ -287,9 +305,18 @@ const filterTimesheetDataByThisWeek = async (req, res) => {
             return accumulator + getCheckoutLate(segment.checkoutTime);
         }, 0);
 
-        checkinLateData = checkinLateValue + " phút/ " + checkinLateNum + " lần";
-        checkoutEarlyData = checkoutEarlyValue + " phút/ " + checkoutEarlyNum + " lần";
-        checkoutLateData = checkoutLateValue + " phút/ " + checkoutLateNum + " lần";
+        checkinLateData = {
+            value: checkinLateValue,
+            number: checkinLateNum,
+        }
+        checkoutEarlyData = {
+            value: checkinLateValue,
+            number: checkinLateNum,
+        }
+        checkoutLateData = {
+            value: checkinLateValue,
+            number: checkinLateNum,
+        }
 
         let timesheetData = {
             checkinLate: checkinLateData,
@@ -331,9 +358,18 @@ const filterTimesheetDataByLastWeek = async (req, res) => {
             return accumulator + getCheckoutLate(segment.checkoutTime);
         }, 0);
 
-        checkinLateData = checkinLateValue + " phút/ " + checkinLateNum + " lần";
-        checkoutEarlyData = checkoutEarlyValue + " phút/ " + checkoutEarlyNum + " lần";
-        checkoutLateData = checkoutLateValue + " phút/ " + checkoutLateNum + " lần";
+        checkinLateData = {
+            value: checkinLateValue,
+            number: checkinLateNum,
+        }
+        checkoutEarlyData = {
+            value: checkinLateValue,
+            number: checkinLateNum,
+        }
+        checkoutLateData = {
+            value: checkinLateValue,
+            number: checkinLateNum,
+        }
 
         let timesheetData = {
             checkinLate: checkinLateData,
@@ -375,9 +411,18 @@ const filterTimesheetDataByThisMonth = async (req, res) => {
             return accumulator + getCheckoutLate(segment.checkoutTime);
         }, 0);
 
-        checkinLateData = checkinLateValue + " phút/ " + checkinLateNum + " lần";
-        checkoutEarlyData = checkoutEarlyValue + " phút/ " + checkoutEarlyNum + " lần";
-        checkoutLateData = checkoutLateValue + " phút/ " + checkoutLateNum + " lần";
+        checkinLateData = {
+            value: checkinLateValue,
+            number: checkinLateNum,
+        }
+        checkoutEarlyData = {
+            value: checkinLateValue,
+            number: checkinLateNum,
+        }
+        checkoutLateData = {
+            value: checkinLateValue,
+            number: checkinLateNum,
+        }
 
         let timesheetData = {
             checkinLate: checkinLateData,
@@ -419,9 +464,18 @@ const filterTimesheetDataByLastMonth = async (req, res) => {
             return accumulator + getCheckoutLate(segment.checkoutTime);
         }, 0);
 
-        checkinLateData = checkinLateValue + " phút/ " + checkinLateNum + " lần";
-        checkoutEarlyData = checkoutEarlyValue + " phút/ " + checkoutEarlyNum + " lần";
-        checkoutLateData = checkoutLateValue + " phút/ " + checkoutLateNum + " lần";
+        checkinLateData = {
+            value: checkinLateValue,
+            number: checkinLateNum,
+        }
+        checkoutEarlyData = {
+            value: checkinLateValue,
+            number: checkinLateNum,
+        }
+        checkoutLateData = {
+            value: checkinLateValue,
+            number: checkinLateNum,
+        }
 
         let timesheetData = {
             checkinLate: checkinLateData,
@@ -462,9 +516,18 @@ const filterTimesheetDataByRange = async (req, res) => {
             return accumulator + getCheckoutLate(segment.checkoutTime);
         }, 0);
 
-        checkinLateData = checkinLateValue + " phút/ " + checkinLateNum + " lần";
-        checkoutEarlyData = checkoutEarlyValue + " phút/ " + checkoutEarlyNum + " lần";
-        checkoutLateData = checkoutLateValue + " phút/ " + checkoutLateNum + " lần";
+        checkinLateData = {
+            value: checkinLateValue,
+            number: checkinLateNum,
+        }
+        checkoutEarlyData = {
+            value: checkinLateValue,
+            number: checkinLateNum,
+        }
+        checkoutLateData = {
+            value: checkinLateValue,
+            number: checkinLateNum,
+        }
 
         let timesheetData = {
             checkinLate: checkinLateData,
