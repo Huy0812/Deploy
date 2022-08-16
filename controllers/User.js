@@ -527,7 +527,7 @@ const searchUser = async (req, res) => {
         const users = await User.find(keyword);
         res
             .status(200)
-            .json({ success: false, message: "Users", array: users })
+            .json({ success: true, message: "Users", array: users })
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });

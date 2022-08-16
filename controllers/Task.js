@@ -119,6 +119,59 @@ const getMyTask = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+const getTaskById = async (req, res) => {
+    try {
+         let user = await User.findById(req.user._id);
+        if (
+            user.privilege !== "Quản trị viên" &&
+            user.privilege !== "Quản lý"
+        ) {
+            return res
+                .status(403)
+                .json({
+                    success: false,
+                    message: "Forbidden: You don't have permisson to access this",
+                });
+        }
+
+        const { _id } = req.body
+        console.log(_id)
+        const tasks = await Task.find({ $or: [{ managerId: _id }, { contributorIds: _id}] })
+
+        myTasks = [];
+        for (let i = 0; i < tasks.length; i++) {
+            manager = await User.findById(tasks[i].managerId)
+            managerName = manager.name
+            contributorsName = []
+            for (let j = 0; j < tasks[i].contributorIds.length; j++) {
+                contributor = await User.findById(tasks[i].contributorIds[j])
+                contributorsName.push(contributor.name)
+            }
+
+            taskTemp = {
+                _id: tasks[i]._id,
+                name: tasks[i].name,
+                description: tasks[i].description,
+                date: tasks[i].date,
+                deadline: tasks[i].deadline,
+                actualEndedTime: tasks[i].actualEndedTime,
+                manager: managerName,
+                contributors: contributorsName,
+                status: tasks[i].status,
+                isDone: tasks[i].isDone,
+                isApproved: tasks[i].isApproved,
+            }
+            myTasks.push(taskTemp)
+        }
+
+        res
+            .status(200)
+            .json({ success: true, message: `Task list`, tasks: myTasks });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
 
 // Lấy Task của nhân viên (với vai trò quản lý)
 const getMyTaskAsManager = async (req, res) => {
@@ -390,4 +443,4 @@ const sortTask = async (req, res) => {
     }
 };
 
-module.exports = { createTask, updateTask, deleteTask, getMyTask, getMyTaskAsManager, getMyTaskAsContributor, getAllTask, checkingTask, countTask, sortTask }
+module.exports = { createTask, updateTask, deleteTask, getMyTask, getMyTaskAsManager, getMyTaskAsContributor,getTaskById, getAllTask, checkingTask, countTask, sortTask }
