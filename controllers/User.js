@@ -157,16 +157,35 @@ const getMyProfile = async (req, res) => {
 };
 
 const getProfile = async (req, res) => {
-    try {
-        const { _id } = req.body
-        const user = await User.findById(_id);
-        if (!user) {
-            return res.status(404).json({ success: false, message: "Can't find user" })
-        }
-        sendToken(res, user, 201, `Welcome back ${user.name}`);
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
+  try {
+    const {_id} =  req.body
+    const user = await User.findById(_id);
+    const userData = {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        avatar: user.avatar,
+        birth: user.birth,
+        gender: user.gender,
+        address: user.address,
+        userId: user.userId,
+        privilege: user.privilege,
+        startWorkingDate: user.startWorkingDate,
+        contractStatus: user.contractStatus,
+        typeOfEmployee: user.typeOfEmployee,
+        role: user.role,
+        deviceId: user.deviceId,
+        firstLogin: user.firstLogin,
+        verified: user.verified,
+    };
+    res
+        .status(200)
+        .json({ success: true, message: `User Information`, user: userData });
+} catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+}
+
 };
 
 const getAllProfile = async (req, res) => {
