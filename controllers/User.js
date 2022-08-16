@@ -207,8 +207,7 @@ const getAllProfile = async (req, res) => {
 
 const updateAdmin = async (req, res) => {
     try {
-        let userAdmin = await User.findById(req.user._id);
-        let userPass = await User.findById(req.user._id).select("+password")
+        let userAdmin = await User.findById(req.user._id).select("+password")
         if (userAdmin.privilege !== "Quản trị viên") {
             return res
                 .status(403)
@@ -228,7 +227,7 @@ const updateAdmin = async (req, res) => {
         } = req.body;
         user = await User.findById(_id);
 
-        const isMatch = await userPass.comparePassword(password);
+        const isMatch = await userAdmin.comparePassword(password);
         if (!isMatch) {
             return res
                 .status(400)
