@@ -302,7 +302,7 @@ const countTaskAsNotDone = async (req, res) => {
 
         return res
             .status(200)
-            .json({ success: true, message: `Number of Done Task`, count: count });
+            .json({ success: true, message: `Number of Not Done Task`, count: count });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -323,7 +323,7 @@ const countTaskAsOutOfDate = async (req, res) => {
 
         return res
             .status(200)
-            .json({ success: true, message: `Number of Done Task`, count: count });
+            .json({ success: true, message: `Number of Out of Date Task`, count: count });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -339,7 +339,7 @@ const countTaskAll = async (req, res) => {
 
         return res
             .status(200)
-            .json({ success: true, message: `Number of Done Task`, count: count });
+            .json({ success: true, message: `Number of All Task`, count: count });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -351,21 +351,47 @@ const sortTask = async (req, res) => {
     try {
         const tasks = await Task.find({ contributorIds: req.user._id });
 
-        tasksDone = tasks.filter(obj => {
+        tasksAll = [];
+        for (let i = 0; i < tasks.length; i++) {
+            manager = await User.findById(tasks[i].managerId)
+            managerName = manager.name
+            contributorsName = []
+            for (let j = 0; j < tasks[i].contributorIds.length; j++) {
+                contributor = await User.findById(tasks[i].contributorIds[j])
+                contributorsName.push(contributor.name)
+            }
+
+            taskTemp = {
+                _id: tasks[i]._id,
+                name: tasks[i].name,
+                description: tasks[i].description,
+                date: tasks[i].date,
+                deadline: tasks[i].deadline,
+                actualEndedTime: tasks[i].actualEndedTime,
+                manager: managerName,
+                contributors: contributorsName,
+                status: tasks[i].status,
+                isDone: tasks[i].isDone,
+                isApproved: tasks[i].isApproved,
+            }
+            tasksAll.push(taskTemp)
+        }
+
+        tasksDone = tasksAll.filter(obj => {
             if (obj.status === "Đã hoàn thành") {
                 return true;
             }
             return false;
         });
 
-        tasksNotDone = tasks.filter(obj => {
+        tasksNotDone = tasksAll.filter(obj => {
             if (obj.status === "Chưa hoàn thành") {
                 return true;
             }
             return false;
         });
 
-        tasksOutOfDate = tasks.filter(obj => {
+        tasksOutOfDate = tasksAll.filter(obj => {
             if (obj.status === "Quá hạn") {
                 return true;
             }
@@ -382,7 +408,7 @@ const sortTask = async (req, res) => {
             return moment(a.deadline, "HH:mm, DD/MM/YYYY") - moment(b.deadline, "HH:mm, DD/MM/YYYY")
         });
 
-        tasksAll = {
+        sortedTask = {
             tasksNotDone: tasksNotDone,
             tasksOutOfDate: tasksOutOfDate,
             tasksDone: tasksDone,
@@ -390,7 +416,7 @@ const sortTask = async (req, res) => {
 
         return res
             .status(200)
-            .json({ success: true, message: `Number of Done Task`, tasks: tasksAll });
+            .json({ success: true, message: `Sorted Task`, tasks: sortedTask });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
