@@ -1,5 +1,5 @@
 const express = require("express")
-const { checking, getTimesheetInfo, getTop5, getMyRank, filterTimesheetDataByToday, filterTimesheetDataByYesterday, filterTimesheetDataByThisWeek, filterTimesheetDataByLastWeek, filterTimesheetDataByThisMonth, filterTimesheetDataByLastMonth, filterTimesheetDataByRange, getTimesheetByMonth } = require("../controllers/Timesheet")
+const { checking, getTimesheetInfo, getTop5, getMyRank, filterTimesheetDataByToday, filterTimesheetDataByYesterday, filterTimesheetDataByThisWeek, filterTimesheetDataByLastWeek, filterTimesheetDataByThisMonth, filterTimesheetDataByLastMonth, filterTimesheetDataByRange, getTimesheetByMonth, getTimesheetPoint } = require("../controllers/Timesheet")
 const isAuthenticated = require("../middleware/auth")
 const router = express.Router()
 router.route("/checking").post(isAuthenticated, checking)
@@ -14,5 +14,6 @@ router.route("/filtertimesheetdatabythismonth").get(isAuthenticated, filterTimes
 router.route("/filtertimesheetdatabylastmonth").get(isAuthenticated, filterTimesheetDataByLastMonth)
 router.route("/filtertimesheetdatabyrange").post(isAuthenticated, filterTimesheetDataByRange)
 router.route("/timesheetbymonth").get(isAuthenticated, getTimesheetByMonth)
+router.route("/timesheetpoint").get(isAuthenticated, getTimesheetPoint)
 
 module.exports = router

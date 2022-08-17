@@ -566,6 +566,7 @@ const getTimesheetByMonth = async (req, res) => {
     }
 }
 
+// Kiểm tra nếu ngày là cuối tuần
 function isWeekend(date) {
     return date.getDay() === 6 || date.getDay() === 0;
 }
@@ -582,16 +583,33 @@ const getTimesheetPoint = async (req, res) => {
             return moment(segment.date, "DD/MM/YYYY") >= monthStart && moment(segment.date, "DD/MM/YYYY") <= monthEnd;
         });
 
-        // segments.forEach((segment) => {
-        //     if(isWeekend(moment(segment.date, "HH:mm, DD/MM/YYYY")){
+        myPoint = 0
+        segments.forEach((segment) => {
+            pointTemp = (segment.workingTime) / (moment.duration(moment("18:00:00", "HH:mm:ss").diff(moment("08:30:00", "HH:mm:ss"))).asHours())
+            if (isNaN(pointTemp)) {
+                pointTemp = 0
+            }
+            if (isWeekend(moment(segment.date, "HH:mm, DD/MM/YYYY").toDate())) {
+                pointTemp *= 1.5;
+            }
+            myPoint += pointTemp;
+        });
 
-        //     }
-        //     sum = await sumFunction(sum, rating);
-        // });
+        maxPoint = 0
+        for (var i = monthStart.toDate(); i <= monthEnd.toDate(); i.setDate(i.getDate() + 1)) {
+            if (i.getDay() != 0 && i.getDay() != 1) maxPoint++;
+        }
+        checkinLateNum = segments.filter(function (segment) { return isCheckinLate(segment.checkinTime) }).length;
+
+        point = {
+            actualPoint: Math.round(myPoint * 10) / 10,
+            maxPoint: maxPoint,
+            checkinLateNum: checkinLateNum,
+        }
 
         return res
             .status(200)
-            .json({ success: true, message: `Timesheet data`, Object: segments });
+            .json({ success: true, message: `Timesheet point`, point: point });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -599,4 +617,4 @@ const getTimesheetPoint = async (req, res) => {
 }
 
 
-module.exports = { checking, getTimesheetInfo, getTop5, getMyRank, filterTimesheetDataByToday, filterTimesheetDataByYesterday, filterTimesheetDataByThisWeek, filterTimesheetDataByLastWeek, filterTimesheetDataByThisMonth, filterTimesheetDataByLastMonth, filterTimesheetDataByRange, getTimesheetByMonth }
+module.exports = { checking, getTimesheetInfo, getTop5, getMyRank, filterTimesheetDataByToday, filterTimesheetDataByYesterday, filterTimesheetDataByThisWeek, filterTimesheetDataByLastWeek, filterTimesheetDataByThisMonth, filterTimesheetDataByLastMonth, filterTimesheetDataByRange, getTimesheetByMonth, getTimesheetPoint }
