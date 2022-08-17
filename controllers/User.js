@@ -567,4 +567,4 @@ module.exports = {
     updateDeviceId,
     searchUser,
     getProfile,
-};
+}

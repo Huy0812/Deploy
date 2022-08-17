@@ -24,7 +24,7 @@ const checking = async (req, res) => {
         if (user.deviceId !== deviceId) {
             return res
                 .status(400)
-                .json({ success: false, message: "deviceId is Incorrect. Please update your deviceId" });
+                .json({ success: false, message: "DeviceId is Incorrect. Please update your DeviceId" });
         }
         if (!timesheet) {
             timesheet = await Timesheet.create({
