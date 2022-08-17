@@ -80,45 +80,6 @@ const deleteTask = async (req, res) => {
     }
 };
 
-// Lấy Task của nhân viên (với mọi vai trò)
-const getMyTask = async (req, res) => {
-    try {
-        const tasks = await Task.find({ $or: [{ managerId: req.user._id }, { contributorIds: req.user._id }] })
-
-        myTasks = [];
-        for (let i = 0; i < tasks.length; i++) {
-            manager = await User.findById(tasks[i].managerId)
-            managerName = manager.name
-            contributorsName = []
-            for (let j = 0; j < tasks[i].contributorIds.length; j++) {
-                contributor = await User.findById(tasks[i].contributorIds[j])
-                contributorsName.push(contributor.name)
-            }
-
-            taskTemp = {
-                _id: tasks[i]._id,
-                name: tasks[i].name,
-                description: tasks[i].description,
-                date: tasks[i].date,
-                deadline: tasks[i].deadline,
-                actualEndedTime: tasks[i].actualEndedTime,
-                manager: managerName,
-                contributors: contributorsName,
-                status: tasks[i].status,
-                isDone: tasks[i].isDone,
-                isApproved: tasks[i].isApproved,
-            }
-            myTasks.push(taskTemp)
-        }
-
-        res
-            .status(200)
-            .json({ success: true, message: `Task list`, tasks: myTasks });
-
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
 const getTaskById = async (req, res) => {
     try {
         let user = await User.findById(req.user._id);
@@ -170,10 +131,56 @@ const getTaskById = async (req, res) => {
     }
 };
 
+// Lấy Task của nhân viên (với mọi vai trò)
+const getMyTask = async (req, res) => {
+    try {
+        const tasks = await Task.find({ $or: [{ managerId: req.user._id }, { contributorIds: req.user._id }] })
+        tasks.sort(function (a, b) {
+            return moment(a.deadline, "HH:mm, DD/MM/YYYY") - moment(b.deadline, "HH:mm, DD/MM/YYYY")
+        });
+
+        myTasks = [];
+        for (let i = 0; i < tasks.length; i++) {
+            manager = await User.findById(tasks[i].managerId)
+            managerName = manager.name
+            contributorsName = []
+            for (let j = 0; j < tasks[i].contributorIds.length; j++) {
+                contributor = await User.findById(tasks[i].contributorIds[j])
+                contributorsName.push(contributor.name)
+            }
+
+            taskTemp = {
+                _id: tasks[i]._id,
+                name: tasks[i].name,
+                description: tasks[i].description,
+                date: tasks[i].date,
+                deadline: tasks[i].deadline,
+                actualEndedTime: tasks[i].actualEndedTime,
+                manager: managerName,
+                contributors: contributorsName,
+                status: tasks[i].status,
+                isDone: tasks[i].isDone,
+                isApproved: tasks[i].isApproved,
+            }
+            myTasks.push(taskTemp)
+        }
+
+        res
+            .status(200)
+            .json({ success: true, message: `Task list`, tasks: myTasks });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
 // Lấy Task của nhân viên (với vai trò quản lý)
 const getMyTaskAsManager = async (req, res) => {
     try {
         const tasks = await Task.find({ managerId: req.user._id });
+        tasks.sort(function (a, b) {
+            return moment(a.deadline, "HH:mm, DD/MM/YYYY") - moment(b.deadline, "HH:mm, DD/MM/YYYY")
+        });
 
         myTasksAsManager = [];
         for (let i = 0; i < tasks.length; i++) {
@@ -214,6 +221,9 @@ const getMyTaskAsManager = async (req, res) => {
 const getMyTaskAsContributor = async (req, res) => {
     try {
         const tasks = await Task.find({ contributorIds: req.user._id });
+        tasks.sort(function (a, b) {
+            return moment(a.deadline, "HH:mm, DD/MM/YYYY") - moment(b.deadline, "HH:mm, DD/MM/YYYY")
+        });
 
         myTasksAsContributor = [];
         for (let i = 0; i < tasks.length; i++) {
@@ -254,6 +264,9 @@ const getMyTaskAsContributor = async (req, res) => {
 const getAllTask = async (req, res) => {
     try {
         var tasks = await Task.find()
+        tasks.sort(function (a, b) {
+            return moment(a.deadline, "HH:mm, DD/MM/YYYY") - moment(b.deadline, "HH:mm, DD/MM/YYYY")
+        });
 
         tasksAll = [];
         for (let i = 0; i < tasks.length; i++) {
