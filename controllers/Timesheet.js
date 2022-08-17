@@ -39,6 +39,7 @@ const checking = async (req, res) => {
                 date: currentDate,
                 checkinTime: currentTime,
                 checkinTime: null,
+                workingTime: 0,
             };
             timesheet.segments.push(timesheetSegment);
 
@@ -50,6 +51,9 @@ const checking = async (req, res) => {
         timesheet = await Timesheet.findOne({ "userId": req.user._id, "segments[index].date": currentDate });
 
         let workingTime = moment.duration(moment(timesheet.segments[index].checkoutTime, "HH:mm:ss").diff(moment(timesheet.segments[index].checkinTime, "HH:mm:ss"))).asHours();
+        if (isNaN(workingTime)) {
+            workingTime = 0
+        }
         workingTime = Math.round(workingTime * 10) / 10;
 
         let timesheetSegment = {
@@ -312,7 +316,7 @@ const filterTimesheetDataByThisWeek = async (req, res) => {
 
         checkinLateNumber = segments.filter(function (segment) { return isCheckinLate(segment.checkinTime) }).length;
         checkoutEarlyNumber = segments.filter(function (segment) { return isCheckoutEarly(segment.checkinTime) }).length;
-        overtimeNumber = segments.filter(function (segment) { return isWeekend(segment.date) }).length;
+        overtimeNumber = segments.filter(function (segment) { return isWeekend(moment(segment.date, "DD/MM/YYYY").toDate) }).length;
 
         checkinLateValue = segments.reduce((accumulator, segment) => {
             return accumulator + getCheckinLate(segment.checkinTime);
@@ -323,6 +327,9 @@ const filterTimesheetDataByThisWeek = async (req, res) => {
         overtimeValue = segments.reduce((accumulator, segment) => {
             return accumulator + getOvertime(segment);
         }, 0);
+        if (overtimeValue == null) {
+            overtimeValue = 0;
+        }
         checkinLateData = {
             value: checkinLateValue,
             number: checkinLateNumber,
@@ -376,12 +383,15 @@ const filterTimesheetDataByLastWeek = async (req, res) => {
         overtimeValue = segments.reduce((accumulator, segment) => {
             return accumulator + getOvertime(segment);
         }, 0);
+        if (overtimeValue == null) {
+            overtimeValue = 0;
+        }
         checkinLateData = {
             value: checkinLateValue,
             number: checkinLateNumber,
         }
         checkoutEarlyData = {
-            value: checkinLateValue,
+            value: checkoutEarlyValue,
             number: checkinLateNumber,
         }
         overtimeData = {
@@ -429,12 +439,15 @@ const filterTimesheetDataByThisMonth = async (req, res) => {
         overtimeValue = segments.reduce((accumulator, segment) => {
             return accumulator + getOvertime(segment);
         }, 0);
+        if (overtimeValue == null) {
+            overtimeValue = 0;
+        }
         checkinLateData = {
             value: checkinLateValue,
             number: checkinLateNumber,
         }
         checkoutEarlyData = {
-            value: checkinLateValue,
+            value: checkoutEarlyValue,
             number: checkinLateNumber,
         }
         overtimeData = {
@@ -482,12 +495,15 @@ const filterTimesheetDataByLastMonth = async (req, res) => {
         overtimeValue = segments.reduce((accumulator, segment) => {
             return accumulator + getOvertime(segment);
         }, 0);
+        if (overtimeValue == null) {
+            overtimeValue = 0;
+        }
         checkinLateData = {
             value: checkinLateValue,
             number: checkinLateNumber,
         }
         checkoutEarlyData = {
-            value: checkinLateValue,
+            value: checkoutEarlyValue,
             number: checkinLateNumber,
         }
         overtimeData = {
@@ -534,12 +550,15 @@ const filterTimesheetDataByRange = async (req, res) => {
         overtimeValue = segments.reduce((accumulator, segment) => {
             return accumulator + getOvertime(segment);
         }, 0);
+        if (overtimeValue == null) {
+            overtimeValue = 0;
+        }
         checkinLateData = {
             value: checkinLateValue,
             number: checkinLateNumber,
         }
         checkoutEarlyData = {
-            value: checkinLateValue,
+            value: checkoutEarlyValue,
             number: checkinLateNumber,
         }
         overtimeData = {
