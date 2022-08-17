@@ -176,7 +176,7 @@ function isCheckoutEarly(checkoutTime) {
 
 // Kiểm tra nếu ngày là cuối tuần
 function isWeekend(date) {
-    return date.getDay() === 6 || date.getDay() === 0;
+    return new Date(date).getDay() === 6 || new Date(date).getDay() === 0;
 }
 
 // Tính thời gian checkin muộn
@@ -203,21 +203,23 @@ function getOvertime(segment) {
 // Lọc thông tin chấm công (hôm nay)
 const filterTimesheetDataByToday = async (req, res) => {
     try {
-        const currentDate = moment().format("DD/MM/YYYY");
+        const today = moment().format("DD/MM/YYYY");
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
-        let index = timesheet.segments.findIndex(x => x.date === currentDate);
+        let index = timesheet.segments.findIndex(x => x.date === today);
 
         if (index === -1)
             return res.status(401).json({ success: false, message: "Have't checkin today" });
 
-        if (isWeekend(moment(currentDate, "DD/MM/YYYY").toDate)) {
+        if (isWeekend(moment(today, "DD/MM/YYYY").toDate)) {
             checkinLateValue = 0;
             checkoutEarlyValue = 0;
             overtimeValue = timesheet.segments[index].workingTime;
+            overtimeNumber = 1;
         } else {
             checkinLateValue = getCheckinLate(timesheet.segments[index].checkinTime);
             checkoutEarlyValue = getCheckoutEarly(timesheet.segments[index].checkoutTime);
             overtimeValue = 0;
+            overtimeNumber = 0;
         }
         checkinLate = {
             value: checkinLateValue,
@@ -229,7 +231,7 @@ const filterTimesheetDataByToday = async (req, res) => {
         }
         overtime = {
             value: overtimeValue,
-            number: 1,
+            number: overtimeNumber,
         }
 
         let timesheetData = {
@@ -250,21 +252,23 @@ const filterTimesheetDataByToday = async (req, res) => {
 // Lọc thông tin chấm công (hôm qua)
 const filterTimesheetDataByYesterday = async (req, res) => {
     try {
-        const currentDate = moment().subtract(1, 'day').format("DD/MM/YYYY");
+        const yesterday = moment().subtract(1, 'day').format("DD/MM/YYYY");
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
-        let index = timesheet.segments.findIndex(x => x.date === currentDate);
+        let index = timesheet.segments.findIndex(x => x.date === yesterday);
 
         if (index === -1)
             return res.status(401).json({ success: false, message: "Have't checkin yesterday" });
 
-        if (isWeekend(moment(currentDate, "DD/MM/YYYY").toDate)) {
+        if (isWeekend(moment(yesterday, "DD/MM/YYYY").toDate)) {
             checkinLateValue = 0;
             checkoutEarlyValue = 0;
             overtimeValue = timesheet.segments[index].workingTime;
+            overtimeNumber = 1;
         } else {
             checkinLateValue = getCheckinLate(timesheet.segments[index].checkinTime);
             checkoutEarlyValue = getCheckoutEarly(timesheet.segments[index].checkoutTime);
             overtimeValue = 0;
+            overtimeNumber = 0;
         }
         checkinLate = {
             value: checkinLateValue,
@@ -276,7 +280,7 @@ const filterTimesheetDataByYesterday = async (req, res) => {
         }
         overtime = {
             value: overtimeValue,
-            number: 1,
+            number: overtimeNumber,
         }
 
         let timesheetData = {
@@ -306,9 +310,9 @@ const filterTimesheetDataByThisWeek = async (req, res) => {
             return moment(segment.date, "DD/MM/YYYY") >= weekStart && moment(segment.date, "DD/MM/YYYY") <= weekEnd;
         });
 
-        checkinLateNum = segments.filter(function (segment) { return isCheckinLate(segment.checkinTime) }).length;
-        checkoutEarlyNum = segments.filter(function (segment) { return isCheckoutEarly(segment.checkinTime) }).length;
-        overtimeNum = segments.filter(function (segment) { return isWeekend(segment.date) }).length;
+        checkinLateNumber = segments.filter(function (segment) { return isCheckinLate(segment.checkinTime) }).length;
+        checkoutEarlyNumber = segments.filter(function (segment) { return isCheckoutEarly(segment.checkinTime) }).length;
+        overtimeNumber = segments.filter(function (segment) { return isWeekend(segment.date) }).length;
 
         checkinLateValue = segments.reduce((accumulator, segment) => {
             return accumulator + getCheckinLate(segment.checkinTime);
@@ -321,15 +325,15 @@ const filterTimesheetDataByThisWeek = async (req, res) => {
         }, 0);
         checkinLateData = {
             value: checkinLateValue,
-            number: checkinLateNum,
+            number: checkinLateNumber,
         }
         checkoutEarlyData = {
             value: checkinLateValue,
-            number: checkinLateNum,
+            number: checkinLateNumber,
         }
         overtimeData = {
             value: overtimeValue,
-            number: overtimeNum,
+            number: overtimeNumber,
         }
 
         let timesheetData = {
@@ -359,9 +363,9 @@ const filterTimesheetDataByLastWeek = async (req, res) => {
             return moment(segment.date, "DD/MM/YYYY") >= weekStart && moment(segment.date, "DD/MM/YYYY") <= weekEnd;
         });
 
-        checkinLateNum = segments.filter(function (segment) { return isCheckinLate(segment.checkinTime) }).length;
-        checkoutEarlyNum = segments.filter(function (segment) { return isCheckoutEarly(segment.checkinTime) }).length;
-        overtimeNum = segments.filter(function (segment) { return isWeekend(segment.date) }).length;
+        checkinLateNumber = segments.filter(function (segment) { return isCheckinLate(segment.checkinTime) }).length;
+        checkoutEarlyNumber = segments.filter(function (segment) { return isCheckoutEarly(segment.checkinTime) }).length;
+        overtimeNumber = segments.filter(function (segment) { return isWeekend(segment.date) }).length;
 
         checkinLateValue = segments.reduce((accumulator, segment) => {
             return accumulator + getCheckinLate(segment.checkinTime);
@@ -374,15 +378,15 @@ const filterTimesheetDataByLastWeek = async (req, res) => {
         }, 0);
         checkinLateData = {
             value: checkinLateValue,
-            number: checkinLateNum,
+            number: checkinLateNumber,
         }
         checkoutEarlyData = {
             value: checkinLateValue,
-            number: checkinLateNum,
+            number: checkinLateNumber,
         }
         overtimeData = {
             value: overtimeValue,
-            number: overtimeNum,
+            number: overtimeNumber,
         }
 
         let timesheetData = {
@@ -412,9 +416,9 @@ const filterTimesheetDataByThisMonth = async (req, res) => {
             return moment(segment.date, "DD/MM/YYYY") >= monthStart && moment(segment.date, "DD/MM/YYYY") <= monthEnd;
         });
 
-        checkinLateNum = segments.filter(function (segment) { return isCheckinLate(segment.checkinTime) }).length;
-        checkoutEarlyNum = segments.filter(function (segment) { return isCheckoutEarly(segment.checkinTime) }).length;
-        overtimeNum = segments.filter(function (segment) { return isWeekend(segment.date) }).length;
+        checkinLateNumber = segments.filter(function (segment) { return isCheckinLate(segment.checkinTime) }).length;
+        checkoutEarlyNumber = segments.filter(function (segment) { return isCheckoutEarly(segment.checkinTime) }).length;
+        overtimeNumber = segments.filter(function (segment) { return isWeekend(segment.date) }).length;
 
         checkinLateValue = segments.reduce((accumulator, segment) => {
             return accumulator + getCheckinLate(segment.checkinTime);
@@ -427,15 +431,15 @@ const filterTimesheetDataByThisMonth = async (req, res) => {
         }, 0);
         checkinLateData = {
             value: checkinLateValue,
-            number: checkinLateNum,
+            number: checkinLateNumber,
         }
         checkoutEarlyData = {
             value: checkinLateValue,
-            number: checkinLateNum,
+            number: checkinLateNumber,
         }
         overtimeData = {
             value: overtimeValue,
-            number: overtimeNum,
+            number: overtimeNumber,
         }
 
         let timesheetData = {
@@ -464,8 +468,10 @@ const filterTimesheetDataByLastMonth = async (req, res) => {
         segments = segments.filter(function (segment) {
             return moment(segment.date, "DD/MM/YYYY") >= monthStart && moment(segment.date, "DD/MM/YYYY") <= monthEnd;
         });
-        checkinLateNum = segments.filter(function (segment) { return isCheckinLate(segment.checkinTime) }).length;
-        checkoutEarlyNum = segments.filter(function (segment) { return isCheckoutEarly(segment.checkinTime) }).length;
+        
+        checkinLateNumber = segments.filter(function (segment) { return isCheckinLate(segment.checkinTime) }).length;
+        checkoutEarlyNumber = segments.filter(function (segment) { return isCheckoutEarly(segment.checkinTime) }).length;
+        overtimeNumber = segments.filter(function (segment) { return isWeekend(segment.date) }).length;
 
         checkinLateValue = segments.reduce((accumulator, segment) => {
             return accumulator + getCheckinLate(segment.checkinTime);
@@ -473,24 +479,26 @@ const filterTimesheetDataByLastMonth = async (req, res) => {
         checkoutEarlyValue = segments.reduce((accumulator, segment) => {
             return accumulator + getCheckoutEarly(segment.checkoutTime);
         }, 0);
-        checkoutLateValue = segments.reduce((accumulator, segment) => {
-            return accumulator + getCheckoutLate(segment.checkoutTime);
+        overtimeValue = segments.reduce((accumulator, segment) => {
+            return accumulator + getOvertime(segment);
         }, 0);
-
         checkinLateData = {
             value: checkinLateValue,
-            number: checkinLateNum,
+            number: checkinLateNumber,
         }
         checkoutEarlyData = {
-            value: checkoutEarlyValue,
-            number: checkoutEarlyNum,
+            value: checkinLateValue,
+            number: checkinLateNumber,
         }
-
+        overtimeData = {
+            value: overtimeValue,
+            number: overtimeNumber,
+        }
 
         let timesheetData = {
             checkinLate: checkinLateData,
             checkoutEarly: checkoutEarlyData,
-
+            overtime: overtimeData,
         }
 
         return res
@@ -513,9 +521,9 @@ const filterTimesheetDataByRange = async (req, res) => {
             return moment(segment.date, "DD/MM/YYYY") >= moment(start, "DD/MM/YYYY") && moment(segment.date, "DD/MM/YYYY") <= moment(end, "DD/MM/YYYY");
         });
 
-        checkinLateNum = segments.filter(function (segment) { return isCheckinLate(segment.checkinTime) }).length;
-        checkoutEarlyNum = segments.filter(function (segment) { return isCheckoutEarly(segment.checkinTime) }).length;
-        overtimeNum = segments.filter(function (segment) { return isWeekend(segment.date) }).length;
+        checkinLateNumber = segments.filter(function (segment) { return isCheckinLate(segment.checkinTime) }).length;
+        checkoutEarlyNumber = segments.filter(function (segment) { return isCheckoutEarly(segment.checkinTime) }).length;
+        overtimeNumber = segments.filter(function (segment) { return isWeekend(segment.date) }).length;
 
         checkinLateValue = segments.reduce((accumulator, segment) => {
             return accumulator + getCheckinLate(segment.checkinTime);
@@ -528,15 +536,15 @@ const filterTimesheetDataByRange = async (req, res) => {
         }, 0);
         checkinLateData = {
             value: checkinLateValue,
-            number: checkinLateNum,
+            number: checkinLateNumber,
         }
         checkoutEarlyData = {
             value: checkinLateValue,
-            number: checkinLateNum,
+            number: checkinLateNumber,
         }
         overtimeData = {
             value: overtimeValue,
-            number: overtimeNum,
+            number: overtimeNumber,
         }
 
         let timesheetData = {
@@ -574,8 +582,6 @@ const getTimesheetByMonth = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 }
-
-
 
 // Lấy điểm chấm công (trong tháng)
 const getTimesheetPoint = async (req, res) => {
@@ -621,6 +627,5 @@ const getTimesheetPoint = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 }
-
 
 module.exports = { checking, getTimesheetInfo, getTop5, getMyRank, filterTimesheetDataByToday, filterTimesheetDataByYesterday, filterTimesheetDataByThisWeek, filterTimesheetDataByLastWeek, filterTimesheetDataByThisMonth, filterTimesheetDataByLastMonth, filterTimesheetDataByRange, getTimesheetByMonth, getTimesheetPoint }
