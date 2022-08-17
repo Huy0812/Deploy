@@ -1,5 +1,5 @@
 const express = require("express")
-const { createTask, updateTask, deleteTask, getMyTask, getMyTaskAsManager, getMyTaskAsContributor, getAllTask, checkingTask, countTask, getTaskById } = require("../controllers/Task")
+const { createTask, updateTask, deleteTask, getMyTask, getMyTaskAsManager, getMyTaskAsContributor, getTaskById, getAllTask, checkingTask, countMyTaskAsContributor, countMyTaskAsManager } = require("../controllers/Task")
 const isAuthenticated = require("../middleware/auth")
 const router = express.Router()
 router.route("/createtask").post(isAuthenticated, createTask)
@@ -10,7 +10,8 @@ router.route("/mytaskasmanager").get(isAuthenticated, getMyTaskAsManager)
 router.route("/mytaskascontributor").get(isAuthenticated, getMyTaskAsContributor)
 router.route("/alltask").get(isAuthenticated, getAllTask)
 router.route("/checkingtask").post(isAuthenticated, checkingTask)
-router.route("/counttask").get(isAuthenticated, countTask)
+router.route("/counttaskascontributor").get(isAuthenticated, countMyTaskAsContributor)
+router.route("/counttaskasmanager").get(isAuthenticated, countMyTaskAsManager)
 router.route("/:_id").get(isAuthenticated, getTaskById)
 
 module.exports = router

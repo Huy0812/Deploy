@@ -94,7 +94,7 @@ const getTaskById = async (req, res) => {
                     message: "Forbidden: You don't have permisson to access this",
                 });
         }
-        const tasks = await Task.find({ contributorIds: req.params._id})
+        const tasks = await Task.find({ contributorIds: req.params._id })
 
         myTasks = [];
         for (let i = 0; i < tasks.length; i++) {
@@ -330,8 +330,8 @@ const checkingTask = async (req, res) => {
     }
 };
 
-// Đếm Task
-const countTask = async (req, res) => {
+// Đếm Task của tôi (với vai trò người tham gia)
+const countMyTaskAsContributor = async (req, res) => {
     try {
         const tasks = await Task.find({ contributorIds: req.user._id });
 
@@ -376,4 +376,50 @@ const countTask = async (req, res) => {
     }
 };
 
-module.exports = { createTask, updateTask, deleteTask, getMyTask, getMyTaskAsManager, getMyTaskAsContributor, getTaskById, getAllTask, checkingTask, countTask }
+// Đếm Task của tôi (với vai trò quản lý)
+const countMyTaskAsManager = async (req, res) => {
+    try {
+        const tasks = await Task.find({ managerId: req.user._id });
+
+        let countTaskAsDone = tasks.filter(obj => {
+            if (obj.status === "Đã hoàn thành") {
+                return true;
+            }
+            return false;
+        }).length;
+
+        let countTaskAsNotDone = tasks.filter(obj => {
+            if (obj.status === "Chưa hoàn thành") {
+                return true;
+            }
+            return false;
+        }).length;
+
+
+        let countTaskAsOutOfDate = tasks.filter(obj => {
+            if (obj.status === "Quá hạn") {
+                return true;
+            }
+            return false;
+        }).length;
+
+
+        let countTaskAll = tasks.length;
+
+        let countTask = {
+            countTaskAsDone: countTaskAsDone,
+            countTaskAsNotDone: countTaskAsNotDone,
+            countTaskAsOutOfDate: countTaskAsOutOfDate,
+            countTaskAll: countTaskAll,
+        }
+
+        return res
+            .status(200)
+            .json({ success: true, message: `Number of Task`, count: countTask });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+module.exports = { createTask, updateTask, deleteTask, getMyTask, getMyTaskAsManager, getMyTaskAsContributor, getTaskById, getAllTask, checkingTask, countMyTaskAsContributor, countMyTaskAsManager }
