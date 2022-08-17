@@ -616,7 +616,8 @@ const getTimesheetPoint = async (req, res) => {
 
         myPoint = 0
         segments.forEach((segment) => {
-            pointTemp = (segment.workingTime) / (moment.duration(moment("18:00:00", "HH:mm:ss").diff(moment("08:30:00", "HH:mm:ss"))).asHours())
+            breakTime = moment.duration(moment("12:00:00", "HH:mm:ss").diff(moment("13:30:00", "HH:mm:ss"))).asHours()
+            pointTemp = (segment.workingTime - breakTime) / (moment.duration(moment("18:00:00", "HH:mm:ss").diff(moment("08:30:00", "HH:mm:ss"))).asHours() - breakTime)
             if (isNaN(pointTemp)) {
                 pointTemp = 0
             }
