@@ -121,7 +121,7 @@ const getMyTask = async (req, res) => {
 };
 const getTaskById = async (req, res) => {
     try {
-         let user = await User.findById(req.user._id);
+        let user = await User.findById(req.user._id);
         if (
             user.privilege !== "Quản trị viên" &&
             user.privilege !== "Quản lý"
@@ -136,7 +136,7 @@ const getTaskById = async (req, res) => {
 
         const { _id } = req.body
         console.log(_id)
-        const tasks = await Task.find({ $or: [{ managerId: _id }, { contributorIds: _id}] })
+        const tasks = await Task.find({ $or: [{ managerId: _id }, { contributorIds: _id }] })
 
         myTasks = [];
         for (let i = 0; i < tasks.length; i++) {
@@ -443,4 +443,4 @@ const sortTask = async (req, res) => {
     }
 };
 
-module.exports = { createTask, updateTask, deleteTask, getMyTask, getMyTaskAsManager, getMyTaskAsContributor,getTaskById, getAllTask, checkingTask, countTask, sortTask }
+module.exports = { createTask, updateTask, deleteTask, getMyTask, getMyTaskAsManager, getMyTaskAsContributor, getTaskById, getAllTask, checkingTask, countTask, sortTask }
