@@ -38,7 +38,7 @@ const checking = async (req, res) => {
             let timesheetSegment = {
                 date: currentDate,
                 checkinTime: currentTime,
-                checkinTime: null,
+                checkoutTime: null,
                 workingTime: 0,
             };
             timesheet.segments.push(timesheetSegment);
@@ -81,6 +81,12 @@ const getTimesheetInfo = async (req, res) => {
         const currentDate = moment().format("DD/MM/YYYY");
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
         let index = timesheet.segments.findIndex(x => x.date === currentDate);
+
+        if (!timesheet) {
+            return res
+                .status(400)
+                .json({ success: true, message: "Bạn chưa chấm công lần đầu!!!" });
+        }
 
         if (index === -1) {
             timesheetData = {
