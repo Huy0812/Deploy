@@ -381,35 +381,25 @@ const countMyTaskAsManager = async (req, res) => {
     try {
         const tasks = await Task.find({ managerId: req.user._id });
 
-        let countTaskAsDone = tasks.filter(obj => {
-            if (obj.status === "Đã hoàn thành") {
+        let countTaskAsApproved = tasks.filter(obj => {
+            if (obj.isApproved) {
                 return true;
             }
             return false;
         }).length;
 
-        let countTaskAsNotDone = tasks.filter(obj => {
-            if (obj.status === "Chưa hoàn thành") {
+        let countTaskAsNotApproved = tasks.filter(obj => {
+            if (!obj.isApproved) {
                 return true;
             }
             return false;
         }).length;
-
-
-        let countTaskAsOutOfDate = tasks.filter(obj => {
-            if (obj.status === "Quá hạn") {
-                return true;
-            }
-            return false;
-        }).length;
-
 
         let countTaskAll = tasks.length;
 
         let countTask = {
-            countTaskAsDone: countTaskAsDone,
-            countTaskAsNotDone: countTaskAsNotDone,
-            countTaskAsOutOfDate: countTaskAsOutOfDate,
+            countTaskAsApproved: countTaskAsApproved,
+            countTaskAsNotApproved: countTaskAsNotApproved,
             countTaskAll: countTaskAll,
         }
 
