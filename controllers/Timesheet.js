@@ -82,12 +82,6 @@ const getTimesheetInfo = async (req, res) => {
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
         let index = timesheet.segments.findIndex(x => x.date === currentDate);
 
-        if (!timesheet) {
-            return res
-                .status(400)
-                .json({ success: true, message: "Bạn chưa chấm công lần đầu!!!" });
-        }
-
         if (index === -1) {
             timesheetData = {
                 checkinTime: null,
