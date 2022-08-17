@@ -38,6 +38,7 @@ const checking = async (req, res) => {
             let timesheetSegment = {
                 date: currentDate,
                 checkinTime: currentTime,
+                checkinTime: null,
             };
             timesheet.segments.push(timesheetSegment);
 
@@ -416,12 +417,12 @@ const filterTimesheetDataByThisMonth = async (req, res) => {
             number: checkinLateNum,
         }
         checkoutEarlyData = {
-            value: checkinLateValue,
-            number: checkinLateNum,
+            value: checkoutEarlyValue,
+            number: checkoutEarlyNum,
         }
         checkoutLateData = {
-            value: checkinLateValue,
-            number: checkinLateNum,
+            value: checkoutLateValue,
+            number: checkoutLateNum,
         }
 
         let timesheetData = {
@@ -469,12 +470,12 @@ const filterTimesheetDataByLastMonth = async (req, res) => {
             number: checkinLateNum,
         }
         checkoutEarlyData = {
-            value: checkinLateValue,
-            number: checkinLateNum,
+            value: checkoutEarlyValue,
+            number: checkoutEarlyNum,
         }
         checkoutLateData = {
-            value: checkinLateValue,
-            number: checkinLateNum,
+            value: checkoutLateValue,
+            number: checkoutLateNum,
         }
 
         let timesheetData = {
@@ -521,12 +522,12 @@ const filterTimesheetDataByRange = async (req, res) => {
             number: checkinLateNum,
         }
         checkoutEarlyData = {
-            value: checkinLateValue,
-            number: checkinLateNum,
+            value: checkoutEarlyValue,
+            number: checkoutEarlyNum,
         }
         checkoutLateData = {
-            value: checkinLateValue,
-            number: checkinLateNum,
+            value: checkoutLateValue,
+            number: checkoutLateNum,
         }
 
         let timesheetData = {
@@ -555,6 +556,38 @@ const getTimesheetByMonth = async (req, res) => {
         segments = segments.filter(function (segment) {
             return moment(segment.date, "DD/MM/YYYY") >= monthStart && moment(segment.date, "DD/MM/YYYY") <= monthEnd;
         });
+
+        return res
+            .status(200)
+            .json({ success: true, message: `Timesheet data`, Object: segments });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+function isWeekend(date) {
+    return date.getDay() === 6 || date.getDay() === 0;
+}
+
+// Lấy điểm chấm công (trong tháng)
+const getTimesheetPoint = async (req, res) => {
+    try {
+        var monthStart = moment().startOf('month');
+        var monthEnd = moment().endOf('month');
+        let timesheet = await Timesheet.findOne({ userId: req.user._id });
+        let segments = timesheet.segments;
+
+        segments = segments.filter(function (segment) {
+            return moment(segment.date, "DD/MM/YYYY") >= monthStart && moment(segment.date, "DD/MM/YYYY") <= monthEnd;
+        });
+
+        // segments.forEach((segment) => {
+        //     if(isWeekend(moment(segment.date, "HH:mm, DD/MM/YYYY")){
+
+        //     }
+        //     sum = await sumFunction(sum, rating);
+        // });
 
         return res
             .status(200)
