@@ -136,7 +136,7 @@ const getTaskById = async (req, res) => {
 
         const { _id } = req.body
         console.log(_id)
-        const tasks = await Task.find({ $or: [{ managerId: _id }, { contributorIds: _id }] })
+        const tasks = await Task.find({ contributorIds: _id})
 
         myTasks = [];
         for (let i = 0; i < tasks.length; i++) {
