@@ -50,7 +50,7 @@ const checking = async (req, res) => {
         timesheet = await Timesheet.findOne({ "userId": req.user._id, "segments[index].date": currentDate });
 
         let workingTime = moment.duration(moment(timesheet.segments[index].checkoutTime, "HH:mm:ss").diff(moment(timesheet.segments[index].checkinTime, "HH:mm:ss"))).asHours();
-        workingTime = Math.round(workingTime * 100) / 100;
+        workingTime = Math.round(workingTime * 10) / 10;
 
         let timesheetSegment = {
             date: timesheet.segments[index].date,
@@ -468,7 +468,7 @@ const filterTimesheetDataByLastMonth = async (req, res) => {
         segments = segments.filter(function (segment) {
             return moment(segment.date, "DD/MM/YYYY") >= monthStart && moment(segment.date, "DD/MM/YYYY") <= monthEnd;
         });
-        
+
         checkinLateNumber = segments.filter(function (segment) { return isCheckinLate(segment.checkinTime) }).length;
         checkoutEarlyNumber = segments.filter(function (segment) { return isCheckoutEarly(segment.checkinTime) }).length;
         overtimeNumber = segments.filter(function (segment) { return isWeekend(segment.date) }).length;
