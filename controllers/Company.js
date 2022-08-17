@@ -40,7 +40,7 @@ const updateCompanyIp = async (req, res) => {
         await company.save();
         res
             .status(200)
-            .json({ success: true, message: "Device Id updated successfully" });
+            .json({ success: true, message: "CompanyIp updated successfully" });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
