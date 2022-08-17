@@ -133,10 +133,7 @@ const getTaskById = async (req, res) => {
                     message: "Forbidden: You don't have permisson to access this",
                 });
         }
-
-        const { _id } = req.body
-        console.log(_id)
-        const tasks = await Task.find({ contributorIds: _id})
+        const tasks = await Task.find({ contributorIds: req.params._id})
 
         myTasks = [];
         for (let i = 0; i < tasks.length; i++) {
