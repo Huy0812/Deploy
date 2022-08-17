@@ -330,7 +330,7 @@ const checkingTask = async (req, res) => {
     }
 };
 
-// Đếm Task (đã hoàn thành)
+// Đếm Task
 const countTask = async (req, res) => {
     try {
         const tasks = await Task.find({ contributorIds: req.user._id });
@@ -376,81 +376,4 @@ const countTask = async (req, res) => {
     }
 };
 
-// Sắp xếp Task (tất cả)
-const sortTask = async (req, res) => {
-    try {
-        const tasks = await Task.find({ contributorIds: req.user._id });
-
-        tasksAll = [];
-        for (let i = 0; i < tasks.length; i++) {
-            manager = await User.findById(tasks[i].managerId)
-            managerName = manager.name
-            contributorsName = []
-            for (let j = 0; j < tasks[i].contributorIds.length; j++) {
-                contributor = await User.findById(tasks[i].contributorIds[j])
-                contributorsName.push(contributor.name)
-            }
-
-            taskTemp = {
-                _id: tasks[i]._id,
-                name: tasks[i].name,
-                description: tasks[i].description,
-                date: tasks[i].date,
-                deadline: tasks[i].deadline,
-                actualEndedTime: tasks[i].actualEndedTime,
-                manager: managerName,
-                contributors: contributorsName,
-                status: tasks[i].status,
-                isDone: tasks[i].isDone,
-                isApproved: tasks[i].isApproved,
-            }
-            tasksAll.push(taskTemp)
-        }
-
-        tasksDone = tasksAll.filter(obj => {
-            if (obj.status === "Đã hoàn thành") {
-                return true;
-            }
-            return false;
-        });
-
-        tasksNotDone = tasksAll.filter(obj => {
-            if (obj.status === "Chưa hoàn thành") {
-                return true;
-            }
-            return false;
-        });
-
-        tasksOutOfDate = tasksAll.filter(obj => {
-            if (obj.status === "Quá hạn") {
-                return true;
-            }
-            return false;
-        });
-
-        tasksNotDone.sort(function (a, b) {
-            return moment(a.deadline, "HH:mm, DD/MM/YYYY") - moment(b.deadline, "HH:mm, DD/MM/YYYY")
-        });
-        tasksDone.sort(function (a, b) {
-            return moment(a.deadline, "HH:mm, DD/MM/YYYY") - moment(b.deadline, "HH:mm, DD/MM/YYYY")
-        });
-        tasksOutOfDate.sort(function (a, b) {
-            return moment(a.deadline, "HH:mm, DD/MM/YYYY") - moment(b.deadline, "HH:mm, DD/MM/YYYY")
-        });
-
-        sortedTask = {
-            tasksNotDone: tasksNotDone,
-            tasksOutOfDate: tasksOutOfDate,
-            tasksDone: tasksDone,
-        }
-
-        return res
-            .status(200)
-            .json({ success: true, message: `Sorted Task`, tasks: sortedTask });
-
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
-
-module.exports = { createTask, updateTask, deleteTask, getMyTask, getMyTaskAsManager, getMyTaskAsContributor, getTaskById, getAllTask, checkingTask, countTask, sortTask }
+module.exports = { createTask, updateTask, deleteTask, getMyTask, getMyTaskAsManager, getMyTaskAsContributor, getTaskById, getAllTask, checkingTask, countTask }
