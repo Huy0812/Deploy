@@ -32,7 +32,7 @@ const createTask = async (req, res) => {
             isDone: isDone,
             isApproved: false,
         });
-        res.status(200).json({ success: true, message: "Create task successfully" });
+        res.status(200).json({ success: true, message: "Tạo công việc thành công" });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -53,7 +53,7 @@ const updateTask = async (req, res) => {
         await task.save()
         return res
             .status(200)
-            .json({ success: true, message: "Updated task successfully" });
+            .json({ success: true, message: "Cập nhật công việc thành công" });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -68,12 +68,12 @@ const deleteTask = async (req, res) => {
         if (!task) {
             return res
                 .status(404)
-                .json({ success: false, message: "None exists" });
+                .json({ success: false, message: "Không tồn tại!" });
         }
         await Task.findByIdAndDelete(taskId)
         res
             .status(200)
-            .json({ success: true, message: "Deleted task successfully" });
+            .json({ success: true, message: "Xóa công việc thành công" });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -91,7 +91,7 @@ const getTaskById = async (req, res) => {
                 .status(403)
                 .json({
                     success: false,
-                    message: "Forbidden: You don't have permisson to access this",
+                    message: "Bạn không có quyền truy cập chức năng này!",
                 });
         }
         const tasks = await Task.find({ contributorIds: req.params._id })
@@ -124,7 +124,7 @@ const getTaskById = async (req, res) => {
 
         res
             .status(200)
-            .json({ success: true, message: `Task list`, tasks: myTasks });
+            .json({ success: true, message: `Công việc`, tasks: myTasks });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -167,7 +167,7 @@ const getMyTask = async (req, res) => {
 
         res
             .status(200)
-            .json({ success: true, message: `Task list`, tasks: myTasks });
+            .json({ success: true, message: `Công việc của tôi`, tasks: myTasks });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -210,7 +210,7 @@ const getMyTaskAsManager = async (req, res) => {
 
         res
             .status(200)
-            .json({ success: true, message: `Task list`, tasks: myTasksAsManager });
+            .json({ success: true, message: `Công việc của tôi (quản lý)`, tasks: myTasksAsManager });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -253,7 +253,7 @@ const getMyTaskAsContributor = async (req, res) => {
 
         res
             .status(200)
-            .json({ success: true, message: `Task list`, tasks: myTasksAsContributor });
+            .json({ success: true, message: `Công việc của tôi (nhân viên)`, tasks: myTasksAsContributor });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -296,7 +296,7 @@ const getAllTask = async (req, res) => {
 
         res
             .status(200)
-            .json({ success: true, message: `Task list`, tasks: tasksAll });
+            .json({ success: true, message: `Tất cả công việc`, tasks: tasksAll });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -317,13 +317,13 @@ const checkingTask = async (req, res) => {
             await task.save();
             return res
                 .status(200)
-                .json({ success: true, message: `Checking Task as Done` });
+                .json({ success: true, message: `Công việc đã hoàn thành` });
         }
         task.isDone[index] = false;
         await task.save();
         return res
             .status(200)
-            .json({ success: true, message: `Checking Task as Not done` });
+            .json({ success: true, message: `Công việc chưa hoàn thành` });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -369,7 +369,7 @@ const countMyTaskAsContributor = async (req, res) => {
 
         return res
             .status(200)
-            .json({ success: true, message: `Number of Task`, count: countTask });
+            .json({ success: true, message: `Số công việc đã tham gia`, count: countTask });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -405,7 +405,7 @@ const countMyTaskAsManager = async (req, res) => {
 
         return res
             .status(200)
-            .json({ success: true, message: `Number of Task`, count: countTask });
+            .json({ success: true, message: `Số công việc đã quản lý`, count: countTask });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
