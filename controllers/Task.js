@@ -232,7 +232,7 @@ const getMyTaskAsContributor = async (req, res) => {
             contributorsName = []
             for (let j = 0; j < tasks[i].contributorIds.length; j++) {
                 contributor = await User.findById(tasks[i].contributorIds[j])
-                contributorsName.push(contributor.name)
+                contributorsName.push(contributor._id)
             }
 
             taskTemp = {
