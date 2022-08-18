@@ -227,8 +227,6 @@ const getMyTaskAsContributor = async (req, res) => {
 
         myTasksAsContributor = [];
         for (let i = 0; i < tasks.length; i++) {
-            manager = await User.findById(tasks[i].managerId)
-            managerName = manager.name
             contributorsName = []
             for (let j = 0; j < tasks[i].contributorIds.length; j++) {
                 contributor = await User.findById(tasks[i].contributorIds[j])
@@ -242,7 +240,6 @@ const getMyTaskAsContributor = async (req, res) => {
                 date: tasks[i].date,
                 deadline: tasks[i].deadline,
                 actualEndedTime: tasks[i].actualEndedTime,
-                manager: managerName,
                 contributors: contributorsName,
                 status: tasks[i].status,
                 isDone: tasks[i].isDone,
