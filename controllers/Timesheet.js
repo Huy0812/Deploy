@@ -559,7 +559,7 @@ const filterTimesheetDataByRange = async (req, res) => {
         }
         checkoutEarlyData = {
             value: checkoutEarlyValue,
-            number: checkinLateNumber,
+            number: checkoutEarlyNumber,
         }
         overtimeData = {
             value: overtimeValue,
@@ -593,9 +593,31 @@ const getTimesheetByMonth = async (req, res) => {
             return moment(segment.date, "DD/MM/YYYY") >= monthStart && moment(segment.date, "DD/MM/YYYY") <= monthEnd;
         });
 
+        segmentMonth = []
+        myPoint = 0
+        segments.forEach((segment) => {
+            breakTime = moment.duration(moment("12:00:00", "HH:mm:ss").diff(moment("13:30:00", "HH:mm:ss"))).asHours()
+            pointTemp = (segment.workingTime - breakTime) / (moment.duration(moment("18:00:00", "HH:mm:ss").diff(moment("08:30:00", "HH:mm:ss"))).asHours() - breakTime)
+            if (isNaN(pointTemp)) {
+                pointTemp = 0
+            }
+            if (isWeekend(moment(segment.date, "HH:mm, DD/MM/YYYY").toDate())) {
+                pointTemp *= 1.5;
+            }
+
+            segmentTemp = {
+                date: segment.date,
+                checkinTime: segment.checkinTime,
+                checkoutTime: segment.checkoutTime,
+                point: Math.round(pointTemp * 10) / 10
+            }
+
+            segmentMonth.push(segmentTemp)
+        });
+
         return res
             .status(200)
-            .json({ success: true, message: `Bảng công tháng này`, Object: segments });
+            .json({ success: true, message: `Bảng công tháng này`, Object: segmentMonth });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -687,7 +709,7 @@ const getTimesheetByMonthForManager = async (req, res) => {
             }
             checkoutEarlyData = {
                 value: checkoutEarlyValue,
-                number: checkinLateNumber,
+                number: checkoutEarlyNumber,
             }
             overtimeData = {
                 value: overtimeValue,
