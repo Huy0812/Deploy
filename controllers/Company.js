@@ -31,7 +31,7 @@ const updateCompanyIp = async (req, res) => {
         if (user.privilege !== "Quản trị viên") {
             return res
                 .status(403)
-                .json({ success: false, message: "Bạn không có quyền truy cập chức năng này!" });
+                .json({ success: false, message: "Bạn không có quyền truy cập chức năng này" });
         }
         const companyId = user.companyId;
         const company = await Company.findById(companyId);
@@ -51,7 +51,7 @@ const updateInformation = async (req, res) => {
         if (user.privilege !== "Quản trị viên") {
             return res
                 .status(403)
-                .json({ success: false, message: "Bạn không có quyền truy cập chức năng này!" });
+                .json({ success: false, message: "Bạn không có quyền truy cập chức năng này" });
         }
 
         const companyId = user.companyId;

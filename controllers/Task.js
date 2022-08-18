@@ -68,7 +68,7 @@ const deleteTask = async (req, res) => {
         if (!task) {
             return res
                 .status(404)
-                .json({ success: false, message: "Không tồn tại!" });
+                .json({ success: false, message: "Không tồn tại" });
         }
         await Task.findByIdAndDelete(taskId)
         res
@@ -91,7 +91,7 @@ const getTaskById = async (req, res) => {
                 .status(403)
                 .json({
                     success: false,
-                    message: "Bạn không có quyền truy cập chức năng này!",
+                    message: "Bạn không có quyền truy cập chức năng này",
                 });
         }
         const tasks = await Task.find({ contributorIds: req.params._id })
@@ -253,7 +253,7 @@ const getMyTaskAsContributor = async (req, res) => {
 
         res
             .status(200)
-            .json({ success: true, message: `Công việc của tôi (nhân viên)`, tasks: myTasksAsContributor });
+            .json({ success: true, message: `Công việc của tôi (tham gia)`, tasks: myTasksAsContributor });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });

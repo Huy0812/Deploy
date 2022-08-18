@@ -19,12 +19,12 @@ const checking = async (req, res) => {
         if (company.companyIp !== networkIp) {
             return res
                 .status(400)
-                .json({ success: false, message: "You need to access the company network" });
+                .json({ success: false, message: "Bạn cần truy cập vào hệ thống mạng của công ty" });
         }
         if (user.deviceId !== deviceId) {
             return res
                 .status(400)
-                .json({ success: false, message: "DeviceId is Incorrect. Please update your DeviceId" });
+                .json({ success: false, message: "Mã thiết bị không đúng. Vui lòng cập nhật lại mã thiết bị" });
         }
         if (!timesheet) {
             timesheet = await Timesheet.create({
@@ -46,7 +46,7 @@ const checking = async (req, res) => {
             await timesheet.save();
             return res
                 .status(200)
-                .json({ success: true, message: "Checkin successfully" });
+                .json({ success: true, message: "Checkin thành công" });
         }
         timesheet = await Timesheet.findOne({ "userId": req.user._id, "segments[index].date": currentDate });
 
@@ -68,7 +68,7 @@ const checking = async (req, res) => {
         await timesheet.save();
         return res
             .status(200)
-            .json({ success: true, message: "Checkout successfully" });
+            .json({ success: true, message: "Checkout thành công" });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -133,7 +133,7 @@ const getTop5 = async (req, res) => {
 
         res
             .status(200)
-            .json({ success: true, message: `Ranking Information`, array: ranking });
+            .json({ success: true, message: `Bảng xếp hạng hôm nay`, array: ranking });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -156,12 +156,12 @@ const getMyRank = async (req, res) => {
         if (myRank === -1) {
             return res
                 .status(400)
-                .json({ success: true, message: `You haven't checkin today` });
+                .json({ success: true, message: `Bạn chưa checkin hôm nay` });
         }
 
         res
             .status(200)
-            .json({ success: true, message: `My ranking`, number: myRank + 1 });
+            .json({ success: true, message: `Xếp hạng hôm nay`, number: myRank + 1 });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -212,7 +212,7 @@ const filterTimesheetDataByToday = async (req, res) => {
         let index = timesheet.segments.findIndex(x => x.date === today);
 
         if (index === -1)
-            return res.status(401).json({ success: false, message: "Have't checkin today" });
+            return res.status(401).json({ success: false, message: "Không có dữ liệu" });
 
         if (isWeekend(moment(today, "DD/MM/YYYY").toDate)) {
             checkinLateValue = 0;
@@ -246,7 +246,7 @@ const filterTimesheetDataByToday = async (req, res) => {
 
         return res
             .status(200)
-            .json({ success: true, message: `Timesheet data`, Object: timesheetData });
+            .json({ success: true, message: `Thông tin chấm công (hôm nay)`, Object: timesheetData });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -261,7 +261,7 @@ const filterTimesheetDataByYesterday = async (req, res) => {
         let index = timesheet.segments.findIndex(x => x.date === yesterday);
 
         if (index === -1)
-            return res.status(401).json({ success: false, message: "Have't checkin yesterday" });
+            return res.status(401).json({ success: false, message: "Không có dữ liệu" });
 
         if (isWeekend(moment(yesterday, "DD/MM/YYYY").toDate)) {
             checkinLateValue = 0;
@@ -295,7 +295,7 @@ const filterTimesheetDataByYesterday = async (req, res) => {
 
         return res
             .status(200)
-            .json({ success: true, message: `Timesheet data`, Object: timesheetData });
+            .json({ success: true, message: `Thông tin chấm công (hôm qua)`, Object: timesheetData });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -351,7 +351,7 @@ const filterTimesheetDataByThisWeek = async (req, res) => {
 
         return res
             .status(200)
-            .json({ success: true, message: `Timesheet data`, Object: timesheetData });
+            .json({ success: true, message: `Thông tin chấm công (tuần này)`, Object: timesheetData });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -407,7 +407,7 @@ const filterTimesheetDataByLastWeek = async (req, res) => {
 
         return res
             .status(200)
-            .json({ success: true, message: `Timesheet data`, Object: timesheetData });
+            .json({ success: true, message: `Thông tin chấm công (tuần trước)`, Object: timesheetData });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -463,7 +463,7 @@ const filterTimesheetDataByThisMonth = async (req, res) => {
 
         return res
             .status(200)
-            .json({ success: true, message: `Timesheet data`, Object: timesheetData });
+            .json({ success: true, message: `Thông tin chấm công (tháng này)`, Object: timesheetData });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -519,7 +519,7 @@ const filterTimesheetDataByLastMonth = async (req, res) => {
 
         return res
             .status(200)
-            .json({ success: true, message: `Timesheet data`, Object: timesheetData });
+            .json({ success: true, message: `Thông tin chấm công (tháng trước)`, Object: timesheetData });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -574,7 +574,7 @@ const filterTimesheetDataByRange = async (req, res) => {
 
         return res
             .status(200)
-            .json({ success: true, message: `Timesheet data`, Object: timesheetData });
+            .json({ success: true, message: `Thông tin chấm công (${start} - ${end})`, Object: timesheetData });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -595,7 +595,7 @@ const getTimesheetByMonth = async (req, res) => {
 
         return res
             .status(200)
-            .json({ success: true, message: `Timesheet data`, Object: segments });
+            .json({ success: true, message: `Bảng công tháng này`, Object: segments });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -641,7 +641,7 @@ const getTimesheetPoint = async (req, res) => {
 
         return res
             .status(200)
-            .json({ success: true, message: `Timesheet point`, point: point });
+            .json({ success: true, message: `Điểm công tháng này`, point: point });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });

@@ -17,7 +17,7 @@ const verify = async (req, res) => {
                 .status(400)
                 .json({
                     success: false,
-                    message: "Invalid OTP or OTP has been expired",
+                    message: "OTP sai hoặc đã hết hạn",
                 });
         }
 
@@ -27,7 +27,7 @@ const verify = async (req, res) => {
 
         await user.save();
 
-        sendToken(res, user, 200, "Account verified");
+        sendToken(res, user, 200, "Xác nhận tài khoản thành công");
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -44,7 +44,7 @@ const register = async (req, res) => {
                 .status(403)
                 .json({
                     success: false,
-                    message: "Forbidden: You don't have permisson to access this",
+                    message: "Bạn không có quyền truy cập chức năng này",
                 });
         }
 
@@ -65,21 +65,21 @@ const register = async (req, res) => {
         if (user) {
             return res
                 .status(400)
-                .json({ success: false, message: "Mail already exists" });
+                .json({ success: false, message: "Mail này đã tồn tại" });
         }
 
         user = await User.findOne({ phoneNumber });
         if (user) {
             return res
                 .status(400)
-                .json({ success: false, message: "Phone number already exists" });
+                .json({ success: false, message: "Số điện thoại này đã tồn tại" });
         }
         if (password != confirmPassword) {
             return res
                 .status(400)
                 .json({
                     success: false,
-                    message: "The password or confirm password is incorrect",
+                    message: "Mật khẩu không khớp",
                 });
         }
         emailFix = email.trim().toLowerCase();
@@ -95,7 +95,7 @@ const register = async (req, res) => {
             role,
         });
 
-        return res.status(200).json({ success: true, message: "Create account successfully" });
+        return res.status(200).json({ success: true, message: "Tạo tài khoản thành công" });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -108,7 +108,7 @@ const login = async (req, res) => {
         if (!phoneNumber || !password) {
             return res
                 .status(400)
-                .json({ success: false, message: "Please enter all fields" });
+                .json({ success: false, message: "Xin vui lòng nhập đầy đủ các trường" });
         }
 
         const user = await User.findOne({ phoneNumber }).select("+password");
@@ -116,7 +116,7 @@ const login = async (req, res) => {
         if (!user) {
             return res
                 .status(400)
-                .json({ success: false, message: "Invalid phone number or password" });
+                .json({ success: false, message: "Sai số điện thoại hoặc mật khẩu" });
         }
 
         const isMatch = await user.comparePassword(password);
@@ -124,10 +124,10 @@ const login = async (req, res) => {
         if (!isMatch) {
             return res
                 .status(400)
-                .json({ success: false, message: "Invalid phone number or password" });
+                .json({ success: false, message: "Sai số điện thoại hoặc mật khẩu" });
         }
 
-        sendToken(res, user, 200, "Login successfully");
+        sendToken(res, user, 200, "Đăng nhập thành công");
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -140,7 +140,7 @@ const logout = async (req, res) => {
             .cookie("token", null, {
                 expires: new Date(Date.now()),
             })
-            .json({ success: true, message: "Logout successfully" });
+            .json({ success: true, message: "Đăng xuất thành công" });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -150,7 +150,7 @@ const getMyProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
 
-        sendToken(res, user, 201, `Welcome back ${user.name}`);
+        sendToken(res, user, 201, `Xin chào ${user.name}`);
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -181,7 +181,7 @@ const getProfile = async (req, res) => {
         };
         res
             .status(200)
-            .json({ success: true, message: `User Information`, user: userData });
+            .json({ success: true, message: `Thông tin tài khoản`, user: userData });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -197,7 +197,7 @@ const getAllProfile = async (req, res) => {
             .status(200)
             .json({
                 success: true,
-                message: `All profiles (sort by userId)`,
+                message: `Tất cả tài khoản`,
                 array: sort,
             });
     } catch (error) {
@@ -211,7 +211,7 @@ const updateAdmin = async (req, res) => {
         if (userAdmin.privilege !== "Quản trị viên") {
             return res
                 .status(403)
-                .json({ success: false, message: "Forbidden: You don't have permisson to access this" });
+                .json({ success: false, message: "Bạn không có quyền truy cập chức năng này" });
         }
         const {
             _id,
@@ -231,7 +231,7 @@ const updateAdmin = async (req, res) => {
         if (!isMatch) {
             return res
                 .status(400)
-                .json({ success: false, message: "Passwords does not match" });
+                .json({ success: false, message: "Mật khẩu không khớp" });
         }
         if (name) user.name = name;
 
@@ -249,7 +249,7 @@ const updateAdmin = async (req, res) => {
         await user.save();
         res
             .status(200)
-            .json({ success: true, message: "Profile updated successfully" });
+            .json({ success: true, message: "Cập nhật tài khoản thành công" });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -277,7 +277,7 @@ const updateProfile = async (req, res) => {
         if (!isMatch) {
             return res
                 .status(400)
-                .json({ success: false, message: "Passwords does not match" });
+                .json({ success: false, message: "Mật khẩu không khớp" });
         }
 
         if (name) user.name = name;
@@ -298,7 +298,7 @@ const updateProfile = async (req, res) => {
         await user.save();
         res
             .status(200)
-            .json({ success: true, message: "Profile updated successfully" });
+            .json({ success: true, message: "Cập nhật tài khoản thành công" });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -322,7 +322,7 @@ const updateAvatar = async (req, res) => {
         await user.save();
         res
             .status(200)
-            .json({ success: true, message: "Avatar updated successfully" });
+            .json({ success: true, message: "Cập nhật avatar thành công" });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -334,7 +334,7 @@ const deleteProfile = async (req, res) => {
         if (user.privilege !== "Quản trị viên") {
             return res
                 .status(403)
-                .json({ success: false, message: "Forbidden: You don't have permisson to access this" });
+                .json({ success: false, message: "Bạn không có quyền truy cập chức năng này" });
         }
 
         const { userId } = req.body;
@@ -342,12 +342,12 @@ const deleteProfile = async (req, res) => {
         if (!user) {
             return res
                 .status(404)
-                .json({ success: false, message: "None exists" });
+                .json({ success: false, message: "Tài khoản không tồn tại" });
         }
         await User.findByIdAndDelete(userId)
         res
             .status(200)
-            .json({ success: true, message: "Deleted user successfully" });
+            .json({ success: true, message: "Xóa tài khoản thành công" });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -363,13 +363,13 @@ const updateDeviceId = async (req, res) => {
         if (userAll) {
             return res
                 .status(400)
-                .json({ success: false, message: "Device Id already exists" });
+                .json({ success: false, message: "Mã thiết bị đã tồn tại" });
         }
         user.deviceId = deviceId;
         await user.save();
         res
             .status(200)
-            .json({ success: true, message: "Device Id updated successfully" });
+            .json({ success: true, message: "Cập nhật mã thiết bị thành công" });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -383,7 +383,7 @@ const updatePassword = async (req, res) => {
         if (!oldPassword || !newPassword) {
             return res
                 .status(400)
-                .json({ success: false, message: "Please enter all fields" });
+                .json({ success: false, message: "Xin vui lòng nhập hết các trường" });
         }
 
         const isMatch = await user.comparePassword(oldPassword);
@@ -391,7 +391,7 @@ const updatePassword = async (req, res) => {
         if (!isMatch) {
             return res
                 .status(400)
-                .json({ success: false, message: "Passwords does not match" });
+                .json({ success: false, message: "Sai mật khẩu" });
         }
         if (newPassword == confirmPassword) {
             user.password = newPassword;
@@ -400,13 +400,13 @@ const updatePassword = async (req, res) => {
                 .status(400)
                 .json({
                     success: false,
-                    message: "The password or confirm password is incorrect",
+                    message: "Mật khẩu không khớp",
                 });
         }
         await user.save();
         res
             .status(200)
-            .json({ success: true, message: "Password updated successfully" });
+            .json({ success: true, message: "Cập nhật mật khẩu thành công" });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -416,12 +416,10 @@ const phonePassword = async (req, res) => {
     try {
         const { phoneNumber } = req.body;
 
-        // emailFix = email.trim().toLowerCase();
-
         let user = await User.findOne({ phoneNumber: phoneNumber });
 
         if (!user) {
-            return res.status(400).json({ success: false, message: "Invalid phone number" });
+            return res.status(400).json({ success: false, message: "Sai số điện thoại" });
         }
 
         const otp = Math.floor(Math.floor(100000 + Math.random() * 900000));
@@ -431,14 +429,13 @@ const phonePassword = async (req, res) => {
 
         await user.save();
 
-        const message = `Your OTP for reseting the password is ${otp}. If you did not request for this, please ignore this email.`;
+        const message = `Mã OTP để đặt lại mật khẩu là ${otp}. Nếu bạn không gửi yêu cầu, xin vui lòng bỏ qua email này.`;
 
-        // await sendMail(emailFix, "Request for reseting password", message);
         await sendPhone(phoneNumber, message);
 
         res
             .status(200)
-            .json({ success: true, message: `OTP has been sent to ${phoneNumber}` });
+            .json({ success: true, message: `OTP đã được gửi tới ${phoneNumber}` });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -453,7 +450,7 @@ const forgetPassword = async (req, res) => {
         let user = await User.findOne({ email: emailFix });
 
         if (!user) {
-            return res.status(400).json({ success: false, message: "Invalid email" });
+            return res.status(400).json({ success: false, message: "Sai email" });
         }
 
         const otp = Math.floor(Math.floor(100000 + Math.random() * 900000));
@@ -463,13 +460,13 @@ const forgetPassword = async (req, res) => {
 
         await user.save();
 
-        const message = `Your OTP for reseting the password is ${otp}. If you did not request for this, please ignore this email.`;
+        const message = `Mã OTP để đặt lại mật khẩu là ${otp}. Nếu bạn không gửi yêu cầu, xin vui lòng bỏ qua email này.`;
 
-        await sendMail(emailFix, "Request for reseting password", message);
+        await sendMail(emailFix, "Yêu cầu đặt lại mật khẩu", message);
 
         res
             .status(200)
-            .json({ success: true, message: `OTP has been sent to ${email}` });
+            .json({ success: true, message: `OTP đã được gửi tới ${email}` });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -489,7 +486,7 @@ const resetPassword = async (req, res) => {
                 .status(400)
                 .json({
                     success: false,
-                    message: "Invalid OTP or OTP has been expired",
+                    message: "OTP sai hoặc đã hết hạn!",
                 });
         }
         if (newPassword == rewritePassword) {
@@ -501,14 +498,14 @@ const resetPassword = async (req, res) => {
                 .status(400)
                 .json({
                     success: false,
-                    message: "The password or confirm password is incorrect",
+                    message: "Mật khẩu không khớp",
                 });
         }
         await user.save();
 
         res
             .status(200)
-            .json({ success: true, message: `Password changed successfully` });
+            .json({ success: true, message: `Thay đổi mật khẩu thành công` });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -527,7 +524,7 @@ const searchUser = async (req, res) => {
         const users = await User.find(keyword);
         res
             .status(200)
-            .json({ success: true, message: "Users", array: users })
+            .json({ success: true, message: "Người dùng", array: users })
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -541,7 +538,7 @@ const filterUser = async (req, res) => {
 
         return res
             .status(200)
-            .json({ success: false, message: "Users", users: query })
+            .json({ success: false, message: "Người dùng", users: query })
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
