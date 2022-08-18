@@ -648,4 +648,98 @@ const getTimesheetPoint = async (req, res) => {
     }
 }
 
-module.exports = { checking, getTimesheetInfo, getTop5, getMyRank, filterTimesheetDataByToday, filterTimesheetDataByYesterday, filterTimesheetDataByThisWeek, filterTimesheetDataByLastWeek, filterTimesheetDataByThisMonth, filterTimesheetDataByLastMonth, filterTimesheetDataByRange, getTimesheetByMonth, getTimesheetPoint }
+// Lấy thông tin bảng chấm công cho quản lý (tháng này)
+const getTimesheetByMonthForManager = async (req, res) => {
+    try {
+        var monthStart = moment().startOf('month');
+        var monthEnd = moment().endOf('month');
+        let timesheet = await Timesheet.find();
+
+        let timesheetData = []
+
+        for (let index = 0; index < timesheet.length; index++) {
+            timesheet[index].segments.filter(function (segment) {
+                return moment(segment.date, "DD/MM/YYYY") >= monthStart && moment(segment.date, "DD/MM/YYYY") <= monthEnd;
+            });
+
+            var user = await User.findById(timesheet[index].userId);
+            var name = user.name;
+
+            var checkinLateNumber = timesheet[index].segments.filter(function (segment) { return isCheckinLate(segment.checkinTime) }).length;
+            var checkoutEarlyNumber = timesheet[index].segments.filter(function (segment) { return isCheckoutEarly(segment.checkinTime) }).length;
+            var overtimeNumber = timesheet[index].segments.filter(function (segment) { return isWeekend(segment.date) }).length;
+
+            var checkinLateValue = timesheet[index].segments.reduce((accumulator, segment) => {
+                return accumulator + getCheckinLate(segment.checkinTime);
+            }, 0);
+            var checkoutEarlyValue = timesheet[index].segments.reduce((accumulator, segment) => {
+                return accumulator + getCheckoutEarly(segment.checkoutTime);
+            }, 0);
+            var overtimeValue = timesheet[index].segments.reduce((accumulator, segment) => {
+                return accumulator + getOvertime(segment);
+            }, 0);
+            if (overtimeValue == null) {
+                overtimeValue = 0;
+            }
+            checkinLateData = {
+                value: checkinLateValue,
+                number: checkinLateNumber,
+            }
+            checkoutEarlyData = {
+                value: checkoutEarlyValue,
+                number: checkinLateNumber,
+            }
+            overtimeData = {
+                value: overtimeValue,
+                number: overtimeNumber,
+            }
+
+            var point = 0
+            timesheet[index].segments.forEach((segment) => {
+                breakTime = moment.duration(moment("12:00:00", "HH:mm:ss").diff(moment("13:30:00", "HH:mm:ss"))).asHours()
+                pointTemp = (segment.workingTime - breakTime) / (moment.duration(moment("18:00:00", "HH:mm:ss").diff(moment("08:30:00", "HH:mm:ss"))).asHours() - breakTime)
+                if (isNaN(pointTemp)) {
+                    pointTemp = 0
+                }
+                if (isWeekend(moment(segment.date, "HH:mm, DD/MM/YYYY").toDate())) {
+                    pointTemp *= 1.5;
+                }
+                point += pointTemp;
+            });
+
+            let timesheetTemp = {
+                name: name,
+                checkinLate: checkinLateData,
+                checkoutEarly: checkoutEarlyData,
+                overtime: overtimeData,
+                point: Math.round(point * 10) / 10,
+            }
+
+            timesheetData.push(timesheetTemp)
+        }
+
+        return res
+            .status(200)
+            .json({ success: true, message: `Bảng công nhân viên tháng này`, Object: timesheetData });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+module.exports = {
+    checking,
+    getTimesheetInfo,
+    getTop5,
+    getMyRank,
+    filterTimesheetDataByToday,
+    filterTimesheetDataByYesterday,
+    filterTimesheetDataByThisWeek,
+    filterTimesheetDataByLastWeek,
+    filterTimesheetDataByThisMonth,
+    filterTimesheetDataByLastMonth,
+    filterTimesheetDataByRange,
+    getTimesheetByMonth,
+    getTimesheetPoint,
+    getTimesheetByMonthForManager,
+}
