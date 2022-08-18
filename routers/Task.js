@@ -13,5 +13,4 @@ router.route("/checkingtask").post(isAuthenticated, checkingTask)
 router.route("/counttaskascontributor").get(isAuthenticated, countMyTaskAsContributor)
 router.route("/counttaskasmanager").get(isAuthenticated, countMyTaskAsManager)
 router.route("/:_id").get(isAuthenticated, getTaskById)
-
 module.exports = router

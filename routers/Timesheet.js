@@ -15,5 +15,4 @@ router.route("/filtertimesheetdatabylastmonth").get(isAuthenticated, filterTimes
 router.route("/filtertimesheetdatabyrange").post(isAuthenticated, filterTimesheetDataByRange)
 router.route("/timesheetbymonth").get(isAuthenticated, getTimesheetByMonth)
 router.route("/timesheetpoint").get(isAuthenticated, getTimesheetPoint)
-
 module.exports = router
