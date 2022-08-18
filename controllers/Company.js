@@ -6,7 +6,7 @@ const create = async (req, res) => {
         company = await Company.create({});
         res
             .status(200)
-            .json({ success: true, message: "Created successfully" });
+            .json({ success: true, message: "Tạo công ty thành công" });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -20,7 +20,7 @@ const getInformation = async (req, res) => {
 
         res
             .status(200)
-            .json({ success: true, message: `Company Information`, company: company });
+            .json({ success: true, message: `Thông tin công ty`, company: company });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -31,7 +31,7 @@ const updateCompanyIp = async (req, res) => {
         if (user.privilege !== "Quản trị viên") {
             return res
                 .status(403)
-                .json({ success: false, message: "Forbidden: You don't have permisson to access this" });
+                .json({ success: false, message: "Bạn không có quyền truy cập chức năng này!" });
         }
         const companyId = user.companyId;
         const company = await Company.findById(companyId);
@@ -40,7 +40,7 @@ const updateCompanyIp = async (req, res) => {
         await company.save();
         res
             .status(200)
-            .json({ success: true, message: "CompanyIp updated successfully" });
+            .json({ success: true, message: "Cập nhật IP công ty thành công" });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -51,7 +51,7 @@ const updateInformation = async (req, res) => {
         if (user.privilege !== "Quản trị viên") {
             return res
                 .status(403)
-                .json({ success: false, message: "Forbidden: You don't have permisson to access this" });
+                .json({ success: false, message: "Bạn không có quyền truy cập chức năng này!" });
         }
 
         const companyId = user.companyId;
@@ -70,7 +70,7 @@ const updateInformation = async (req, res) => {
 
         res
             .status(200)
-            .json({ success: true, message: "Updated successfully" });
+            .json({ success: true, message: "Cập nhật thông tin công ty thành công" });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
