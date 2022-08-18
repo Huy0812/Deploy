@@ -17,7 +17,7 @@ const verify = async (req, res) => {
                 .status(400)
                 .json({
                     success: false,
-                    message: "OTP sai hoặc đã hết hạn",
+                    message: "OTP không đúng hoặc đã hết hạn",
                 });
         }
 
@@ -116,7 +116,7 @@ const login = async (req, res) => {
         if (!user) {
             return res
                 .status(400)
-                .json({ success: false, message: "Sai số điện thoại hoặc mật khẩu" });
+                .json({ success: false, message: "Số điện thoại hoặc mật khẩu không hợp lệ" });
         }
 
         const isMatch = await user.comparePassword(password);
@@ -124,7 +124,7 @@ const login = async (req, res) => {
         if (!isMatch) {
             return res
                 .status(400)
-                .json({ success: false, message: "Sai số điện thoại hoặc mật khẩu" });
+                .json({ success: false, message: "Số điện thoại hoặc mật khẩu không hợp lệ" });
         }
 
         sendToken(res, user, 200, "Đăng nhập thành công");
@@ -486,7 +486,7 @@ const resetPassword = async (req, res) => {
                 .status(400)
                 .json({
                     success: false,
-                    message: "OTP sai hoặc đã hết hạn!",
+                    message: "OTP không đúng hoặc đã hết hạn!",
                 });
         }
         if (newPassword == rewritePassword) {
