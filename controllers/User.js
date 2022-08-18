@@ -17,7 +17,7 @@ const verify = async (req, res) => {
                 .status(400)
                 .json({
                     success: false,
-                    message: "OTP sai hoặc đã hết hạn",
+                    message: "OTP không đúng hoặc đã hết hạn",
                 });
         }
 
@@ -65,7 +65,7 @@ const register = async (req, res) => {
         if (user) {
             return res
                 .status(400)
-                .json({ success: false, message: "Mail này đã tồn tại" });
+                .json({ success: false, message: "Email này đã tồn tại" });
         }
 
         user = await User.findOne({ phoneNumber });
@@ -116,7 +116,7 @@ const login = async (req, res) => {
         if (!user) {
             return res
                 .status(400)
-                .json({ success: false, message: "Sai số điện thoại hoặc mật khẩu" });
+                .json({ success: false, message: "Số điện thoại hoặc mật khẩu không hợp lệ" });
         }
 
         const isMatch = await user.comparePassword(password);
@@ -124,7 +124,7 @@ const login = async (req, res) => {
         if (!isMatch) {
             return res
                 .status(400)
-                .json({ success: false, message: "Sai số điện thoại hoặc mật khẩu" });
+                .json({ success: false, message: "Số điện thoại hoặc mật khẩu không hợp lệ" });
         }
 
         sendToken(res, user, 200, "Đăng nhập thành công");
@@ -391,7 +391,7 @@ const updatePassword = async (req, res) => {
         if (!isMatch) {
             return res
                 .status(400)
-                .json({ success: false, message: "Sai mật khẩu" });
+                .json({ success: false, message: "Mật khẩu không đúng" });
         }
         if (newPassword == confirmPassword) {
             user.password = newPassword;
@@ -419,7 +419,7 @@ const phonePassword = async (req, res) => {
         let user = await User.findOne({ phoneNumber: phoneNumber });
 
         if (!user) {
-            return res.status(400).json({ success: false, message: "Sai số điện thoại" });
+            return res.status(400).json({ success: false, message: "Số điện thoại không đúng" });
         }
 
         const otp = Math.floor(Math.floor(100000 + Math.random() * 900000));
@@ -450,7 +450,7 @@ const forgetPassword = async (req, res) => {
         let user = await User.findOne({ email: emailFix });
 
         if (!user) {
-            return res.status(400).json({ success: false, message: "Sai email" });
+            return res.status(400).json({ success: false, message: "Email không đúng" });
         }
 
         const otp = Math.floor(Math.floor(100000 + Math.random() * 900000));
@@ -486,7 +486,7 @@ const resetPassword = async (req, res) => {
                 .status(400)
                 .json({
                     success: false,
-                    message: "OTP sai hoặc đã hết hạn!",
+                    message: "OTP không đúng hoặc đã hết hạn!",
                 });
         }
         if (newPassword == rewritePassword) {
@@ -514,30 +514,30 @@ const resetPassword = async (req, res) => {
 const searchUser = async (req, res) => {
     try {
         const name = req.query.name
-    ? {
-          name: { $regex: req.query.name, $options: "i" } 
-      }
-    : {};
-    const privilege = req.query.privilege
-    ? {
-          privilege: { $regex: req.query.privilege, $options: "i" } 
-      }
-    : {};
-    const typeOfEmployee = req.query.typeOfEmployee
-    ? {
-          typeOfEmployee: { $regex: req.query.typeOfEmployee, $options: "i" } 
-      }
-    : {};
-    const role = req.query.role
-    ? {
-          role: { $regex: req.query.role, $options: "i" } 
-      }
-    : {};
-    const contractStatus = req.query.contractStatus
-    ? {
-          contractStatus: { $regex: req.query.contractStatus, $options: "i" } 
-      }
-    : {};
+            ? {
+                name: { $regex: req.query.name, $options: "i" }
+            }
+            : {};
+        const privilege = req.query.privilege
+            ? {
+                privilege: { $regex: req.query.privilege, $options: "i" }
+            }
+            : {};
+        const typeOfEmployee = req.query.typeOfEmployee
+            ? {
+                typeOfEmployee: { $regex: req.query.typeOfEmployee, $options: "i" }
+            }
+            : {};
+        const role = req.query.role
+            ? {
+                role: { $regex: req.query.role, $options: "i" }
+            }
+            : {};
+        const contractStatus = req.query.contractStatus
+            ? {
+                contractStatus: { $regex: req.query.contractStatus, $options: "i" }
+            }
+            : {};
         const users = await User.find(name).find(privilege).find(typeOfEmployee).find(role).find(contractStatus)
         res
             .status(200)
