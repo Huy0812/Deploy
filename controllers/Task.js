@@ -231,7 +231,6 @@ const getMyTaskAsContributor = async (req, res) => {
             managerName = manager.name
             contributorsName = []
             for (let j = 0; j < tasks[i].contributorIds.length; j++) {
-                contributor = await User.findById(tasks[i].contributorIds[j])
                 contributorsName.push(contributor._id)
             }
 
