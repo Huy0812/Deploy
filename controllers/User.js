@@ -516,15 +516,32 @@ const resetPassword = async (req, res) => {
 
 const searchUser = async (req, res) => {
     try {
-        const keyword = req.query.name
-            ? {
-                $or: [
-                    { name: { $regex: req.query.name, $options: "i" } },
-                ],
-            }
-            : {};
-
-        const users = await User.find(keyword);
+        const name = req.query.name
+    ? {
+          name: { $regex: req.query.name, $options: "i" } 
+      }
+    : {};
+    const privilege = req.query.privilege
+    ? {
+          privilege: { $regex: req.query.privilege, $options: "i" } 
+      }
+    : {};
+    const typeOfEmployee = req.query.typeOfEmployee
+    ? {
+          typeOfEmployee: { $regex: req.query.typeOfEmployee, $options: "i" } 
+      }
+    : {};
+    const role = req.query.role
+    ? {
+          role: { $regex: req.query.role, $options: "i" } 
+      }
+    : {};
+    const contractStatus = req.query.contractStatus
+    ? {
+          contractStatus: { $regex: req.query.contractStatus, $options: "i" } 
+      }
+    : {};
+        const users = await User.find(name).find(privilege).find(typeOfEmployee).find(role).find(contractStatus)
         res
             .status(200)
             .json({ success: true, message: "Users", array: users })
