@@ -267,6 +267,7 @@ const getTop5 = async (req, res) => {
             ranking.push(userTemp);
         }
 
+        console.log()
         res
             .status(200)
             .json({ success: true, message: `Bảng xếp hạng hôm nay`, ranking: ranking });
