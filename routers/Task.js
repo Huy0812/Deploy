@@ -1,5 +1,5 @@
 const express = require("express")
-const { createTask, updateTask, deleteTask, getMyTask, getMyTaskAsManager, getMyTaskAsContributor, getTaskById, getAllTask, checkingTask, countMyTaskAsContributor, countMyTaskAsManager } = require("../controllers/Task")
+const { createTask, updateTask, deleteTask, getMyTask, getMyTaskAsManager, getMyTaskAsContributor, getTaskById, getAllTask, checkingTask, countMyTaskAsContributor, countMyTaskAsManager, searchTask } = require("../controllers/Task")
 const isAuthenticated = require("../middleware/auth")
 const router = express.Router()
 router.route("/createtask").post(isAuthenticated, createTask)
