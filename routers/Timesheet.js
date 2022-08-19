@@ -1,32 +1,16 @@
 const express = require("express")
 const { checking,
-    getTimesheetInfo,
-    getTop5,
+    getChecking,
     getMyRank,
-    filterTimesheetDataByToday,
-    filterTimesheetDataByYesterday,
-    filterTimesheetDataByThisWeek,
-    filterTimesheetDataByLastWeek,
-    filterTimesheetDataByThisMonth,
-    filterTimesheetDataByLastMonth,
-    filterTimesheetDataByRange,
-    getTimesheetByMonth,
-    getTimesheetPoint,
-    getTimesheetByMonthForManager } = require("../controllers/Timesheet")
+    getTop5,
+    filterTimesheetByThisMonth,
+    getTimesheetByMonthForManager, } = require("../controllers/Timesheet")
 const isAuthenticated = require("../middleware/auth")
 const router = express.Router()
 router.route("/checking").post(isAuthenticated, checking)
-router.route("/timesheetinfo").get(isAuthenticated, getTimesheetInfo)
-router.route("/top5").get(getTop5)
-router.route("/rank").get(isAuthenticated, getMyRank)
-router.route("/filtertimesheetdatabytoday").get(isAuthenticated, filterTimesheetDataByToday)
-router.route("/filtertimesheetdatabyyesterday").get(isAuthenticated, filterTimesheetDataByYesterday)
-router.route("/filtertimesheetdatabythisweek").get(isAuthenticated, filterTimesheetDataByThisWeek)
-router.route("/filtertimesheetdatabylastweek").get(isAuthenticated, filterTimesheetDataByLastWeek)
-router.route("/filtertimesheetdatabythismonth").get(isAuthenticated, filterTimesheetDataByThisMonth)
-router.route("/filtertimesheetdatabylastmonth").get(isAuthenticated, filterTimesheetDataByLastMonth)
-router.route("/filtertimesheetdatabyrange").post(isAuthenticated, filterTimesheetDataByRange)
-router.route("/timesheetbymonth").get(isAuthenticated, getTimesheetByMonth)
-router.route("/timesheetpoint").get(isAuthenticated, getTimesheetPoint)
-router.route("/timesheetbymonthformanager").get(getTimesheetByMonthForManager)
+router.route("/getchecking").get(isAuthenticated, getChecking)
+router.route("/getmyrank").get(isAuthenticated, getMyRank)
+router.route("/gettop5").get(getTop5)
+router.route("/filtertimesheetbythismonth").get(isAuthenticated, filterTimesheetByThisMonth)
+router.route("/gettimesheetbymonthformanager").get(getTimesheetByMonthForManager)
 module.exports = router
