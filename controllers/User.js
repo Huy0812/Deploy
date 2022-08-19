@@ -61,6 +61,13 @@ const register = async (req, res) => {
             role,
         } = req.body;
 
+        if (!name || !email || !phoneNumber || !password || !confirmPassword || !privilege
+            || !startWorkingDate || !contractStatus || !typeOfEmployee || !role) {
+            return res
+                .status(400)
+                .json({ success: false, message: "Xin vui lòng nhập đầy đủ các trường" });
+        }
+
         user = await User.findOne({ email });
         if (user) {
             return res
