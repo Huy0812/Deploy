@@ -555,7 +555,22 @@ const searchUser = async (req, res) => {
     }
 
 };
+const searchUserTask = async (req, res) => {
+    try {
+        const name = req.query.name
+            ? {
+                name: { $regex: req.query.name, $options: "i" }
+            }
+            : {};
+        const users = await User.find(name)
+            .status(200)
+            .json({ success: true, message: "Người dùng", array: users })
 
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+
+};
 // Lọc người dùng
 const filterUser = async (req, res) => {
     try {
@@ -588,4 +603,5 @@ module.exports = {
     updateDeviceId,
     searchUser,
     getProfile,
+    searchUserTask
 }

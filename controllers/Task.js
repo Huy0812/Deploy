@@ -38,7 +38,22 @@ const createTask = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+const searchTask = async (req, res) => {
+    try {
+        const name = req.query.name
+            ? {
+                name: { $regex: req.query.name, $options: "i" }
+            }
+            : {};
+        const users = await User.find(name)
+            .status(200)
+            .json({ success: true, message: "Người dùng", array: users })
 
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+
+};
 // Sửa Task
 const updateTask = async (req, res) => {
     try {
@@ -412,4 +427,4 @@ const countMyTaskAsManager = async (req, res) => {
     }
 };
 
-module.exports = { createTask, updateTask, deleteTask, getMyTask, getMyTaskAsManager, getMyTaskAsContributor, getTaskById, getAllTask, checkingTask, countMyTaskAsContributor, countMyTaskAsManager }
+module.exports = { createTask, updateTask, deleteTask, getMyTask, getMyTaskAsManager, getMyTaskAsContributor, getTaskById, getAllTask, checkingTask, countMyTaskAsContributor, countMyTaskAsManager, searchTask }
