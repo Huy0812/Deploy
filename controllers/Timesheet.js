@@ -184,7 +184,7 @@ const checking = async (req, res) => {
 // Lấy thông tin checkin, checkout
 const getChecking = async (req, res) => {
     try {
-        const currentDate = moment();
+        const currentDate = moment().format("DD/MM/YYYY");
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
         let index = timesheet.segments.findIndex(x => x.date === currentDate);
 
@@ -213,7 +213,7 @@ const getChecking = async (req, res) => {
 // Lấy xếp hạng checkin trong ngày của nhân viên
 const getMyRank = async (req, res) => {
     try {
-        const currentDate = moment();
+        const currentDate = moment().format("DD/MM/YYYY");
 
         let timesheet = await Timesheet.find();
         let sort = timesheet.sort(function (a, b) {
@@ -242,7 +242,7 @@ const getMyRank = async (req, res) => {
 // Lấy bảng xếp hạng top 5 nhân viên checkin trong ngày
 const getTop5 = async (req, res) => {
     try {
-        const currentDate = moment();
+        const currentDate = moment().format("DD/MM/YYYY");
 
         let timesheet = await Timesheet.find();
         let sort = timesheet.sort(function (a, b) {
@@ -267,7 +267,6 @@ const getTop5 = async (req, res) => {
             ranking.push(userTemp);
         }
 
-        console.log()
         res
             .status(200)
             .json({ success: true, message: `Bảng xếp hạng hôm nay`, ranking: ranking });
@@ -280,17 +279,15 @@ const getTop5 = async (req, res) => {
 // Lọc thông tin chấm công (hôm nay)
 const filterTimesheetByToday = async (req, res) => {
     try {
-        const today = moment();
+        const today = moment().format("DD/MM/YYYY");
 
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
         let segments = timesheet.segments;
 
-        console.log(moment(segments[0].date, "DD/MM/YYYY"))
         segments = segments.filter(function (segment) {
             return moment(segment.date, "DD/MM/YYYY") >= today && moment(segment.date, "DD/MM/YYYY") <= today;
         });
 
-        console.log(segments)
         let checkinLateValue = segments.reduce((accumulator, segment) => {
             return accumulator + getCheckinLate(segment);
         }, 0);
@@ -358,7 +355,7 @@ const filterTimesheetByToday = async (req, res) => {
 // Lọc thông tin chấm công (hôm qua)
 const filterTimesheetByYesterday = async (req, res) => {
     try {
-        const yesterday = moment();
+        const yesterday = moment().format("DD/MM/YYYY");
 
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
         let segments = timesheet.segments;
