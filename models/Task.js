@@ -48,7 +48,7 @@ const taskSchema = new mongoose.Schema({
     },
 
     // Tình trạng hoàn thành
-    isDone: [{ type: Boolean }],
+    isDone: [{ type: Boolean, required: true, }],
 
     // Tình trạng phê duyệt
     isApproved: {

@@ -39,6 +39,8 @@ const companySchema = new mongoose.Schema({
         type: String,
         default: "https://www.facebook.com/vikinology",
     },
+
+    // IP công ty
     companyIp: {
         type: String,
         default: ""

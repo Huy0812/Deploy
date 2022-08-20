@@ -28,21 +28,18 @@ const timesheetSchema = new mongoose.Schema({
             checkinTime: {
                 type: String,
                 required: true,
-                default: null,
             },
 
             // Thời gian checkout
             checkoutTime: {
                 type: String,
                 required: true,
-                default: null,
             },
 
             // Thời gian làm việc
             workingTime: {
                 type: Number,
                 required: true,
-                default: 0,
             },
 
         },

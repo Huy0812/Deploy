@@ -76,10 +76,9 @@ const userSchema = new mongoose.Schema({
         ref: 'Company',
         required: true,
         default: "62e8947f86efb4e31838346d",
-        unique: true,
     },
 
-    //  Mã nhân viên
+    //  Mã thứ tự nhân viên
     userId: {
         type: Number,
         unique: true,
@@ -108,15 +107,19 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+
+    // Mã thiết bị đăng nhập
     deviceId: {
         type: String,
         unique: true,
     },
+
     // Xác thực
     verified: {
         type: Boolean,
         default: true,
     },
+
     otp: Number,
     otp_expiry: Date,
     resetPasswordOtp: Number,

@@ -18,14 +18,13 @@ const sendToken = (res, user, statusCode, message) => {
         gender: user.gender,
         address: user.address,
         userId: user.userId,
+        privilege: user.privilege,
         startWorkingDate: user.startWorkingDate,
         contractStatus: user.contractStatus,
         typeOfEmployee: user.typeOfEmployee,
         role: user.role,
         deviceId: user.deviceId,
-        firstLogin: user.firstLogin,
         verified: user.verified,
-
     };
 
     res

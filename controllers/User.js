@@ -4,14 +4,11 @@ const sendPhone = require("../utils/sendPhone");
 const sendToken = require("../utils/sendToken");
 const cloudinary = require("cloudinary");
 const fs = require("fs");
-const moment = require("moment");
 
 const verify = async (req, res) => {
     try {
         const otp = Number(req.body.otp);
-
         const user = await User.findById(req.user._id);
-
         if (user.otp !== otp || user.otp_expiry < Date.now()) {
             return res
                 .status(400)
@@ -24,7 +21,6 @@ const verify = async (req, res) => {
         user.verified = true;
         user.otp = null;
         user.otp_expiry = null;
-
         await user.save();
 
         sendToken(res, user, 200, "Xác nhận tài khoản thành công");
@@ -60,7 +56,6 @@ const register = async (req, res) => {
             typeOfEmployee,
             role,
         } = req.body;
-
         if (!name || !email || !phoneNumber || !password || !confirmPassword || !privilege
             || !startWorkingDate || !contractStatus || !typeOfEmployee || !role) {
             return res
@@ -74,13 +69,13 @@ const register = async (req, res) => {
                 .status(400)
                 .json({ success: false, message: "Email này đã tồn tại" });
         }
-
         user = await User.findOne({ phoneNumber });
         if (user) {
             return res
                 .status(400)
                 .json({ success: false, message: "Số điện thoại này đã tồn tại" });
         }
+
         if (password != confirmPassword) {
             return res
                 .status(400)
@@ -89,10 +84,10 @@ const register = async (req, res) => {
                     message: "Mật khẩu không khớp",
                 });
         }
-        emailFix = email.trim().toLowerCase();
+
         user = await User.create({
             name,
-            email: emailFix,
+            email,
             phoneNumber,
             password,
             privilege,
@@ -119,7 +114,6 @@ const login = async (req, res) => {
         }
 
         const user = await User.findOne({ phoneNumber }).select("+password");
-
         if (!user) {
             return res
                 .status(400)
@@ -127,7 +121,6 @@ const login = async (req, res) => {
         }
 
         const isMatch = await user.comparePassword(password);
-
         if (!isMatch) {
             return res
                 .status(400)
@@ -153,19 +146,9 @@ const logout = async (req, res) => {
     }
 };
 
-const getMyProfile = async (req, res) => {
-    try {
-        const user = await User.findById(req.user._id);
-
-        sendToken(res, user, 201, `Xin chào ${user.name}`);
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
-
 const getProfile = async (req, res) => {
     try {
-        const { _id } = req.body
+        const { _id } = req.body;
         const user = await User.findById(_id);
         const userData = {
             _id: user._id,
@@ -183,7 +166,6 @@ const getProfile = async (req, res) => {
             typeOfEmployee: user.typeOfEmployee,
             role: user.role,
             deviceId: user.deviceId,
-            firstLogin: user.firstLogin,
             verified: user.verified,
         };
         res
@@ -195,10 +177,20 @@ const getProfile = async (req, res) => {
 
 };
 
+const getMyProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+
+        sendToken(res, user, 201, `Xin chào ${user.name}`);
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
 const getAllProfile = async (req, res) => {
     try {
         const users = await User.find();
-        sort = users.sort((a, b) => a.userId - b.userId);
+        const sort = users.sort((a, b) => a.userId - b.userId);
 
         return res
             .status(200)
@@ -212,14 +204,138 @@ const getAllProfile = async (req, res) => {
     }
 };
 
+const updateProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        const userPass = await User.findById(req.user._id).select("+password");
+
+        const avatar = req.files.avatar.tempFilePath;
+        if (user.avatar.public_id != null) {
+            await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+        }
+        const mycloud = await cloudinary.v2.uploader.upload(avatar);
+        fs.rmSync("./tmp", { recursive: true });
+        user.avatar = {
+            public_id: mycloud.public_id,
+            url: mycloud.secure_url,
+        };
+
+        const { name, email, phoneNumber, birth, gender, address, password } = req.body;
+
+        const isMatch = await userPass.comparePassword(password);
+        if (!isMatch) {
+            return res
+                .status(400)
+                .json({ success: false, message: "Mật khẩu không khớp" });
+        }
+
+        if (name) user.name = name;
+        if (email) user.email = email;
+        if (phoneNumber) user.phoneNumber = phoneNumber;
+        if (birth) user.birth = birth;
+        if (gender) user.gender = gender;
+        if (address) user.address = address;
+        await user.save();
+        res
+            .status(200)
+            .json({ success: true, message: "Cập nhật tài khoản thành công" });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+const updateAvatar = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+
+        const avatar = req.files.avatar.tempFilePath;
+        if (user.avatar.public_id != null) {
+            await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+        }
+        const mycloud = await cloudinary.v2.uploader.upload(avatar);
+        fs.rmSync("./tmp", { recursive: true });
+        user.avatar = {
+            public_id: mycloud.public_id,
+            url: mycloud.secure_url,
+        };
+        await user.save();
+
+        res
+            .status(200)
+            .json({ success: true, message: "Cập nhật avatar thành công" });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+const updateDeviceId = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id)
+        const { deviceId } = req.body;
+
+        const users = await User.findOne({ deviceId });
+        if (users) {
+            return res
+                .status(400)
+                .json({ success: false, message: "Mã thiết bị đã tồn tại" });
+        }
+        user.deviceId = deviceId;
+        await user.save();
+
+        res
+            .status(200)
+            .json({ success: true, message: "Cập nhật mã thiết bị thành công" });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+const updatePassword = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id).select("+password");
+
+        const { oldPassword, newPassword, confirmPassword } = req.body;
+        if (!oldPassword || !newPassword) {
+            return res
+                .status(400)
+                .json({ success: false, message: "Xin vui lòng nhập hết các trường" });
+        }
+
+        const isMatch = await user.comparePassword(oldPassword);
+        if (!isMatch) {
+            return res
+                .status(400)
+                .json({ success: false, message: "Mật khẩu không đúng" });
+        }
+        if (newPassword == confirmPassword) {
+            user.password = newPassword;
+        } else {
+            return res
+                .status(400)
+                .json({
+                    success: false,
+                    message: "Mật khẩu không khớp",
+                });
+        }
+        await user.save();
+
+        res
+            .status(200)
+            .json({ success: true, message: "Cập nhật mật khẩu thành công" });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
 const updateAdmin = async (req, res) => {
     try {
-        let userAdmin = await User.findById(req.user._id).select("+password")
+        const userAdmin = await User.findById(req.user._id).select("+password");
         if (userAdmin.privilege !== "Quản trị viên") {
             return res
                 .status(403)
                 .json({ success: false, message: "Bạn không có quyền truy cập chức năng này" });
         }
+
         const {
             _id,
             name,
@@ -232,7 +348,7 @@ const updateAdmin = async (req, res) => {
             privilege,
             password
         } = req.body;
-        user = await User.findById(_id);
+        const user = await User.findById(_id);
 
         const isMatch = await userAdmin.comparePassword(password);
         if (!isMatch) {
@@ -240,13 +356,9 @@ const updateAdmin = async (req, res) => {
                 .status(400)
                 .json({ success: false, message: "Mật khẩu không khớp" });
         }
+
         if (name) user.name = name;
-
-        if (email) {
-            emailFix = email.trim().toLowerCase();
-            user.email = emailFix;
-        }
-
+        if (email) user.email = email;
         if (phoneNumber) user.phoneNumber = phoneNumber;
         if (startWorkingDate) user.startWorkingDate = startWorkingDate;
         if (contractStatus) user.contractStatus = contractStatus;
@@ -254,82 +366,10 @@ const updateAdmin = async (req, res) => {
         if (role) user.role = role;
         if (privilege) user.privilege = privilege;
         await user.save();
+
         res
             .status(200)
             .json({ success: true, message: "Cập nhật tài khoản thành công" });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
-
-const updateProfile = async (req, res) => {
-    try {
-        let user = await User.findById(req.user._id);
-        const userPass = await User.findById(req.user._id).select("+password");
-        const avatar = req.files.avatar.tempFilePath;
-        if (user.avatar.public_id != null) {
-            await cloudinary.v2.uploader.destroy(user.avatar.public_id);
-        }
-        user = await User.findById(req.user._id);
-        const mycloud = await cloudinary.v2.uploader.upload(avatar);
-        fs.rmSync("./tmp", { recursive: true });
-
-        user.avatar = {
-            public_id: mycloud.public_id,
-            url: mycloud.secure_url,
-        };
-
-        const { name, email, phoneNumber, birth, gender, address, password } = req.body;
-        const isMatch = await userPass.comparePassword(password);
-        if (!isMatch) {
-            return res
-                .status(400)
-                .json({ success: false, message: "Mật khẩu không khớp" });
-        }
-
-        if (name) user.name = name;
-
-        if (email) {
-            emailFix = email.trim().toLowerCase();
-            user.email = emailFix;
-        }
-
-        if (phoneNumber) user.phoneNumber = phoneNumber;
-
-        if (birth) {
-            user.birth = birth;
-        }
-        if (gender) user.gender = gender;
-        if (address) user.address = address;
-
-        await user.save();
-        res
-            .status(200)
-            .json({ success: true, message: "Cập nhật tài khoản thành công" });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
-
-const updateAvatar = async (req, res) => {
-    try {
-        let user = await User.findById(req.user._id);
-        const avatar = req.files.avatar.tempFilePath;
-        if (user.avatar.public_id != null) {
-            await cloudinary.v2.uploader.destroy(user.avatar.public_id);
-        }
-        user = await User.findById(req.user._id);
-        const mycloud = await cloudinary.v2.uploader.upload(avatar);
-        fs.rmSync("./tmp", { recursive: true });
-
-        user.avatar = {
-            public_id: mycloud.public_id,
-            url: mycloud.secure_url,
-        };
-        await user.save();
-        res
-            .status(200)
-            .json({ success: true, message: "Cập nhật avatar thành công" });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -351,93 +391,30 @@ const deleteProfile = async (req, res) => {
                 .status(404)
                 .json({ success: false, message: "Tài khoản không tồn tại" });
         }
-        await User.findByIdAndDelete(userId)
+        await User.findByIdAndDelete(userId);
         res
             .status(200)
             .json({ success: true, message: "Xóa tài khoản thành công" });
-
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 };
 
-const updateDeviceId = async (req, res) => {
-    try {
-        const user = await User.findById(req.user._id)
-        const { deviceId } = req.body;
-
-        userAll = await User.findOne({ deviceId });
-        if (userAll) {
-            return res
-                .status(400)
-                .json({ success: false, message: "Mã thiết bị đã tồn tại" });
-        }
-        user.deviceId = deviceId;
-        await user.save();
-        res
-            .status(200)
-            .json({ success: true, message: "Cập nhật mã thiết bị thành công" });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
-const updatePassword = async (req, res) => {
-    try {
-        const user = await User.findById(req.user._id).select("+password");
-
-        const { oldPassword, newPassword, confirmPassword } = req.body;
-
-        if (!oldPassword || !newPassword) {
-            return res
-                .status(400)
-                .json({ success: false, message: "Xin vui lòng nhập hết các trường" });
-        }
-
-        const isMatch = await user.comparePassword(oldPassword);
-
-        if (!isMatch) {
-            return res
-                .status(400)
-                .json({ success: false, message: "Mật khẩu không đúng" });
-        }
-        if (newPassword == confirmPassword) {
-            user.password = newPassword;
-        } else {
-            return res
-                .status(400)
-                .json({
-                    success: false,
-                    message: "Mật khẩu không khớp",
-                });
-        }
-        await user.save();
-        res
-            .status(200)
-            .json({ success: true, message: "Cập nhật mật khẩu thành công" });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
-
-const phonePassword = async (req, res) => {
+const forgetPasswordPhone = async (req, res) => {
     try {
         const { phoneNumber } = req.body;
 
         let user = await User.findOne({ phoneNumber: phoneNumber });
-
         if (!user) {
             return res.status(400).json({ success: false, message: "Số điện thoại không đúng" });
         }
 
         const otp = Math.floor(Math.floor(100000 + Math.random() * 900000));
-
         user.resetPasswordOtp = otp;
         user.resetPasswordOtpExpiry = Date.now() + 10 * 60 * 1000;
-
         await user.save();
 
         const message = `Mã OTP để đặt lại mật khẩu là ${otp}. Nếu bạn không gửi yêu cầu, xin vui lòng bỏ qua email này.`;
-
         await sendPhone(phoneNumber, message);
 
         res
@@ -448,27 +425,21 @@ const phonePassword = async (req, res) => {
     }
 };
 
-const forgetPassword = async (req, res) => {
+const forgetPasswordEmail = async (req, res) => {
     try {
         const { email } = req.body;
 
-        emailFix = email.trim().toLowerCase();
-
-        let user = await User.findOne({ email: emailFix });
-
+        let user = await User.findOne({ email: email });
         if (!user) {
             return res.status(400).json({ success: false, message: "Email không đúng" });
         }
 
         const otp = Math.floor(Math.floor(100000 + Math.random() * 900000));
-
         user.resetPasswordOtp = otp;
         user.resetPasswordOtpExpiry = Date.now() + 10 * 60 * 1000;
-
         await user.save();
 
         const message = `Mã OTP để đặt lại mật khẩu là ${otp}. Nếu bạn không gửi yêu cầu, xin vui lòng bỏ qua email này.`;
-
         await sendMail(emailFix, "Yêu cầu đặt lại mật khẩu", message);
 
         res
@@ -487,7 +458,6 @@ const resetPassword = async (req, res) => {
             resetPasswordOtp: otp,
             resetPasswordExpiry: { $gt: Date.now() },
         });
-
         if (!user) {
             return res
                 .status(400)
@@ -545,16 +515,16 @@ const searchUser = async (req, res) => {
                 contractStatus: { $regex: req.query.contractStatus, $options: "i" }
             }
             : {};
-        const users = await User.find(name).find(privilege).find(typeOfEmployee).find(role).find(contractStatus)
+        const users = await User.find(name).find(privilege).find(typeOfEmployee).find(role).find(contractStatus);
+
         res
             .status(200)
             .json({ success: true, message: "Người dùng", array: users })
-
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
-
 };
+
 const searchUserTask = async (req, res) => {
     try {
         const name = req.query.name
@@ -563,45 +533,31 @@ const searchUserTask = async (req, res) => {
             }
             : {};
         const users = await User.find(name)
+        res
             .status(200)
             .json({ success: true, message: "Người dùng", array: users })
-
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
-
-};
-// Lọc người dùng
-const filterUser = async (req, res) => {
-    try {
-
-        return res
-            .status(200)
-            .json({ success: false, message: "Người dùng", users: query })
-
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-
 };
 
 module.exports = {
-    register,
     verify,
+    register,
     login,
     logout,
+    getProfile,
     getMyProfile,
     getAllProfile,
     updateProfile,
     updateAvatar,
-    deleteProfile,
-    updatePassword,
-    forgetPassword,
-    resetPassword,
-    updateAdmin,
-    phonePassword,
     updateDeviceId,
+    updatePassword,
+    updateAdmin,
+    deleteProfile,
+    forgetPasswordPhone,
+    forgetPasswordEmail,
+    resetPassword,
     searchUser,
-    getProfile,
     searchUserTask
 }
