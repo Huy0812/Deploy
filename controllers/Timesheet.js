@@ -22,7 +22,7 @@ const BREAK_TIME_DEFAULT = moment.duration(moment(CHECKINTIME_PM_DEFAULT, "HH:mm
 
 // Kiểm tra nếu ngày là cuối tuần
 function isWeekend(date) {
-    return new Date(date).getDay() === 6 || new Date(date).getDay() === 0;
+    return moment(date, "DD/MM/YYYY").toDate().getDay() === 6 || moment(date, "DD/MM/YYYY").toDate().getDay() === 0;
 }
 
 // Kiểm tra checkin muộn
@@ -86,8 +86,8 @@ function getActualWorkingTime(segment) {
 // Tính thời gian OT
 function getOvertime(segment) {
     if (isWeekend(segment.date))
-        return moment.duration(moment(segment.checkoutTime), "HH:mm:ss")
-            .diff(moment(segment.checkinTime), "HH:mm:ss").asHours();
+        return moment.duration(moment(segment.checkoutTime, "HH:mm:ss")
+            .diff(moment(segment.checkinTime, "HH:mm:ss"))).asHours();
     return 0;
 }
 
@@ -285,7 +285,7 @@ const filterTimesheetByToday = async (req, res) => {
         let segments = timesheet.segments;
 
         segments = segments.filter(function (segment) {
-            return moment(segment.date, "DD/MM/YYYY") === today;
+            return moment(segment.date, "DD/MM/YYYY").format("DD/MM/YYYY") === today.format("DD/MM/YYYY");
         });
 
         let checkinLateValue = segments.reduce((accumulator, segment) => {
@@ -355,13 +355,13 @@ const filterTimesheetByToday = async (req, res) => {
 // Lọc thông tin chấm công (hôm qua)
 const filterTimesheetByYesterday = async (req, res) => {
     try {
-        const yesterday = moment().tz('Asia/Ho_Chi_Minh');
+        const yesterday = moment().tz('Asia/Ho_Chi_Minh').subtract(1, 'days');
 
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
         let segments = timesheet.segments;
 
         segments = segments.filter(function (segment) {
-            return moment(segment.date, "DD/MM/YYYY") === yesterday;
+            return moment(segment.date, "DD/MM/YYYY").format("DD/MM/YYYY") === yesterday.format("DD/MM/YYYY");
         });
 
         let checkinLateValue = segments.reduce((accumulator, segment) => {
@@ -741,7 +741,8 @@ const filterTimesheetByLastMonth = async (req, res) => {
 // Lọc thông tin chấm công (trong khoảng)
 const filterTimesheetByRange = async (req, res) => {
     try {
-        const { start, end } = req.body;
+        const start = moment(req.body.start, "DD/MM/YYYY");
+        const end = moment(req.body.end, "DD/MM/YYYY");
 
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
         let segments = timesheet.segments;
@@ -809,7 +810,7 @@ const filterTimesheetByRange = async (req, res) => {
 
         return res
             .status(200)
-            .json({ success: true, message: `Dữ liệu công trong khoảng ${start} - ${end}`, timesheetData: timesheetData, timesheetTable: timesheetTable });
+            .json({ success: true, message: `Dữ liệu công trong khoảng ${req.body.start} - ${req.body.end}`, timesheetData: timesheetData, timesheetTable: timesheetTable });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
