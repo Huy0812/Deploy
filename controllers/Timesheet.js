@@ -977,8 +977,12 @@ const filterTimesheetByThisMonthByUser = async (req, res) => {
 // Lấy board chấm công
 const getTimesheetBoard = async (req, res) => {
     try {
-        const start = moment().tz('Asia/Ho_Chi_Minh').startOf('month');
-        const end = moment().tz('Asia/Ho_Chi_Minh').endOf('month');
+        const start = moment()
+        // .tz('Asia/Ho_Chi_Minh')
+        .startOf('month');
+        const end = moment()
+        // .tz('Asia/Ho_Chi_Minh')
+        .endOf('month');
 
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
         let segments = timesheet.segments;
