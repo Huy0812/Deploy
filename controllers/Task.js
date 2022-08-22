@@ -7,8 +7,7 @@ const mongoose = require("mongoose")
 // Tạo công việc
 const createTask = async (req, res) => {
     try {
-        //var userIds = JSON.parse(req.body.users);
-        const userIds = req.body.users.map(s => mongoose.Types.ObjectId(s));
+        const contributorIds = JSON.parse(req.body.contributorIds);
         const name = req.body.name;
         const description = req.body.description;
         const deadline = req.body.deadline;
@@ -24,7 +23,7 @@ const createTask = async (req, res) => {
             deadline: deadline,
             actualEndedTime: "N/A",
             managerId: req.user._id,
-            contributorIds: userIds,
+            contributorIds: contributorIds,
             status: "Chưa hoàn thành",
             isDone: isDone,
             isApproved: false,
@@ -316,7 +315,8 @@ const approvingTask = async (req, res) => {
                 .status(200)
                 .json({ success: true, message: `Công việc chưa hoàn thành` });
 
-        task.isApproved = false;
+        task.isApproved = true;
+        task.actualEndedTime = String(moment().tz('Asia/Ho_Chi_Minh'));
         await task.save();
 
         return res
