@@ -286,6 +286,31 @@ const checkingTask = async (req, res) => {
     }
 };
 
+// Phê duyệt công việc
+const approvingTask = async (req, res) => {
+    try {
+        const { taskId } = req.body;
+        const task = await Task.findById(taskId);
+
+        for (let index = 0; index < task.length; index++) {
+            if (!task.isDone[index]) {
+                return req
+                    .status(200)
+                    .json({ success: true, message: `Công việc chưa hoàn thành` });
+            }
+        }
+
+        task.isApproved = false;
+        await task.save();
+
+        return res
+            .status(200)
+            .json({ success: true, message: `Công việc đã được phê duyệt` });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
 module.exports = {
     createTask,
     searchTask,
@@ -295,5 +320,6 @@ module.exports = {
     getMyTaskAsManager,
     getMyTaskAsContributor,
     getAllTask,
-    checkingTask
+    checkingTask,
+    approvingTask
 }
