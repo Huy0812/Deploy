@@ -141,6 +141,7 @@ const getTaskById = async (req, res) => {
 // Lấy công việc của nhân viên (với vai trò quản lý)
 const getMyTaskAsManager = async (req, res) => {
     try {
+        const current = moment().tz('Asia/Ho_Chi_Minh');
         const tasks = await Task.find({ managerId: req.user._id });
         tasks.sort(function (a, b) {
             return moment(a.deadline, "HH:mm, DD/MM/YYYY") - moment(b.deadline, "HH:mm, DD/MM/YYYY");
@@ -155,6 +156,8 @@ const getMyTaskAsManager = async (req, res) => {
                 let contributor = await User.findById(tasks[i].contributorIds[j]);
                 contributorsName.push(contributor.name);
             }
+            if (tasks.isDone.every(element => element === true)) tasks[i].status = "Quá hạn";
+            await tasks[i].save();
             let taskTemp = {
                 _id: tasks[i]._id,
                 name: tasks[i].name,
@@ -196,6 +199,10 @@ const getMyTaskAsContributor = async (req, res) => {
                 let contributor = await User.findById(tasks[i].contributorIds[j]);
                 contributorsName.push(contributor.name);
             }
+
+            if (tasks.isDone.every(element => element === true)) tasks[i].status = "Quá hạn";
+            await tasks[i].save();
+
             let taskTemp = {
                 _id: tasks[i]._id,
                 name: tasks[i].name,
@@ -237,6 +244,8 @@ const getAllTask = async (req, res) => {
                 let contributor = await User.findById(tasks[i].contributorIds[j]);
                 contributorsName.push(contributor.name);
             }
+            if (tasks.isDone.every(element => element === true)) tasks[i].status = "Quá hạn";
+            await tasks[i].save();
             let taskTemp = {
                 _id: tasks[i]._id,
                 name: tasks[i].name,
@@ -271,12 +280,18 @@ const checkingTask = async (req, res) => {
         if (!task.isDone[index]) {
             task.isDone[index] = true;
             await task.save();
+            if (task.isDone.every(element => element === true)) {
+                task.status = "Đã hoàn thành";
+            }
             return res
                 .status(200)
                 .json({ success: true, message: `Công việc đã hoàn thành` });
         }
         task.isDone[index] = false;
         await task.save();
+        if (task.isDone.every(element => element === true)) {
+            task.status = "Đã hoàn thành";
+        }
 
         return res
             .status(200)
@@ -292,13 +307,10 @@ const approvingTask = async (req, res) => {
         const { taskId } = req.body;
         const task = await Task.findById(taskId);
 
-        for (let index = 0; index < task.length; index++) {
-            if (!task.isDone[index]) {
-                return req
-                    .status(200)
-                    .json({ success: true, message: `Công việc chưa hoàn thành` });
-            }
-        }
+        if (!task.isDone.every(element => element === true))
+            return req
+                .status(200)
+                .json({ success: true, message: `Công việc chưa hoàn thành` });
 
         task.isApproved = false;
         await task.save();
