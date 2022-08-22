@@ -85,9 +85,11 @@ function getActualWorkingTime(segment) {
 
 // Tính thời gian OT
 function getOvertime(segment) {
-    if (isWeekend(segment.date))
-        return moment.duration(moment(segment.checkoutTime, "HH:mm:ss")
+    if (isWeekend(segment.date)) {
+        overtime = moment.duration(moment(segment.checkoutTime, "HH:mm:ss")
             .diff(moment(segment.checkinTime, "HH:mm:ss"))).asHours();
+        return Math.round(overtime * 10) / 10;
+    }
     return 0;
 }
 
