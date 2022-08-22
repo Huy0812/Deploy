@@ -7,12 +7,12 @@ const mongoose = require("mongoose")
 // Tạo công việc
 const createTask = async (req, res) => {
     try {
-        const contributorIds = JSON.parse(req.body.contributorIds);
+        const contributorIds = req.body.contributorIds;
         const name = req.body.name;
         const description = req.body.description;
         const deadline = req.body.deadline;
         const isDone = [];
-        for (let i = 0; i < req.body.users.length; i++) {
+        for (let i = 0; i < req.body.contributorIds.length; i++) {
             isDone.push(false);
         }
         const currentTime = moment().tz('Asia/Ho_Chi_Minh');
