@@ -10,7 +10,8 @@ const { checking,
     filterTimesheetByThisMonth,
     filterTimesheetByLastMonth,
     filterTimesheetByRange,
-    getTimesheetByMonthForManager, } = require("../controllers/Timesheet")
+    getTimesheetByMonthForManager,
+    filterTimesheetByThisMonthByUser, } = require("../controllers/Timesheet")
 const isAuthenticated = require("../middleware/auth")
 const router = express.Router()
 router.route("/checking").post(isAuthenticated, checking)
@@ -25,4 +26,6 @@ router.route("/filtertimesheetbythismonth").get(isAuthenticated, filterTimesheet
 router.route("/filtertimesheetbylastmonth").get(isAuthenticated, filterTimesheetByLastMonth)
 router.route("/filtertimesheetbyrange").post(isAuthenticated, filterTimesheetByRange)
 router.route("/gettimesheetbymonthformanager").get(getTimesheetByMonthForManager)
+
+router.route("/filtertimesheetbythismonthbyuser").get(isAuthenticated, filterTimesheetByThisMonthByUser)
 module.exports = router

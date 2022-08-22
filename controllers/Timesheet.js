@@ -894,6 +894,86 @@ const getTimesheetByMonthForManager = async (req, res) => {
     }
 }
 
+// Lọc thông tin chấm công theo người dùng (theo tháng)
+const filterTimesheetByThisMonthByUser = async (req, res) => {
+    try {
+        const userId = req.body;
+
+        const start = moment().tz('Asia/Ho_Chi_Minh').startOf('month');
+        const end = moment().tz('Asia/Ho_Chi_Minh').endOf('month');
+
+        let timesheet = await Timesheet.findOne({ userId: userId });
+        let segments = timesheet.segments;
+
+        segments = segments.filter(function (segment) {
+            return moment(segment.date, "DD/MM/YYYY") >= start && moment(segment.date, "DD/MM/YYYY") <= end;
+        });
+
+        let checkinLateValue = segments.reduce((accumulator, segment) => {
+            return accumulator + getCheckinLate(segment);
+        }, 0);
+        let checkinLateNumber = segments.filter(function (segment) { return isCheckinLate(segment) }).length;
+        let checkoutEarlyValue = segments.reduce((accumulator, segment) => {
+            return accumulator + getCheckoutEarly(segment);
+        }, 0);
+        let checkoutEarlyNumber = segments.filter(function (segment) { return isCheckoutEarly(segment) }).length;
+        let overtimeValue = segments.reduce((accumulator, segment) => {
+            return accumulator + getOvertime(segment);
+        }, 0);
+        if (overtimeValue == null) {
+            overtimeValue = 0;
+        }
+        let overtimeNumber = segments.filter(function (segment) { return isWeekend(segment.date) }).length;
+        let maxPoint = 0;
+        for (let i = start.toDate(); i <= end.toDate(); i.setDate(i.getDate() + 1)) {
+            if (!isWeekend(i)) maxPoint++;
+        }
+        let actualPoint = segments.reduce((accumulator, segment) => {
+            return accumulator + getTimesheetPoint(segment)
+        }, 0);
+        let checkinLateData = {
+            value: checkinLateValue,
+            number: checkinLateNumber,
+        }
+        let checkoutEarlyData = {
+            value: checkoutEarlyValue,
+            number: checkoutEarlyNumber,
+        }
+        let overtimeData = {
+            value: overtimeValue,
+            number: overtimeNumber,
+        }
+        let pointData = {
+            actual: actualPoint,
+            max: maxPoint,
+        };
+        let timesheetData = {
+            checkinLate: checkinLateData,
+            checkoutEarly: checkoutEarlyData,
+            overtime: overtimeData,
+            point: pointData,
+        };
+
+        let timesheetTable = [];
+        segments.forEach((segment) => {
+            let timesheetTemp = {
+                date: segment.date,
+                checkinTime: segment.checkinTime,
+                checkoutTime: segment.checkoutTime,
+                overtime: getOvertime(segment),
+                point: getTimesheetPoint(segment),
+            }
+            timesheetTable.push(timesheetTemp);
+        });
+
+        return res
+            .status(200)
+            .json({ success: true, message: `Dữ liệu công tháng này`, timesheetData: timesheetData, timesheetTable: timesheetTable });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
 module.exports = {
     checking,
     getChecking,
@@ -907,4 +987,5 @@ module.exports = {
     filterTimesheetByLastMonth,
     filterTimesheetByRange,
     getTimesheetByMonthForManager,
+    filterTimesheetByThisMonthByUser
 }
