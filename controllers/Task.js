@@ -114,7 +114,7 @@ const getTaskById = async (req, res) => {
                 let contributor = await User.findById(tasks[i].contributorIds[j]);
                 contributorsName.push(contributor.name);
             }
-            if (moment().tz('Asia/Ho_Chi_Minh').isAfter(moment(tasks[i].deadline), "HH:mm, DD/MM/YYYY")) tasks[i].status = "Quá hạn";
+            if (moment().tz('Asia/Ho_Chi_Minh').isAfter(moment(tasks[i].deadline, "HH:mm, DD/MM/YYYY"))) tasks[i].status = "Quá hạn";
             if (tasks[i].isDone.every(element => element === true)) tasks[i].status = "Đã hoàn thành";
             await tasks[i].save();
             let taskTemp = {
@@ -159,7 +159,7 @@ const getMyTaskAsManager = async (req, res) => {
                 let contributor = await User.findById(tasks[i].contributorIds[j]);
                 contributorsName.push(contributor.name);
             }
-            if (moment().tz('Asia/Ho_Chi_Minh').isAfter(moment(tasks[i].deadline), "HH:mm, DD/MM/YYYY")) tasks[i].status = "Quá hạn";
+            if (moment().tz('Asia/Ho_Chi_Minh').isAfter(moment(tasks[i].deadline, "HH:mm, DD/MM/YYYY"))) tasks[i].status = "Quá hạn";
             if (tasks[i].isDone.every(element => element === true)) tasks[i].status = "Đã hoàn thành";
             await tasks[i].save();
             let taskTemp = {
@@ -203,7 +203,7 @@ const getMyTaskAsContributor = async (req, res) => {
                 let contributor = await User.findById(tasks[i].contributorIds[j]);
                 contributorsName.push(contributor.name);
             }
-            if (moment().tz('Asia/Ho_Chi_Minh').isAfter(moment(tasks[i].deadline), "HH:mm, DD/MM/YYYY")) tasks[i].status = "Quá hạn";
+            if (moment().tz('Asia/Ho_Chi_Minh').isAfter(moment(tasks[i].deadline, "HH:mm, DD/MM/YYYY"))) tasks[i].status = "Quá hạn";
             if (tasks[i].isDone.every(element => element === true)) tasks[i].status = "Đã hoàn thành";
             await tasks[i].save();
             let taskTemp = {
@@ -247,7 +247,7 @@ const getAllTask = async (req, res) => {
                 let contributor = await User.findById(tasks[i].contributorIds[j]);
                 contributorsName.push(contributor.name);
             }
-            if (moment().tz('Asia/Ho_Chi_Minh').isAfter(moment(tasks[i].deadline), "HH:mm, DD/MM/YYYY")) tasks[i].status = "Quá hạn";
+            if (moment().tz('Asia/Ho_Chi_Minh').isAfter(moment(tasks[i].deadline, "HH:mm, DD/MM/YYYY"))) tasks[i].status = "Quá hạn";
             if (tasks[i].isDone.every(element => element === true)) tasks[i].status = "Đã hoàn thành";
             await tasks[i].save();
             let taskTemp = {
