@@ -974,6 +974,43 @@ const filterTimesheetByThisMonthByUser = async (req, res) => {
     }
 }
 
+// Lấy board chấm công
+const getTimesheetBoard = async (req, res) => {
+    try {
+        const start = moment().tz('Asia/Ho_Chi_Minh').startOf('month');
+        const end = moment().tz('Asia/Ho_Chi_Minh').endOf('month');
+
+        let timesheet = await Timesheet.findOne({ userId: req.user._id });
+        let segments = timesheet.segments;
+
+        segments = segments.filter(function (segment) {
+            return moment(segment.date, "DD/MM/YYYY") >= start && moment(segment.date, "DD/MM/YYYY") <= end;
+        });
+
+        let checkinLateNumber = segments.filter(function (segment) { return isCheckinLate(segment) }).length;
+
+        let maxPoint = 0;
+        for (let i = start.toDate(); i <= end.toDate(); i.setDate(i.getDate() + 1)) {
+            if (!isWeekend(i)) maxPoint++;
+        }
+        let actualPoint = segments.reduce((accumulator, segment) => {
+            return accumulator + getTimesheetPoint(segment)
+        }, 0);
+
+        let timesheetBoard = {
+            checkinLateNumber: checkinLateNumber,
+            actualPoint: actualPoint,
+            maxPoint: maxPoint,
+        }
+
+        return res
+            .status(200)
+            .json({ success: true, message: `Dữ liệu công tháng này`, timesheetBoard: timesheetBoard });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
 module.exports = {
     checking,
     getChecking,
@@ -987,5 +1024,6 @@ module.exports = {
     filterTimesheetByLastMonth,
     filterTimesheetByRange,
     getTimesheetByMonthForManager,
-    filterTimesheetByThisMonthByUser
+    filterTimesheetByThisMonthByUser,
+    getTimesheetBoard,
 }
