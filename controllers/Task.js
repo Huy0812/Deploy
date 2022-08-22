@@ -114,6 +114,8 @@ const getTaskById = async (req, res) => {
                 let contributor = await User.findById(tasks[i].contributorIds[j]);
                 contributorsName.push(contributor.name);
             }
+            if (tasks[i].isDone.every(element => element === true)) tasks[i].status = "Quá hạn";
+            await tasks[i].save();
             let taskTemp = {
                 _id: tasks[i]._id,
                 name: tasks[i].name,
@@ -156,7 +158,7 @@ const getMyTaskAsManager = async (req, res) => {
                 let contributor = await User.findById(tasks[i].contributorIds[j]);
                 contributorsName.push(contributor.name);
             }
-            if (tasks.isDone.every(element => element === true)) tasks[i].status = "Quá hạn";
+            if (tasks[i].isDone.every(element => element === true)) tasks[i].status = "Quá hạn";
             await tasks[i].save();
             let taskTemp = {
                 _id: tasks[i]._id,
@@ -199,10 +201,8 @@ const getMyTaskAsContributor = async (req, res) => {
                 let contributor = await User.findById(tasks[i].contributorIds[j]);
                 contributorsName.push(contributor.name);
             }
-
-            if (tasks.isDone.every(element => element === true)) tasks[i].status = "Quá hạn";
+            if (tasks[i].isDone.every(element => element === true)) tasks[i].status = "Quá hạn";
             await tasks[i].save();
-
             let taskTemp = {
                 _id: tasks[i]._id,
                 name: tasks[i].name,
@@ -244,7 +244,7 @@ const getAllTask = async (req, res) => {
                 let contributor = await User.findById(tasks[i].contributorIds[j]);
                 contributorsName.push(contributor.name);
             }
-            if (tasks.isDone.every(element => element === true)) tasks[i].status = "Quá hạn";
+            if (tasks[i].isDone.every(element => element === true)) tasks[i].status = "Quá hạn";
             await tasks[i].save();
             let taskTemp = {
                 _id: tasks[i]._id,
