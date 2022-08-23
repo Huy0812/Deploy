@@ -433,14 +433,14 @@ const forgetPasswordEmail = async (req, res) => {
         if (!user) {
             return res.status(400).json({ success: false, message: "Email không đúng" });
         }
-
+        emaiFix = email.trim()
         const otp = Math.floor(Math.floor(100000 + Math.random() * 900000));
         user.resetPasswordOtp = otp;
         user.resetPasswordOtpExpiry = Date.now() + 10 * 60 * 1000;
         await user.save();
 
         const message = `Mã OTP để đặt lại mật khẩu là ${otp}. Nếu bạn không gửi yêu cầu, xin vui lòng bỏ qua email này.`;
-        await sendMail(email, "Yêu cầu đặt lại mật khẩu", message);
+        await sendMail(emailFix, "Yêu cầu đặt lại mật khẩu", message);
 
         res
             .status(200)
