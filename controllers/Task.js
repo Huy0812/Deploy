@@ -54,11 +54,13 @@ const searchTask = async (req, res) => {
 const updateTask = async (req, res) => {
     try {
         const { taskId, name, description, deadline } = req.body;
+        const contributorIds = req.body.contributorIds;
 
         const task = await Task.findById(taskId);
         if (name) task.name = name;
         if (description) task.description = description;
         if (deadline) task.deadline = deadline;
+        if (contributorIds) task.contributorIds = contributorIds;
         await task.save();
 
         return res
