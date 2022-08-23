@@ -316,13 +316,22 @@ const checkingTask = async (req, res) => {
 // Phê duyệt công việc
 const approvingTask = async (req, res) => {
     try {
+        const user = req.body.user._id;
+        if (user.privilege !== "Quản lý" || user.privilege !== "Quản tri viên")
+            return res
+                .status(403)
+                .json({
+                    success: false,
+                    message: "Bạn không có quyền truy cập chức năng này",
+                });
+
         const { taskId } = req.body;
         const task = await Task.findById(taskId);
 
         if (!task.isDone.every(element => element === true))
             return req
-                .status(200)
-                .json({ success: true, message: `Công việc chưa hoàn thành` });
+                .status(400)
+                .json({ success: false, message: `Công việc chưa hoàn thành` });
 
         task.isApproved = true;
         task.actualEndedTime = String(moment().tz('Asia/Ho_Chi_Minh'));
