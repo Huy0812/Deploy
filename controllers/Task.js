@@ -44,9 +44,10 @@ const searchTask = async (req, res) => {
           name: { $regex: req.query.name, $options: "i" },
         }
       : {};
-    const users = await User.find(name)
+    const tasks = await Task.find(name)
+    res
       .status(200)
-      .json({ success: true, message: "Người dùng", array: users });
+      .json({ success: true, message: "Task", array: tasks });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
