@@ -587,8 +587,12 @@ const filterTimesheetByLastWeek = async (req, res) => {
 // Lọc thông tin chấm công (tháng này)
 const filterTimesheetByThisMonth = async (req, res) => {
     try {
-        const start = moment().tz('Asia/Ho_Chi_Minh').startOf('month');
-        const end = moment().tz('Asia/Ho_Chi_Minh').endOf('month');
+        const start = moment()
+            // .tz('Asia/Ho_Chi_Minh')
+            .startOf('month');
+        const end = moment()
+            // .tz('Asia/Ho_Chi_Minh')
+            .endOf('month');
 
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
         let segments = timesheet.segments;
@@ -665,8 +669,12 @@ const filterTimesheetByThisMonth = async (req, res) => {
 // Lọc thông tin chấm công (tháng trước)
 const filterTimesheetByLastMonth = async (req, res) => {
     try {
-        const start = moment().tz('Asia/Ho_Chi_Minh').startOf('month').subtract(1, 'month');
-        const end = moment().tz('Asia/Ho_Chi_Minh').endOf('month').subtract(1, 'month');
+        const start = moment()
+            // .tz('Asia/Ho_Chi_Minh')
+            .startOf('month');
+        const end = moment()
+            // .tz('Asia/Ho_Chi_Minh')
+            .endOf('month');
 
 
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
@@ -978,11 +986,11 @@ const filterTimesheetByThisMonthByUser = async (req, res) => {
 const getTimesheetBoard = async (req, res) => {
     try {
         const start = moment()
-        // .tz('Asia/Ho_Chi_Minh')
-        .startOf('month');
+            // .tz('Asia/Ho_Chi_Minh')
+            .startOf('month');
         const end = moment()
-        // .tz('Asia/Ho_Chi_Minh')
-        .endOf('month');
+            // .tz('Asia/Ho_Chi_Minh')
+            .endOf('month');
 
         let timesheet = await Timesheet.findOne({ userId: req.user._id });
         let segments = timesheet.segments;
