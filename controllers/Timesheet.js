@@ -1011,7 +1011,7 @@ const getTimesheetBoard = async (req, res) => {
 
         let timesheetBoard = {
             checkinLateNumber: checkinLateNumber,
-            actualPoint: actualPoint,
+            actualPoint: Math.round(actualPoint * 10) / 10,
             maxPoint: maxPoint,
         }
 
