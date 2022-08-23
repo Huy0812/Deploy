@@ -47,7 +47,7 @@ const searchTask = async (req, res) => {
     const tasks = await Task.find(name)
     res
       .status(200)
-      .json({ success: true, message: "Task", array: tasks });
+      .json({ success: true, message: "Task", tasks: tasks });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
