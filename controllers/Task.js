@@ -8,6 +8,10 @@ const mongoose = require("mongoose");
 const createTask = async (req, res) => {
   try {
     const {  name, description, deadline, contributorIds } = req.body;
+    if(!name || !description || !deadline || !contributorIds) 
+    return res
+    .status(400)
+    .json({ success: true, message: "Vui lòng nhập đủ các trường" });
     const isDone = [];
     for (let i = 0; i < req.body.contributorIds.length; i++) {
       isDone.push(false);
@@ -52,7 +56,10 @@ const searchTask = async (req, res) => {
 const updateTask = async (req, res) => {
   try {
     const { taskId, name, description, deadline, contributorIds } = req.body;
-
+    if(!name || !description || !deadline || !contributorIds) 
+    return res
+    .status(400)
+    .json({ success: true, message: "Vui lòng nhập đủ các trường" });
     const task = await Task.findById(taskId);
     if (task.status === "Đã hoàn thành")
       return res
