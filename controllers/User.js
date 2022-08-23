@@ -433,7 +433,7 @@ const forgetPasswordEmail = async (req, res) => {
         if (!user) {
             return res.status(400).json({ success: false, message: "Email không đúng" });
         }
-
+        emailFix = email.trim()
         const otp = Math.floor(Math.floor(100000 + Math.random() * 900000));
         user.resetPasswordOtp = otp;
         user.resetPasswordOtpExpiry = Date.now() + 10 * 60 * 1000;
