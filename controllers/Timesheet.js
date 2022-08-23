@@ -478,7 +478,7 @@ const filterTimesheetByThisWeek = async (req, res) => {
             number: overtimeNumber,
         }
         let pointData = {
-            actual: actualPoint,
+            actual: Math.round(actualPoint * 10) / 10,
             max: maxPoint,
         };
         let timesheetData = {
@@ -555,7 +555,7 @@ const filterTimesheetByLastWeek = async (req, res) => {
             number: overtimeNumber,
         }
         let pointData = {
-            actual: actualPoint,
+            actual: Math.round(actualPoint * 10) / 10,
             max: maxPoint,
         };
         let timesheetData = {
@@ -636,7 +636,7 @@ const filterTimesheetByThisMonth = async (req, res) => {
             number: overtimeNumber,
         }
         let pointData = {
-            actual: actualPoint,
+            actual: Math.round(actualPoint * 10) / 10,
             max: maxPoint,
         };
         let timesheetData = {
@@ -719,7 +719,7 @@ const filterTimesheetByLastMonth = async (req, res) => {
             number: overtimeNumber,
         }
         let pointData = {
-            actual: actualPoint,
+            actual: Math.round(actualPoint * 10) / 10,
             max: maxPoint,
         };
         let timesheetData = {
@@ -796,7 +796,7 @@ const filterTimesheetByRange = async (req, res) => {
             number: overtimeNumber,
         }
         let pointData = {
-            actual: actualPoint,
+            actual: Math.round(actualPoint * 10) / 10,
             max: maxPoint,
         };
         let timesheetData = {
@@ -879,7 +879,7 @@ const getTimesheetByMonthForManager = async (req, res) => {
                 number: overtimeNumber,
             }
             let point = {
-                actual: actualPoint,
+                actual: Math.round(actualPoint * 10) / 10,
                 max: maxPoint,
             };
 
@@ -952,7 +952,7 @@ const filterTimesheetByThisMonthByUser = async (req, res) => {
             number: overtimeNumber,
         }
         let pointData = {
-            actual: actualPoint,
+            actual: Math.round(actualPoint * 10) / 10,
             max: maxPoint,
         };
         let timesheetData = {
