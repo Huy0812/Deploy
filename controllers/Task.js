@@ -53,14 +53,21 @@ const searchTask = async (req, res) => {
 // Sửa công việc
 const updateTask = async (req, res) => {
     try {
-        const { taskId, name, description, deadline } = req.body;
-        const contributorIds = req.body.contributorIds;
+        const { taskId, name, description, deadline, contributorIds } = req.body;
 
         const task = await Task.findById(taskId);
+        if (task.status === "Đã hoàn thành")
+            return res
+                .status(400)
+                .json({ success: false, message: "Không thể cập nhật công việc. Công việc đã hoàn thành" });
+
         if (name) task.name = name;
         if (description) task.description = description;
         if (deadline) task.deadline = deadline;
         if (contributorIds) task.contributorIds = contributorIds;
+        task.isDone.forEach((element) => {
+            element = false;
+        });
         await task.save();
 
         return res
