@@ -38,19 +38,54 @@ const createTask = async (req, res) => {
 };
 
 const searchTask = async (req, res) => {
-  try {
-    const name = req.query.name
-      ? {
-          name: { $regex: req.query.name, $options: "i" },
+    try {
+        const name = req.query.name
+            ? {
+                name: { $regex: req.query.name, $options: "i" },
+            }
+            : {};
+        const tasks = await Task.find(name)
+
+        taskSearch = []
+
+        for (let i = 0; i < tasks.length; i++) {
+            let manager = await User.findById(tasks[i].managerId);
+            let managerName = manager.name;
+            let contributorsName = [];
+            for (let j = 0; j < tasks[i].contributorIds.length; j++) {
+                let contributor = await User.findById(tasks[i].contributorIds[j]);
+                contributorsName.push(contributor.name);
+            }
+            if (
+                moment()
+                    .tz("Asia/Ho_Chi_Minh")
+                    .isAfter(moment(tasks[i].deadline, "HH:mm, DD/MM/YYYY"))
+            )
+                tasks[i].status = "Quá hạn";
+            if (tasks[i].isDone.every((element) => element === true))
+                tasks[i].status = "Đã hoàn thành";
+            await tasks[i].save();
+            let taskTemp = {
+                _id: tasks[i]._id,
+                name: tasks[i].name,
+                description: tasks[i].description,
+                date: tasks[i].date,
+                deadline: tasks[i].deadline,
+                actualEndedTime: tasks[i].actualEndedTime,
+                manager: managerName,
+                contributors: contributorsName,
+                status: tasks[i].status,
+                isDone: tasks[i].isDone,
+                isApproved: tasks[i].isApproved,
+            };
+            taskSearch.push(taskTemp);
         }
-      : {};
-    const tasks = await Task.find(name)
-    res
-      .status(200)
-      .json({ success: true, message: "Task", tasks: tasks });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+        res
+            .status(200)
+            .json({ success: true, message: "Task", tasks: taskSearch });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
 };
 
 // Sửa công việc
