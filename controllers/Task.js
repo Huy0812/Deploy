@@ -7,7 +7,7 @@ const mongoose = require("mongoose");
 // Tạo công việc
 const createTask = async (req, res) => {
   try {
-    const { contributorIds, name, description, deadline } = req.body;
+    const {  name, description, deadline, contributorIds } = req.body;
     const isDone = [];
     for (let i = 0; i < req.body.contributorIds.length; i++) {
       isDone.push(false);
