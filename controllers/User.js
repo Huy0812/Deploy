@@ -440,7 +440,7 @@ const forgetPasswordEmail = async (req, res) => {
         await user.save();
 
         const message = `Mã OTP để đặt lại mật khẩu là ${otp}. Nếu bạn không gửi yêu cầu, xin vui lòng bỏ qua email này.`;
-        await sendMail(emailFix, "Yêu cầu đặt lại mật khẩu", message);
+        await sendMail(email, "Yêu cầu đặt lại mật khẩu", message);
 
         res
             .status(200)
