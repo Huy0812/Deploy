@@ -909,7 +909,7 @@ const filterTimesheetByThisMonthByUser = async (req, res) => {
         const start = moment().startOf('month');
         const end = moment().endOf('month');
 
-        let timesheet = await Timesheet.findOne({ userId: userId });
+        let timesheet = await Timesheet.findOne(userId);
         if (!timesheet) {
             return res
             .status(404)

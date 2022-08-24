@@ -28,6 +28,6 @@ router.route("/filtertimesheetbylastmonth").get(isAuthenticated, filterTimesheet
 router.route("/filtertimesheetbyrange").post(isAuthenticated, filterTimesheetByRange)
 router.route("/gettimesheetbymonthformanager").get(getTimesheetByMonthForManager)
 
-router.route("/filtertimesheetbythismonthbyuser").get(isAuthenticated, filterTimesheetByThisMonthByUser)
+router.route("/filtertimesheetbythismonthbyuser").post(isAuthenticated, filterTimesheetByThisMonthByUser)
 router.route("/gettimesheetboard").get(isAuthenticated, getTimesheetBoard)
 module.exports = router
