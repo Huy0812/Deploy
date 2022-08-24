@@ -665,7 +665,6 @@ const filterTimesheetByThisMonth = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 }
-
 // Lọc thông tin chấm công (tháng trước)
 const filterTimesheetByLastMonth = async (req, res) => {
     try {
@@ -907,10 +906,15 @@ const filterTimesheetByThisMonthByUser = async (req, res) => {
     try {
         const userId = req.body;
 
-        const start = moment().tz('Asia/Ho_Chi_Minh').startOf('month');
-        const end = moment().tz('Asia/Ho_Chi_Minh').endOf('month');
+        const start = moment().startOf('month');
+        const end = moment().endOf('month');
 
-        let timesheet = await Timesheet.findOne({ userId: userId });
+        let timesheet = await Timesheet.findOne(userId);
+        if (!timesheet) {
+            return res
+            .status(404)
+            .json({ success: false, message: `Bạn chưa chấm công lần nào`});
+        }
         let segments = timesheet.segments;
 
         segments = segments.filter(function (segment) {
