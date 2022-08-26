@@ -662,7 +662,7 @@ const filterTimesheetByThisMonth = async (req, res) => {
             .status(200)
             .json({ success: true, message: `Dữ liệu công tháng này`, timesheetData: timesheetData, timesheetTable: timesheetTable });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        res.status(500).json({ success: false });
     }
 }
 // Lọc thông tin chấm công (tháng trước)
