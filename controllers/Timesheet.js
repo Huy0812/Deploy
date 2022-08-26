@@ -38,7 +38,7 @@ function isCheckoutEarly(segment) {
     if (isWeekend(segment.date))
         return false;
     return moment(segment.checkoutTime, "HH:mm:ss").isBefore(moment(CHECKOUTTIME_AM_DEFAULT, "HH:mm:ss")) ||
-        moment(segment.checkinTime, "HH:mm:ss").isBefore(moment(CHECKOUTTIME_PM_DEFAULT, "HH:mm:ss"));
+        moment(segment.checkoutTime, "HH:mm:ss").isBefore(moment(CHECKOUTTIME_PM_DEFAULT, "HH:mm:ss"));
 }
 
 // Tính thời gian checkin muộn
