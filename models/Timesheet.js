@@ -1,4 +1,5 @@
 const mongoose = require("mongoose")
+
 const timesheetSchema = new mongoose.Schema({
 
     //  Mã nhân viên
@@ -46,6 +47,6 @@ const timesheetSchema = new mongoose.Schema({
 
     }
 
-});
+})
 
-module.exports = mongoose.model("Timesheet", timesheetSchema);
+module.exports = mongoose.model("Timesheet", timesheetSchema)

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose")
+
 const companySchema = new mongoose.Schema({
 
     // Tên
@@ -46,6 +47,6 @@ const companySchema = new mongoose.Schema({
         default: ""
     }
 
-});
+})
 
-module.exports = mongoose.model("Company", companySchema);
+module.exports = mongoose.model("Company", companySchema)
